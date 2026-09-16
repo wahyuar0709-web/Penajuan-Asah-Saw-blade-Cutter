@@ -138,6 +138,13 @@
     background:var(--warn); color:#fff; border:2px solid var(--kraft); font-size:14px; line-height:1;
     cursor:pointer; font-weight:700;
   }
+  .photo-check{
+    display:inline-flex; align-items:center; gap:6px; margin-top:9px; margin-left:10px;
+    font-size:12.5px; font-weight:600; padding:6px 11px; border-radius:999px;
+  }
+  .photo-check.ok{ background:var(--ok-bg); color:var(--ok); }
+  .photo-check.bad{ background:var(--warn-bg); color:var(--warn); }
+  .photo-check.checking{ background:rgba(0,0,0,.06); color:var(--ink-soft); }
   .divider{ border:none; border-top:1px dashed var(--kraft-shadow); margin:22px 0 18px; }
   .submit-wrap{ margin-top:6px; }
   button.submit{
@@ -265,32 +272,20 @@
               <button type="button" class="chip" data-v="Aus / Gundul">Aus / Gundul</button>
               <button type="button" class="chip" data-v="Lainnya">Lainnya</button>
             </div>
+            <input type="text" id="fKondisiManual" placeholder="Tulis kondisi alat…" style="display:none; margin-top:10px">
           </div>
 
           <div class="field">
-            <label>Aktual Pemakaian di Mesin <span class="hint">opsional</span></label>
-            <div class="qty-row">
-              <div class="stepper" style="flex:0 0 auto">
-                <button type="button" id="pmkMinus">−</button>
-                <input type="text" id="fPemakaian" value="0" inputmode="numeric">
-                <button type="button" id="pmkPlus">+</button>
-              </div>
-              <div class="unit-toggle" id="unitToggle">
-                <button type="button" class="on" data-u="Hari">Hari</button>
-                <button type="button" data-u="Minggu">Minggu</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Foto Kondisi Alat <span class="hint">opsional</span></label>
-            <input type="file" id="fFoto" accept="image/*" capture="environment" style="display:none">
+            <label>Foto Kondisi Alat <span class="req">*</span></label>
+            <input type="file" id="fFoto" accept="image/*" style="display:none">
             <button type="button" class="photo-zone" id="photoZoneBtn">📷 Ambil / Pilih Foto</button>
             <div class="photo-preview" id="photoPreview" style="display:none">
               <img id="photoImg" alt="Preview foto alat">
               <button type="button" id="photoRemove">×</button>
             </div>
+            <div class="photo-check" id="photoCheck" style="display:none"></div>
           </div>
+
 
           <div class="field" style="margin-bottom:6px">
             <label>Catatan <span class="hint">opsional</span></label>
@@ -528,36 +523,75 @@
     input.addEventListener('blur', function(){ input.value = clamp(input.value); });
   }
   stepper('fQty','qtyMinus','qtyPlus',1,999);
-  stepper('fPemakaian','pmkMinus','pmkPlus',0,999);
-
-  var unitToggle = document.getElementById('unitToggle');
-  var pemakaianUnit = 'Hari';
-  unitToggle.addEventListener('click', function(e){
-    var btn = e.target.closest('button'); if(!btn) return;
-    unitToggle.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
-    btn.classList.add('on');
-    pemakaianUnit = btn.dataset.u;
-  });
 
   var chipsWrap = document.getElementById('kondisiChips');
+  var kondisiManualInput = document.getElementById('fKondisiManual');
   var kondisi = '';
   chipsWrap.addEventListener('click', function(e){
     var btn = e.target.closest('.chip'); if(!btn) return;
     chipsWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
     btn.classList.add('on');
-    kondisi = btn.dataset.v;
+    if(btn.dataset.v === 'Lainnya'){
+      kondisiManualInput.style.display = 'block';
+      kondisiManualInput.focus();
+      kondisi = kondisiManualInput.value.trim();
+    }else{
+      kondisiManualInput.style.display = 'none';
+      kondisi = btn.dataset.v;
+    }
   });
+  kondisiManualInput.addEventListener('input', function(){ kondisi = kondisiManualInput.value.trim(); });
 
   var fFoto = document.getElementById('fFoto');
   var photoZoneBtn = document.getElementById('photoZoneBtn');
   var photoPreview = document.getElementById('photoPreview');
   var photoImg = document.getElementById('photoImg');
+  var photoCheck = document.getElementById('photoCheck');
   var fotoBase64 = '';
+
+  /* Skor ketajaman sederhana (varian Laplacian pada citra abu-abu yang diperkecil).
+     Ini heuristik ringan di browser, bukan pengecekan sempurna — hanya penanda
+     bantu, operator tetap bisa lanjut kirim meski hasilnya "kurang jelas". */
+  function nilaiKetajaman(canvasSumber){
+    var w = 220;
+    var scale = w / canvasSumber.width;
+    var h = Math.max(1, Math.round(canvasSumber.height * scale));
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    var cx = c.getContext('2d');
+    cx.drawImage(canvasSumber, 0, 0, w, h);
+    var data = cx.getImageData(0, 0, w, h).data;
+    var gray = new Float32Array(w*h);
+    for(var i=0, p=0; i<data.length; i+=4, p++){
+      gray[p] = 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
+    }
+    var sum = 0, sumSq = 0, n = 0;
+    for(var y=1; y<h-1; y++){
+      for(var x=1; x<w-1; x++){
+        var idx = y*w+x;
+        var lap = gray[idx-1] + gray[idx+1] + gray[idx-w] + gray[idx+w] - 4*gray[idx];
+        sum += lap; sumSq += lap*lap; n++;
+      }
+    }
+    if(!n) return 0;
+    var mean = sum/n;
+    return (sumSq/n) - (mean*mean);
+  }
+
+  function tandaiHasilFoto(canvasSumber){
+    var skor = nilaiKetajaman(canvasSumber);
+    var jelas = skor > 140;
+    photoCheck.style.display = 'inline-flex';
+    photoCheck.className = 'photo-check ' + (jelas ? 'ok' : 'bad');
+    photoCheck.textContent = jelas ? '✓ Foto tampak jelas' : '⚠ Foto tampak buram — coba ambil ulang di tempat lebih terang';
+  }
 
   photoZoneBtn.addEventListener('click', function(){ fFoto.click(); });
   fFoto.addEventListener('change', function(){
     var file = fFoto.files[0];
     if(!file) return;
+    photoCheck.style.display = 'inline-flex';
+    photoCheck.className = 'photo-check checking';
+    photoCheck.textContent = 'Memeriksa foto…';
     var reader = new FileReader();
     reader.onload = function(ev){
       var img = new Image();
@@ -569,11 +603,31 @@
         canvas.height = img.height * scale;
         var ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        var dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+
+        // Bar timestamp ala aplikasi "timestamp camera" di pojok kiri bawah foto
+        var now = new Date();
+        var jam = ('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2)+':'+('0'+now.getSeconds()).slice(-2);
+        var baris1 = fmtDate(now) + '  ' + jam;
+        var baris2 = 'RDI Gudang Tools · Tiket ' + currentTicket;
+        var fs = Math.max(12, Math.round(canvas.width / 40));
+        ctx.font = 'bold '+fs+'px Inter, sans-serif';
+        var padX = fs*0.7, padY = fs*0.55, lineGap = fs*1.35;
+        var textW = Math.max(ctx.measureText(baris1).width, ctx.measureText(baris2).width);
+        var barH = lineGap*2 + padY*1.6;
+        ctx.fillStyle = 'rgba(0,0,0,.55)';
+        ctx.fillRect(0, canvas.height-barH, textW+padX*2, barH);
+        ctx.fillStyle = '#fff';
+        ctx.textBaseline = 'top';
+        ctx.fillText(baris1, padX, canvas.height-barH+padY*0.8);
+        ctx.font = fs*0.82+'px Inter, sans-serif';
+        ctx.fillText(baris2, padX, canvas.height-barH+padY*0.8+lineGap);
+
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.72);
         fotoBase64 = dataUrl.split(',')[1];
         photoImg.src = dataUrl;
         photoPreview.style.display = 'inline-block';
         photoZoneBtn.style.display = 'none';
+        tandaiHasilFoto(canvas);
       };
       img.src = ev.target.result;
     };
@@ -583,7 +637,9 @@
     fFoto.value = ''; fotoBase64 = '';
     photoPreview.style.display = 'none';
     photoZoneBtn.style.display = 'block';
+    photoCheck.style.display = 'none';
   });
+
 
   function genTicketNo(){
     var d = new Date();
@@ -675,10 +731,10 @@
     if(!m){ showError('Pilih mesin terlebih dahulu.'); mesinSel.focus(); return; }
     var tool = resolveTool();
     if(!tool){ showError('Pilih alat / spesifikasi, atau isi manual di "Pilih ukuran lain".'); return; }
-    if(!kondisi){ showError('Pilih kondisi alat.'); return; }
+    if(!kondisi){ showError('Pilih kondisi alat, atau isi manual kalau pilih "Lainnya".'); return; }
+    if(!fotoBase64){ showError('Foto kondisi alat wajib diisi.'); photoZoneBtn.scrollIntoView({behavior:'smooth', block:'center'}); return; }
 
     var qty = parseInt(document.getElementById('fQty').value,10) || 1;
-    var pemakaian = parseInt(document.getElementById('fPemakaian').value,10) || 0;
     var catatan = document.getElementById('fCatatan').value.trim();
 
     var payload = {
@@ -690,9 +746,8 @@
       spesifikasi: tool.kode + ' · ' + tool.spek,
       qty: qty,
       kondisi: kondisi,
-      pemakaian: pemakaian + ' ' + pemakaianUnit,
       catatan: catatan,
-      foto: fotoBase64 || '',
+      foto: fotoBase64,
       token: SHARED_TOKEN
     };
 
@@ -742,10 +797,10 @@
     document.getElementById('ticketDate').textContent = fmtDate(new Date());
     mesinSel.value=''; mesinSel.dispatchEvent(new Event('change'));
     document.getElementById('fQty').value='1';
-    document.getElementById('fPemakaian').value='0';
     document.getElementById('fCatatan').value='';
     chipsWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); kondisi='';
-    fFoto.value=''; fotoBase64=''; photoPreview.style.display='none'; photoZoneBtn.style.display='block';
+    kondisiManualInput.style.display='none'; kondisiManualInput.value='';
+    fFoto.value=''; fotoBase64=''; photoPreview.style.display='none'; photoZoneBtn.style.display='block'; photoCheck.style.display='none';
     clearError();
   });
 
