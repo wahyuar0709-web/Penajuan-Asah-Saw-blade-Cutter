@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Pengajuan Asah — RDI Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1a1c1e;
+    --bg-2:#212427;
+    --metal:#3a3f45;
+    --metal-line:#4a5057;
+    --kraft:#e9ddc0;
+    --kraft-2:#ded0ab;
+    --kraft-shadow:#c9b98c;
+    --ink:#28241b;
+    --ink-soft:#5b5442;
+    --spark:#ef7b2c;
+    --spark-dark:#c25f18;
+    --ok:#3f7a4c;
+    --ok-bg:#e4efe1;
+    --warn:#b3392b;
+    --warn-bg:#f4e2dd;
+    --steel-text:#c7ccd1;
+    --steel-dim:#7d868d;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(1100px 700px at 50% -10%, #2a2e32 0%, var(--bg) 55%),
+      repeating-linear-gradient(135deg, rgba(255,255,255,.018) 0 2px, transparent 2px 26px);
+    font-family:'Inter',system-ui,sans-serif;
+    color:var(--steel-text);
+    display:flex;
+    justify-content:center;
+    padding:28px 14px 60px;
+  }
+  .floor-label{
+    position:fixed; top:16px; left:0; right:0; text-align:center;
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em;
+    color:var(--steel-dim); pointer-events:none; text-transform:uppercase;
+  }
+  .wrap{ width:100%; max-width:460px; margin-top:26px; }
+  .hanger{ display:flex; justify-content:center; margin-bottom:-14px; position:relative; z-index:2; }
+  .hanger svg{ filter:drop-shadow(0 3px 3px rgba(0,0,0,.45)); }
+  .ticket{
+    position:relative;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,0) 8%),
+      var(--kraft);
+    border-radius:6px;
+    box-shadow:0 22px 50px -18px rgba(0,0,0,.65), 0 2px 0 rgba(255,255,255,.15) inset;
+    color:var(--ink);
+    overflow:hidden;
+  }
+  .ticket::before{
+    content:''; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background-image: radial-gradient(rgba(0,0,0,.05) 1px, transparent 1px);
+    background-size:3px 3px;
+  }
+  .punch{
+    width:20px; height:20px; border-radius:50%;
+    background:radial-gradient(circle at 35% 32%, #3a3d40, #16171a 70%);
+    box-shadow:inset 0 2px 3px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05);
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    z-index:3;
+  }
+  .head{ padding:34px 26px 18px; text-align:center; border-bottom:2px dashed var(--kraft-shadow); position:relative; }
+  .eyebrow{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; color:var(--ink-soft); text-transform:uppercase; }
+  .title{ font-family:'Oswald',sans-serif; font-weight:700; font-size:29px; letter-spacing:.01em; margin:6px 0 4px; color:var(--ink); }
+  .sub{ font-size:13px; color:var(--ink-soft); }
+  .ticket-meta{
+    display:flex; justify-content:space-between; margin-top:16px;
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft);
+    border-top:1px solid var(--kraft-shadow); padding-top:10px;
+  }
+  .ticket-meta b{ color:var(--ink); }
+  .body{ padding:22px 24px 26px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:6px; letter-spacing:.01em; }
+  .field label .req{ color:var(--warn); }
+  .field label .hint{ font-weight:400; color:var(--kraft-shadow); margin-left:4px; }
+  input[type=text], input[type=number], select, textarea{
+    width:100%; font-family:'Inter',sans-serif; font-size:15px; color:var(--ink);
+    background:rgba(255,255,255,.35); border:none;
+    border-bottom:2px solid var(--ink-soft);
+    padding:10px 4px 9px; outline:none; transition:border-color .15s, background .15s;
+    appearance:none; -webkit-appearance:none; border-radius:2px 2px 0 0;
+  }
+  select{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9'><path d='M1 1l6 6 6-6' stroke='%2328241b' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat; background-position:right 6px center; padding-right:26px;
+  }
+  input:focus, select:focus, textarea:focus{ border-color:var(--spark); background:rgba(255,255,255,.55); }
+  textarea{ resize:vertical; min-height:64px; border:2px solid var(--ink-soft); border-radius:4px; padding:9px 10px; background:rgba(255,255,255,.35);}
+  textarea:focus{ border-color:var(--spark); }
+  ::placeholder{ color:#9a927a; }
+  select:disabled, input:disabled{ opacity:.4; }
+  .tool-preview{ margin-top:7px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); min-height:16px; }
+  .tool-preview b{ color:var(--ink); }
+  .link-btn{
+    display:inline-block; margin-top:9px; background:none; border:none; padding:0;
+    font-family:'Inter',sans-serif; font-size:12.5px; font-weight:600; color:var(--spark-dark);
+    cursor:pointer; text-decoration:underline; text-underline-offset:2px;
+  }
+  .alt-box{ margin-top:12px; padding-top:12px; border-top:1px dashed var(--kraft-shadow); }
+  .manual-grid{ display:grid; grid-template-columns:1fr; gap:8px; margin-top:8px; }
+  .manual-grid input{ font-size:13.5px; }
+  .mesin-row{ display:flex; gap:10px; align-items:center; }
+  .mesin-row select{ flex:1; }
+  .qty-row{ display:flex; align-items:stretch; gap:10px; }
+  .stepper{ display:flex; align-items:center; border:2px solid var(--ink-soft); border-radius:6px; overflow:hidden; background:rgba(255,255,255,.35); }
+  .stepper button{ width:42px; border:none; background:transparent; font-size:20px; color:var(--ink); cursor:pointer; font-weight:600; }
+  .stepper button:active{ background:rgba(0,0,0,.08); }
+  .stepper input{ width:52px; text-align:center; border:none; border-left:1px solid var(--kraft-shadow); border-right:1px solid var(--kraft-shadow); background:transparent; padding:9px 0; }
+  .unit-toggle{ display:flex; border:2px solid var(--ink-soft); border-radius:6px; overflow:hidden; flex:1; }
+  .unit-toggle button{ flex:1; border:none; background:transparent; padding:0 8px; font-size:13px; color:var(--ink-soft); cursor:pointer; font-family:'Inter',sans-serif; }
+  .unit-toggle button.on{ background:var(--ink-soft); color:var(--kraft); font-weight:600; }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{ padding:8px 13px; border-radius:999px; border:2px solid var(--ink-soft); font-size:13.5px; color:var(--ink-soft); cursor:pointer; font-weight:500; background:transparent; transition:all .12s; }
+  .chip.on{ background:var(--spark); border-color:var(--spark-dark); color:#241000; font-weight:700; box-shadow:0 2px 0 var(--spark-dark); }
+  .photo-zone{
+    width:100%; padding:16px; border:2px dashed var(--ink-soft); border-radius:8px;
+    background:rgba(255,255,255,.25); color:var(--ink-soft); font-family:'Inter',sans-serif;
+    font-size:13.5px; font-weight:600; cursor:pointer;
+  }
+  .photo-zone:active{ background:rgba(255,255,255,.4); }
+  .photo-preview{ position:relative; margin-top:10px; display:inline-block; }
+  .photo-preview img{ width:120px; height:120px; object-fit:cover; border-radius:8px; border:2px solid var(--ink-soft); display:block; }
+  .photo-preview button{
+    position:absolute; top:-8px; right:-8px; width:24px; height:24px; border-radius:50%;
+    background:var(--warn); color:#fff; border:2px solid var(--kraft); font-size:14px; line-height:1;
+    cursor:pointer; font-weight:700;
+  }
+  .divider{ border:none; border-top:1px dashed var(--kraft-shadow); margin:22px 0 18px; }
+  .submit-wrap{ margin-top:6px; }
+  button.submit{
+    width:100%; padding:16px; font-family:'Oswald',sans-serif; font-size:18px;
+    letter-spacing:.06em; font-weight:600; color:#2a1200; text-transform:uppercase;
+    background:linear-gradient(180deg, #ff9548, var(--spark) 55%, var(--spark-dark));
+    border:none; border-radius:8px; cursor:pointer;
+    box-shadow:0 5px 0 var(--spark-dark), 0 10px 18px -8px rgba(194,95,24,.6);
+    transition:transform .08s;
+  }
+  button.submit:active{ transform:translateY(3px); box-shadow:0 2px 0 var(--spark-dark); }
+  button.submit:disabled{ opacity:.55; cursor:progress; box-shadow:0 5px 0 var(--spark-dark); }
+  .footnote{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:12px; line-height:1.5; }
+  .errbox{ background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn); border-radius:6px; padding:9px 11px; font-size:12.5px; margin-bottom:14px; display:none; }
+  .offline-flag{ display:none; align-items:center; gap:6px; background:#fff2df; border:1px solid #d7a24d; color:#7a5410; font-size:12px; padding:7px 10px; border-radius:6px; margin-bottom:14px; }
+  .dot{ width:7px; height:7px; border-radius:50%; background:#d7a24d; flex:none; }
+  .success{ display:none; padding:44px 24px 40px; text-align:center; position:relative; }
+  .stamp{
+    display:inline-block; border:5px solid var(--ok); color:var(--ok);
+    font-family:'Oswald',sans-serif; font-weight:700; font-size:27px; letter-spacing:.06em;
+    padding:10px 22px; border-radius:10px; transform:rotate(-8deg) scale(0);
+    text-transform:uppercase; animation:stampin .38s cubic-bezier(.2,1.4,.4,1) .1s forwards;
+  }
+  @keyframes stampin{ 0%{ transform:rotate(-8deg) scale(2.4); opacity:0; } 60%{ opacity:1; } 100%{ transform:rotate(-8deg) scale(1); opacity:1; } }
+  .success .tnum{ margin-top:20px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); }
+  .success .tnum b{ color:var(--ink); font-size:15px; }
+  .success p{ font-size:13.5px; color:var(--ink-soft); max-width:280px; margin:14px auto 0; line-height:1.55; }
+  .success button{ margin-top:22px; background:none; border:2px solid var(--ink-soft); color:var(--ink); padding:11px 20px; border-radius:8px; font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px; cursor:pointer; }
+  .gear{
+    position:fixed; bottom:16px; right:16px; width:38px; height:38px; border-radius:50%;
+    background:var(--bg-2); border:1px solid var(--metal-line); color:var(--steel-dim);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; z-index:10;
+  }
+  .cfg-modal{ display:none; position:fixed; inset:0; background:rgba(10,10,10,.6); z-index:20; align-items:center; justify-content:center; padding:20px; }
+  .cfg-box{ background:var(--bg-2); border:1px solid var(--metal-line); border-radius:10px; padding:20px; width:100%; max-width:360px; color:var(--steel-text); }
+  .cfg-box h3{ margin:0 0 4px; font-family:'Oswald',sans-serif; font-size:17px; }
+  .cfg-box p{ font-size:12px; color:var(--steel-dim); margin:0 0 14px; line-height:1.5; }
+  .cfg-box input{ background:#181a1c; color:var(--steel-text); border:1px solid var(--metal-line); border-radius:5px; padding:9px 10px; margin-bottom:10px; }
+  .cfg-box input:focus{ border-color:var(--spark); }
+  .cfg-actions{ display:flex; gap:8px; margin-top:14px; }
+  .cfg-actions button{ flex:1; padding:10px; border-radius:6px; border:1px solid var(--metal-line); cursor:pointer; font-family:'Inter',sans-serif; font-weight:600; font-size:13px; }
+  .cfg-actions .save{ background:var(--spark); border-color:var(--spark-dark); color:#241000; }
+  .cfg-actions .close{ background:transparent; color:var(--steel-text); }
+</style>
+</head>
+<body>
+  <div class="floor-label">PT RAYARD DELI INDONESIA · GUDANG TOOLS</div>
+
+  <div class="wrap">
+    <div class="hanger">
+      <svg width="60" height="20" viewBox="0 0 60 20"><path d="M30 0 C 30 12, 12 8, 12 18 C 12 8, 48 8, 48 18 C 48 8, 30 12, 30 0" stroke="#4a5057" stroke-width="2.4" fill="none"/></svg>
+    </div>
+
+    <div class="ticket">
+      <div class="punch"></div>
+
+      <div id="formView">
+        <div class="head">
+          <div class="eyebrow">Form Internal · Gudang RDI</div>
+          <div class="title">Pengajuan Asah</div>
+          <div class="sub">Ajukan alat potong tumpul untuk dikirim ke vendor asah</div>
+          <div class="ticket-meta">
+            <span>No. Tiket<br><b id="ticketNo">—</b></span>
+            <span style="text-align:right">Tanggal<br><b id="ticketDate">—</b></span>
+          </div>
+        </div>
+
+        <div class="body">
+          <div class="offline-flag" id="offlineFlag"><span class="dot"></span> Tidak ada koneksi — pengajuan akan disimpan &amp; dikirim otomatis nanti</div>
+          <div class="errbox" id="errBox"></div>
+
+          <div class="field">
+            <label>Nama Pengaju / Operator <span class="req">*</span></label>
+            <input type="text" id="fOperator" placeholder="Nama lengkap operator produksi" list="operatorList" autocomplete="off">
+            <datalist id="operatorList"></datalist>
+          </div>
+
+          <div class="field">
+            <label>Mesin <span class="req">*</span></label>
+            <div class="mesin-row">
+              <select id="fMesin">
+                <option value="">— Pilih mesin —</option>
+              </select>
+            </div>
+            <button type="button" class="link-btn" id="btnAddMesin">+ Tambah mesin baru</button>
+          </div>
+
+          <div class="field">
+            <label>Alat / Spesifikasi <span class="req">*</span><span class="hint">brand &amp; ukuran</span></label>
+            <select id="fAlat" disabled>
+              <option value="">Pilih mesin dahulu…</option>
+            </select>
+            <div class="tool-preview" id="toolPreview"></div>
+            <button type="button" class="link-btn" id="toggleAlt">Alat tidak ada di daftar? Pilih ukuran lain ▾</button>
+
+            <div class="alt-box" id="altBox" style="display:none">
+              <select id="fAlatAlt">
+                <option value="">— Cari dari semua alat / semua mesin —</option>
+              </select>
+              <div class="manual-grid" id="manualGrid" style="display:none">
+                <input type="text" id="mKode" placeholder="Kode alat, mis. XYZ-SB-01">
+                <input type="text" id="mBrand" placeholder="Brand / merk">
+                <input type="text" id="mSpek" placeholder="Spesifikasi / ukuran">
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Jumlah (Qty) <span class="req">*</span></label>
+            <div class="qty-row">
+              <div class="stepper">
+                <button type="button" id="qtyMinus">−</button>
+                <input type="text" id="fQty" value="1" inputmode="numeric">
+                <button type="button" id="qtyPlus">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Kondisi Alat <span class="req">*</span></label>
+            <div class="chips" id="kondisiChips">
+              <button type="button" class="chip" data-v="Tumpul">Tumpul</button>
+              <button type="button" class="chip" data-v="Gompal">Gompal</button>
+              <button type="button" class="chip" data-v="Patah">Patah</button>
+              <button type="button" class="chip" data-v="Aus / Gundul">Aus / Gundul</button>
+              <button type="button" class="chip" data-v="Lainnya">Lainnya</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Aktual Pemakaian di Mesin <span class="hint">opsional</span></label>
+            <div class="qty-row">
+              <div class="stepper" style="flex:0 0 auto">
+                <button type="button" id="pmkMinus">−</button>
+                <input type="text" id="fPemakaian" value="0" inputmode="numeric">
+                <button type="button" id="pmkPlus">+</button>
+              </div>
+              <div class="unit-toggle" id="unitToggle">
+                <button type="button" class="on" data-u="Hari">Hari</button>
+                <button type="button" data-u="Minggu">Minggu</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Foto Kondisi Alat <span class="hint">opsional</span></label>
+            <input type="file" id="fFoto" accept="image/*" capture="environment" style="display:none">
+            <button type="button" class="photo-zone" id="photoZoneBtn">📷 Ambil / Pilih Foto</button>
+            <div class="photo-preview" id="photoPreview" style="display:none">
+              <img id="photoImg" alt="Preview foto alat">
+              <button type="button" id="photoRemove">×</button>
+            </div>
+          </div>
+
+          <div class="field" style="margin-bottom:6px">
+            <label>Catatan <span class="hint">opsional</span></label>
+            <textarea id="fCatatan" placeholder="Contoh: gigi pecah 2 buah di sisi kiri…"></textarea>
+          </div>
+
+          <hr class="divider">
+
+          <div class="submit-wrap">
+            <button class="submit" id="btnSubmit">Ajukan Asah</button>
+          </div>
+          <div class="footnote">Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.</div>
+        </div>
+      </div>
+
+      <div class="success" id="successView">
+        <div class="stamp">Diterima</div>
+        <div class="tnum">No. Tiket<br><b id="doneTicket">—</b></div>
+        <p id="doneDetail">Pengajuan asah telah tercatat. Gudang akan mengonfirmasi &amp; menjadwalkan pengiriman ke vendor.</p>
+        <button id="btnAgain">+ Ajukan Alat Lain</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="gear" id="gearBtn" title="Pengaturan">⚙</div>
+
+  <div class="cfg-modal" id="cfgModal">
+    <div class="cfg-box">
+      <h3>Pengaturan Koneksi</h3>
+      <p>Tempel URL Web App Google Apps Script (deploy sebagai "Web app", akses "Anyone"). Cukup diisi sekali per perangkat.</p>
+      <input type="text" id="cfgApiUrl" placeholder="https://script.google.com/macros/s/…/exec" style="width:100%">
+      <div class="cfg-actions">
+        <button class="close" id="cfgClose">Tutup</button>
+        <button class="save" id="cfgSave">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cfg-modal" id="mesinModal">
+    <div class="cfg-box">
+      <h3>Tambah Mesin Baru</h3>
+      <p>Mesin ini tersimpan di perangkat ini dan langsung bisa dipilih. Alat untuk mesin baru belum terdaftar otomatis — gunakan "Pilih ukuran lain" di bawah untuk cari alat dari mesin lain, atau isi manual.</p>
+      <input type="text" id="newMesinCode" placeholder="Kode mesin, mis. RDS050" style="width:100%">
+      <input type="text" id="newMesinName" placeholder="Nama proses / mesin, mis. Rip Saw" style="width:100%">
+      <div class="cfg-actions">
+        <button class="close" id="mesinClose">Batal</button>
+        <button class="save" id="mesinSave">Tambah &amp; Pilih</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DATA = {"machines":[{"code":"RDS001","name":"Panel saw","tools":[{"kode":"Leu-SB-01","nama":"Saw Blade-Leuco","spek":"180 X 4,85-5,65 X 45_Z36","brand":"Leuco"},{"kode":"Leu-SB-02","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z72","brand":"Leuco"},{"kode":"Leu-SB-03","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z84","brand":"Leuco"},{"kode":"Leu-SB-05","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z72","brand":"Leuco"}]},{"code":"RDS002","name":"Fourside edge banding","tools":[{"kode":"Leu-CT-01","nama":"Cutter-Leuco","spek":"150 X 42,9/80 X 45/70_L","brand":"Leuco"},{"kode":"Leu-CT-02","nama":"Cutter-Leuco","spek":"150 X 42,9/80 X 45/70_R","brand":"Leuco"},{"kode":"Leu-CT-03","nama":"Cutter-Leuco","spek":"180 X 43 X 35_Z8+8_L","brand":"Leuco"},{"kode":"Leu-CT-04","nama":"Cutter-Leuco","spek":"180 X 43 X 35_Z8+8_R","brand":"Leuco"},{"kode":"Leu-CT-05","nama":"Cutter-Leuco","spek":"200 X 42,9/60 X 60_L","brand":"Leuco"},{"kode":"Leu-CT-06","nama":"Cutter-Leuco","spek":"200 X 42,9/60 X 60_R","brand":"Leuco"},{"kode":"Leu-CT-07","nama":"Cutter-Leuco","spek":"250 X 8 X 60_Z54+27_L","brand":"Leuco"},{"kode":"Leu-CT-08","nama":"Cutter-Leuco","spek":"250 X 8 X 60_Z54+27_R","brand":"Leuco"}]},{"code":"RDS003","name":"Single Edging","tools":[{"kode":"Leu-CT-09","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_L","brand":"Leuco"},{"kode":"Leu-CT-10","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_R","brand":"Leuco"}]},{"code":"RDS004","name":"Double Edging","tools":[{"kode":"Leu-CT-09","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_L","brand":"Leuco"},{"kode":"Leu-CT-10","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_R","brand":"Leuco"}]},{"code":"RDS015","name":"Panel saw","tools":[{"kode":"Leu-SB-02","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z72","brand":"Leuco"},{"kode":"LEU-CT-49","nama":"MILLING CUTTER","spek":"125x33.1/40.1x30_Z3+3","brand":"Leuco"}]},{"code":"RDS017","name":"CNC Cutting/Cut & Drill","tools":[{"kode":"AKE-SB-01","nama":"Saw blade-Ake","spek":"200 X 4,8-5,8/3,5 X 45_Z36","brand":"Ake"},{"kode":"AKE-SB-04","nama":"Saw Blade-Ake","spek":"400 X 4,4/3,2 X 60_Z72","brand":"Ake"},{"kode":"Hau-SB-01","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Hau-SB-02","nama":"Saw blade-Haupt","spek":"400 X 4,4 X 60_Z84","brand":"Haupt"},{"kode":"Hau-SB-07","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Lei-CT-01","nama":"Cutter-Leitz","spek":"200,3D30Z20/20/20/36/20/20","brand":"Leitz"},{"kode":"Lei-SB-01","nama":"Saw blade-Leitz","spek":"280 X 4/3 X 30_Z72","brand":"Leitz"},{"kode":"Leu-SB-06","nama":"Saw blade-Leuco","spek":"400 X 4,4 X 60_Z84","brand":"Leuco"}]},{"code":"RDS018","name":"CNC Cutting/Cut & Drill","tools":[{"kode":"AKE-SB-01","nama":"Saw blade-Ake","spek":"200 X 4,8-5,8/3,5 X 45_Z36","brand":"Ake"},{"kode":"AKE-SB-04","nama":"Saw Blade-Ake","spek":"400 X 4,4/3,2 X 60_Z72","brand":"Ake"},{"kode":"Hau-SB-01","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Hau-SB-02","nama":"Saw blade-Haupt","spek":"400 X 4,4 X 60_Z84","brand":"Haupt"},{"kode":"Hau-SB-07","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Hau-SB-08","nama":"Saw Blade-Haupt","spek":"400X4,4X60_Z84","brand":"Haupt"},{"kode":"Lei-CT-01","nama":"Cutter-Leitz","spek":"200,3D30Z20/20/20/36/20/20","brand":"Leitz"},{"kode":"Lei-SB-01","nama":"Saw blade-Leitz","spek":"280 X 4/3 X 30_Z72","brand":"Leitz"},{"kode":"Leu-SB-06","nama":"Saw blade-Leuco","spek":"400 X 4,4 X 60_Z84","brand":"Leuco"}]},{"code":"RDS019","name":"CNC Cutting/Cut & Drill","tools":[{"kode":"AKE-SB-01","nama":"Saw blade-Ake","spek":"200 X 4,8-5,8/3,5 X 45_Z36","brand":"Ake"},{"kode":"AKE-SB-04","nama":"Saw Blade-Ake","spek":"400 X 4,4/3,2 X 60_Z72","brand":"Ake"},{"kode":"Hau-SB-01","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Hau-SB-02","nama":"Saw blade-Haupt","spek":"400 X 4,4 X 60_Z84","brand":"Haupt"},{"kode":"Hau-SB-07","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Hau-SB-08","nama":"Saw Blade-Haupt","spek":"400X4,4X60_Z84","brand":"Haupt"},{"kode":"Lei-CT-01","nama":"Cutter-Leitz","spek":"200,3D30Z20/20/20/36/20/20","brand":"Leitz"},{"kode":"Lei-SB-01","nama":"Saw blade-Leitz","spek":"280 X 4/3 X 30_Z72","brand":"Leitz"},{"kode":"Leu-SB-06","nama":"Saw blade-Leuco","spek":"400 X 4,4 X 60_Z84","brand":"Leuco"}]},{"code":"RDS020","name":"Fourside Planner","tools":[{"kode":"Leu-CT-16","nama":"Cutter-Leuco","spek":"180 X 7,5 X 50","brand":"Leuco"},{"kode":"Leu-CT-17","nama":"Cutter-Leuco","spek":"200 X 12 X 50_Z16","brand":"Leuco"},{"kode":"Leu-CT-18","nama":"Cutter-Leuco","spek":"200 X 21,5 X 60_Z12","brand":"Leuco"},{"kode":"Leu-CT-19","nama":"Cutter-Leuco","spek":"200 X 23,5 X 60_Z12","brand":"Leuco"}]},{"code":"RDS021","name":"Fourside Planner","tools":[{"kode":"Leu-CT-16","nama":"Cutter-Leuco","spek":"180 X 7,5 X 50","brand":"Leuco"},{"kode":"Leu-CT-17","nama":"Cutter-Leuco","spek":"200 X 12 X 50_Z16","brand":"Leuco"},{"kode":"Leu-CT-18","nama":"Cutter-Leuco","spek":"200 X 21,5 X 60_Z12","brand":"Leuco"},{"kode":"Leu-CT-19","nama":"Cutter-Leuco","spek":"200 X 23,5 X 60_Z12","brand":"Leuco"}]},{"code":"RDS028","name":"Corner Cutter","tools":[{"kode":"Guo-SB-01","nama":"Saw Blade-Guo","spek":"255 X 3,2/2,2 X 25,4_Z100","brand":"Guo"},{"kode":"Hau-SB-06","nama":"Saw Blade-Haupt","spek":"255 X 3,2 X 25,4_Z100","brand":"Haupt"}]},{"code":"RDS030","name":"Multiblade","tools":[{"kode":"Hau-SB-03","nama":"Saw blade-Haupt","spek":"270 X 2,8 X 100_Z60","brand":"Haupt"}]},{"code":"RDS036","name":"Cross Cut","tools":[{"kode":"Hau-SB-04","nama":"Saw Blade-Haupt","spek":"300 X 3,2 X 30_Z60","brand":"Haupt"}]},{"code":"RDS038","name":"Double and Milling (KOMPLE)","tools":[{"kode":"Leu-CT-22","nama":"Cutter-Leuco","spek":"220 X 8,3 X 60_Z6","brand":"Leuco"},{"kode":"Leu-CT-37","nama":"Cutter-Leuco","spek":"220 X 8 X 60_Z12","brand":"Leuco"},{"kode":"Leu-CT-41","nama":"Cutter-Leuco","spek":"150 X 4/7 X 55_Z18","brand":"Leuco"}]},{"code":"RDS040","name":"Paper Cut","tools":[{"kode":"Hau-SB-05","nama":"Saw Blade-Haupt","spek":"480 X 3,8 X 25,4_Z120","brand":"Haupt"},{"kode":"Luc-SB-01","nama":"Saw Blade-Luckgem","spek":"480 X 3,8 X 25,4_Z120","brand":"Luckgem"}]},{"code":"RDS041","name":"Curve Edging","tools":[{"kode":"Leu-CT-11","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_L","brand":"Leuco"},{"kode":"Leu-CT-12","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_R","brand":"Leuco"},{"kode":"Leu-CT-13","nama":"Cutter-Leuco","spek":"100 X 48 X 30_Z3+3","brand":"Leuco"},{"kode":"Leu-CT-14","nama":"Cutter-Leuco","spek":"100 X 65 X 30_Z3+3","brand":"Leuco"},{"kode":"Leu-CT-15","nama":"Cutter-Leuco","spek":"125 X 48 X 30_Z3+3","brand":"Leuco"}]},{"code":"RDS042","name":"Curve Edging","tools":[{"kode":"Leu-CT-11","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_L","brand":"Leuco"},{"kode":"Leu-CT-12","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_R","brand":"Leuco"},{"kode":"Leu-CT-13","nama":"Cutter-Leuco","spek":"100 X 48 X 30_Z3+3","brand":"Leuco"},{"kode":"Leu-CT-14","nama":"Cutter-Leuco","spek":"100 X 65 X 30_Z3+3","brand":"Leuco"},{"kode":"Leu-CT-15","nama":"Cutter-Leuco","spek":"125 X 48 X 30_Z3+3","brand":"Leuco"}]},{"code":"RDS043","name":"Fourside Planner","tools":[{"kode":"Leu-CT-20","nama":"Cutter-Leuco","spek":"200 X 7,5 X 60_Z12","brand":"Leuco"},{"kode":"Leu-CT-39","nama":"Cutter-Leuco","spek":"200 X 6,5 X 60_Z12","brand":"Leuco"},{"kode":"Leu-CT-40","nama":"Cutter-Leuco","spek":"200 X 7,7 X 60_Z12","brand":"Leuco"},{"kode":"Leu-SB-24","nama":"Saw blade-Leuco","spek":"250 X 3.4/2.2 X 60_Z60","brand":"Leuco"}]}],"brands":["Ake","Guo","Haupt","Leitz","Leuco","Luckgem"]};
+
+  var LS_API = 'pa_api_url';
+  var DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbz9vHxUYy-SEqIM7Fl03YHYUQJPiyUwveXX2jk8gOvJS86WO9RMYbJfOu7jYIaF_Wfc/exec';
+  function getApiUrl(){ return localStorage.getItem(LS_API) || DEFAULT_API_URL; }
+  // Token penyaring sederhana — harus sama persis dengan SHARED_TOKEN di PengajuanAsah_Backend.gs.
+  // Bukan enkripsi/keamanan kuat, hanya menyaring bot/iseng yang menemukan URL Apps Script.
+  var SHARED_TOKEN = 'Lxaq90chpA0ZzFiMNPWk-KZr';
+
+  var LS_OPERATORS = 'pa_operators';
+  var LS_QUEUE = 'pa_queue';
+  var LS_CUSTOM_MACHINES = 'pa_custom_machines';
+
+  var machineByCode = {};
+  DATA.machines.forEach(function(m){ machineByCode[m.code] = m; });
+
+  var mesinSel = document.getElementById('fMesin');
+  var alatSel = document.getElementById('fAlat');
+  var toolPreview = document.getElementById('toolPreview');
+
+  function loadCustomMachines(){
+    try{ return JSON.parse(localStorage.getItem(LS_CUSTOM_MACHINES) || '[]'); }catch(e){ return []; }
+  }
+  function saveCustomMachines(arr){ localStorage.setItem(LS_CUSTOM_MACHINES, JSON.stringify(arr)); }
+
+  var groupBawaan = document.createElement('optgroup'); groupBawaan.label = 'Mesin terdaftar';
+  DATA.machines.forEach(function(m){
+    var opt = document.createElement('option');
+    opt.value = m.code;
+    opt.textContent = m.code + ' — ' + m.name;
+    groupBawaan.appendChild(opt);
+  });
+  mesinSel.appendChild(groupBawaan);
+
+  var groupCustom = document.createElement('optgroup'); groupCustom.label = 'Mesin tambahan (perangkat ini)';
+  function renderCustomMachineOptions(){
+    groupCustom.innerHTML = '';
+    var custom = loadCustomMachines();
+    custom.forEach(function(m){
+      machineByCode[m.code] = m;
+      var opt = document.createElement('option');
+      opt.value = m.code;
+      opt.textContent = m.code + ' — ' + m.name + ' (baru)';
+      groupCustom.appendChild(opt);
+    });
+    if(custom.length && !mesinSel.contains(groupCustom)) mesinSel.appendChild(groupCustom);
+  }
+  renderCustomMachineOptions();
+
+  var ALL_TOOLS = [];
+  DATA.machines.forEach(function(m){
+    m.tools.forEach(function(t){
+      ALL_TOOLS.push({ kode:t.kode, brand:t.brand, spek:t.spek, mesin:m.code+' — '+m.name });
+    });
+  });
+  ALL_TOOLS.sort(function(a,b){ return a.kode.localeCompare(b.kode); });
+
+  var altSel = document.getElementById('fAlatAlt');
+  ALL_TOOLS.forEach(function(t, i){
+    var o = document.createElement('option');
+    o.value = i;
+    o.textContent = t.kode + ' · ' + t.brand + ' · ' + t.spek + '  (biasanya di ' + t.mesin + ')';
+    altSel.appendChild(o);
+  });
+  var manualOpt = document.createElement('option');
+  manualOpt.value = 'manual';
+  manualOpt.textContent = '+ Lainnya (isi manual)';
+  altSel.appendChild(manualOpt);
+
+  mesinSel.addEventListener('change', function(){
+    var m = machineByCode[mesinSel.value];
+    alatSel.innerHTML = '';
+    toolPreview.textContent = '';
+    resetAlt();
+    if(!m){
+      alatSel.disabled = true;
+      var o = document.createElement('option'); o.textContent = 'Pilih mesin dahulu…'; alatSel.appendChild(o);
+      return;
+    }
+    alatSel.disabled = false;
+    var o0 = document.createElement('option'); o0.value=''; o0.textContent='— Pilih alat —'; alatSel.appendChild(o0);
+    if(!m.tools.length){
+      var oEmpty = document.createElement('option'); oEmpty.value=''; oEmpty.disabled=true;
+      oEmpty.textContent = 'Belum ada alat terdaftar untuk mesin ini';
+      alatSel.appendChild(oEmpty);
+    }
+    m.tools.forEach(function(t, i){
+      var o = document.createElement('option');
+      o.value = i;
+      o.textContent = t.kode + ' · ' + t.brand + ' · ' + t.spek;
+      alatSel.appendChild(o);
+    });
+  });
+
+  alatSel.addEventListener('change', function(){
+    var m = machineByCode[mesinSel.value];
+    if(!m || alatSel.value===''){ toolPreview.innerHTML=''; return; }
+    var t = m.tools[alatSel.value];
+    toolPreview.innerHTML = '<b>'+t.kode+'</b> — '+t.nama+' &middot; '+t.spek;
+    altSel.value = ''; toggleManualGrid(false);
+  });
+
+  var altBox = document.getElementById('altBox');
+  var toggleAltBtn = document.getElementById('toggleAlt');
+  var manualGrid = document.getElementById('manualGrid');
+  toggleAltBtn.addEventListener('click', function(){
+    var show = altBox.style.display === 'none';
+    altBox.style.display = show ? 'block' : 'none';
+    toggleAltBtn.textContent = show ? 'Sembunyikan pilihan lain ▴' : 'Alat tidak ada di daftar? Pilih ukuran lain ▾';
+  });
+  function toggleManualGrid(show){ manualGrid.style.display = show ? 'grid' : 'none'; }
+  altSel.addEventListener('change', function(){
+    if(altSel.value === 'manual'){ toggleManualGrid(true); }
+    else{
+      toggleManualGrid(false);
+      if(altSel.value !== '') alatSel.value = '';
+      toolPreview.textContent = '';
+    }
+  });
+  function resetAlt(){
+    altSel.value = '';
+    toggleManualGrid(false);
+    altBox.style.display = 'none';
+    toggleAltBtn.textContent = 'Alat tidak ada di daftar? Pilih ukuran lain ▾';
+    document.getElementById('mKode').value = '';
+    document.getElementById('mBrand').value = '';
+    document.getElementById('mSpek').value = '';
+  }
+
+  function resolveTool(){
+    if(altSel.value === 'manual'){
+      var kode = document.getElementById('mKode').value.trim();
+      var brand = document.getElementById('mBrand').value.trim();
+      var spek = document.getElementById('mSpek').value.trim();
+      if(!kode || !spek) return null;
+      return { kode:kode, brand:brand || '-', spek:spek };
+    }
+    if(altSel.value !== ''){
+      return ALL_TOOLS[altSel.value];
+    }
+    var m = machineByCode[mesinSel.value];
+    if(m && alatSel.value !== ''){
+      var t = m.tools[alatSel.value];
+      return { kode:t.kode, brand:t.brand, spek:t.spek };
+    }
+    return null;
+  }
+
+  var mesinModal = document.getElementById('mesinModal');
+  document.getElementById('btnAddMesin').addEventListener('click', function(){
+    document.getElementById('newMesinCode').value = '';
+    document.getElementById('newMesinName').value = '';
+    mesinModal.style.display = 'flex';
+  });
+  document.getElementById('mesinClose').addEventListener('click', function(){ mesinModal.style.display='none'; });
+  document.getElementById('mesinSave').addEventListener('click', function(){
+    var code = document.getElementById('newMesinCode').value.trim().toUpperCase();
+    var name = document.getElementById('newMesinName').value.trim();
+    if(!code || !name){ alert('Isi kode dan nama mesin terlebih dahulu.'); return; }
+    if(machineByCode[code]){ alert('Kode mesin ini sudah ada.'); return; }
+    var custom = loadCustomMachines();
+    var newMachine = { code:code, name:name, tools:[] };
+    custom.push(newMachine);
+    saveCustomMachines(custom);
+    renderCustomMachineOptions();
+    mesinSel.value = code;
+    mesinSel.dispatchEvent(new Event('change'));
+    mesinModal.style.display = 'none';
+    altBox.style.display = 'block';
+    toggleAltBtn.textContent = 'Sembunyikan pilihan lain ▴';
+  });
+
+  function stepper(inputId, minusId, plusId, min, max){
+    var input = document.getElementById(inputId);
+    var minus = document.getElementById(minusId);
+    var plus = document.getElementById(plusId);
+    function clamp(v){ v = parseInt(v,10); if(isNaN(v)) v = min; return Math.max(min, Math.min(max, v)); }
+    minus.addEventListener('click', function(){ input.value = clamp(parseInt(input.value||min,10)-1); });
+    plus.addEventListener('click', function(){ input.value = clamp(parseInt(input.value||min,10)+1); });
+    input.addEventListener('blur', function(){ input.value = clamp(input.value); });
+  }
+  stepper('fQty','qtyMinus','qtyPlus',1,999);
+  stepper('fPemakaian','pmkMinus','pmkPlus',0,999);
+
+  var unitToggle = document.getElementById('unitToggle');
+  var pemakaianUnit = 'Hari';
+  unitToggle.addEventListener('click', function(e){
+    var btn = e.target.closest('button'); if(!btn) return;
+    unitToggle.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
+    btn.classList.add('on');
+    pemakaianUnit = btn.dataset.u;
+  });
+
+  var chipsWrap = document.getElementById('kondisiChips');
+  var kondisi = '';
+  chipsWrap.addEventListener('click', function(e){
+    var btn = e.target.closest('.chip'); if(!btn) return;
+    chipsWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+    btn.classList.add('on');
+    kondisi = btn.dataset.v;
+  });
+
+  var fFoto = document.getElementById('fFoto');
+  var photoZoneBtn = document.getElementById('photoZoneBtn');
+  var photoPreview = document.getElementById('photoPreview');
+  var photoImg = document.getElementById('photoImg');
+  var fotoBase64 = '';
+
+  photoZoneBtn.addEventListener('click', function(){ fFoto.click(); });
+  fFoto.addEventListener('change', function(){
+    var file = fFoto.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var img = new Image();
+      img.onload = function(){
+        var maxW = 900;
+        var scale = Math.min(1, maxW / img.width);
+        var canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+        fotoBase64 = dataUrl.split(',')[1];
+        photoImg.src = dataUrl;
+        photoPreview.style.display = 'inline-block';
+        photoZoneBtn.style.display = 'none';
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('photoRemove').addEventListener('click', function(){
+    fFoto.value = ''; fotoBase64 = '';
+    photoPreview.style.display = 'none';
+    photoZoneBtn.style.display = 'block';
+  });
+
+  function genTicketNo(){
+    var d = new Date();
+    var y = d.getFullYear();
+    var rand = Math.floor(1000+Math.random()*9000);
+    return 'PA-'+y+'-'+rand;
+  }
+  var currentTicket = genTicketNo();
+  document.getElementById('ticketNo').textContent = currentTicket;
+  function fmtDate(d){
+    var days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    var months=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    return days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
+  }
+  document.getElementById('ticketDate').textContent = fmtDate(new Date());
+
+  var operatorInput = document.getElementById('fOperator');
+  var operatorList = document.getElementById('operatorList');
+  function loadOperators(){
+    try{
+      var arr = JSON.parse(localStorage.getItem(LS_OPERATORS)||'[]');
+      operatorList.innerHTML = '';
+      arr.forEach(function(n){ var o=document.createElement('option'); o.value=n; operatorList.appendChild(o); });
+      if(arr[0]) operatorInput.value = arr[0];
+    }catch(e){}
+  }
+  function saveOperator(name){
+    try{
+      var arr = JSON.parse(localStorage.getItem(LS_OPERATORS)||'[]');
+      arr = [name].concat(arr.filter(function(n){return n!==name;})).slice(0,8);
+      localStorage.setItem(LS_OPERATORS, JSON.stringify(arr));
+    }catch(e){}
+  }
+  loadOperators();
+
+  var gearBtn = document.getElementById('gearBtn');
+  var cfgModal = document.getElementById('cfgModal');
+  var cfgInput = document.getElementById('cfgApiUrl');
+  gearBtn.addEventListener('click', function(){
+    cfgInput.value = getApiUrl();
+    cfgModal.style.display = 'flex';
+  });
+  document.getElementById('cfgClose').addEventListener('click', function(){ cfgModal.style.display='none'; });
+  document.getElementById('cfgSave').addEventListener('click', function(){
+    localStorage.setItem(LS_API, cfgInput.value.trim());
+    cfgModal.style.display='none';
+  });
+
+  var offlineFlag = document.getElementById('offlineFlag');
+  function getQueue(){ try{ return JSON.parse(localStorage.getItem(LS_QUEUE)||'[]'); }catch(e){ return []; } }
+  function setQueue(q){ localStorage.setItem(LS_QUEUE, JSON.stringify(q)); }
+  function updateOfflineFlag(){
+    var q = getQueue();
+    offlineFlag.style.display = (!navigator.onLine || q.length) ? 'flex' : 'none';
+    offlineFlag.querySelector('.dot').nextSibling.textContent =
+      !navigator.onLine ? ' Tidak ada koneksi — pengajuan akan disimpan & dikirim otomatis nanti'
+      : ' '+q.length+' pengajuan menunggu dikirim…';
+  }
+  function flushQueue(){
+    var apiUrl = getApiUrl();
+    if(!apiUrl || !navigator.onLine) return;
+    var q = getQueue();
+    if(!q.length) return;
+    var remaining = q.slice();
+    function sendNext(){
+      if(!remaining.length){ setQueue([]); updateOfflineFlag(); return; }
+      var payload = remaining[0];
+      fetch(apiUrl, {method:'POST', body: JSON.stringify(payload)})
+        .then(function(){ remaining.shift(); setQueue(remaining); updateOfflineFlag(); sendNext(); })
+        .catch(function(){ });
+    }
+    sendNext();
+  }
+  window.addEventListener('online', flushQueue);
+  window.addEventListener('load', function(){ updateOfflineFlag(); flushQueue(); });
+
+  var errBox = document.getElementById('errBox');
+  function showError(msg){ errBox.textContent = msg; errBox.style.display='block'; }
+  function clearError(){ errBox.style.display='none'; }
+
+  var btnSubmit = document.getElementById('btnSubmit');
+  btnSubmit.addEventListener('click', function(){
+    clearError();
+    var operator = operatorInput.value.trim();
+    var mesinCode = mesinSel.value;
+    var m = machineByCode[mesinCode];
+
+    if(!operator){ showError('Isi nama pengaju terlebih dahulu.'); operatorInput.focus(); return; }
+    if(!m){ showError('Pilih mesin terlebih dahulu.'); mesinSel.focus(); return; }
+    var tool = resolveTool();
+    if(!tool){ showError('Pilih alat / spesifikasi, atau isi manual di "Pilih ukuran lain".'); return; }
+    if(!kondisi){ showError('Pilih kondisi alat.'); return; }
+
+    var qty = parseInt(document.getElementById('fQty').value,10) || 1;
+    var pemakaian = parseInt(document.getElementById('fPemakaian').value,10) || 0;
+    var catatan = document.getElementById('fCatatan').value.trim();
+
+    var payload = {
+      ticket: currentTicket,
+      tanggalPengajuan: fmtDate(new Date()),
+      namaPengaju: operator,
+      mesin: mesinCode + ' — ' + m.name,
+      brand: tool.brand,
+      spesifikasi: tool.kode + ' · ' + tool.spek,
+      qty: qty,
+      kondisi: kondisi,
+      pemakaian: pemakaian + ' ' + pemakaianUnit,
+      catatan: catatan,
+      foto: fotoBase64 || '',
+      token: SHARED_TOKEN
+    };
+
+    saveOperator(operator);
+    submitPayload(payload);
+  });
+
+  function submitPayload(payload){
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Mengirim…';
+    var apiUrl = getApiUrl();
+
+    function finish(queued){
+      showSuccess(payload, queued);
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'Ajukan Asah';
+    }
+
+    if(!apiUrl || !navigator.onLine){
+      var q = getQueue(); q.push(payload); setQueue(q); updateOfflineFlag();
+      finish(true);
+      return;
+    }
+
+    fetch(apiUrl, {method:'POST', body: JSON.stringify(payload)})
+      .then(function(){ finish(false); })
+      .catch(function(){
+        var q = getQueue(); q.push(payload); setQueue(q); updateOfflineFlag();
+        finish(true);
+      });
+  }
+
+  function showSuccess(payload, queued){
+    document.getElementById('formView').style.display = 'none';
+    document.getElementById('successView').style.display = 'block';
+    document.getElementById('doneTicket').textContent = payload.ticket;
+    document.getElementById('doneDetail').textContent = queued
+      ? 'Belum ada koneksi ke server — pengajuan tersimpan di perangkat ini dan akan terkirim otomatis begitu online kembali.'
+      : 'Pengajuan asah untuk ' + payload.spesifikasi + ' (' + payload.qty + ' unit) telah tercatat. Gudang akan verifikasi & menjadwalkan pengiriman ke vendor.';
+  }
+
+  document.getElementById('btnAgain').addEventListener('click', function(){
+    document.getElementById('successView').style.display = 'none';
+    document.getElementById('formView').style.display = 'block';
+    currentTicket = genTicketNo();
+    document.getElementById('ticketNo').textContent = currentTicket;
+    document.getElementById('ticketDate').textContent = fmtDate(new Date());
+    mesinSel.value=''; mesinSel.dispatchEvent(new Event('change'));
+    document.getElementById('fQty').value='1';
+    document.getElementById('fPemakaian').value='0';
+    document.getElementById('fCatatan').value='';
+    chipsWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); kondisi='';
+    fFoto.value=''; fotoBase64=''; photoPreview.style.display='none'; photoZoneBtn.style.display='block';
+    clearError();
+  });
+
+})();
+</script>
+</body>
+</html>
