@@ -125,10 +125,11 @@
   .chips{ display:flex; flex-wrap:wrap; gap:8px; }
   .chip{ padding:8px 13px; border-radius:999px; border:2px solid var(--ink-soft); font-size:13.5px; color:var(--ink-soft); cursor:pointer; font-weight:500; background:transparent; transition:all .12s; }
   .chip.on{ background:var(--spark); border-color:var(--spark-dark); color:#241000; font-weight:700; box-shadow:0 2px 0 var(--spark-dark); }
+  .photo-zone-row{ display:flex; gap:8px; }
   .photo-zone{
-    width:100%; padding:16px; border:2px dashed var(--ink-soft); border-radius:8px;
+    flex:1; padding:14px 8px; border:2px dashed var(--ink-soft); border-radius:8px;
     background:rgba(255,255,255,.25); color:var(--ink-soft); font-family:'Inter',sans-serif;
-    font-size:13.5px; font-weight:600; cursor:pointer;
+    font-size:13px; font-weight:600; cursor:pointer; text-align:center;
   }
   .photo-zone:active{ background:rgba(255,255,255,.4); }
   .photo-preview{ position:relative; margin-top:10px; display:inline-block; }
@@ -277,8 +278,12 @@
 
           <div class="field">
             <label>Foto Kondisi Alat <span class="req">*</span></label>
-            <input type="file" id="fFoto" accept="image/*" style="display:none">
-            <button type="button" class="photo-zone" id="photoZoneBtn">📷 Ambil / Pilih Foto</button>
+            <input type="file" id="fFotoKamera" accept="image/*" capture="environment" style="display:none">
+            <input type="file" id="fFotoGaleri" accept="image/*" style="display:none">
+            <div class="photo-zone-row" id="photoZoneRow">
+              <button type="button" class="photo-zone" id="photoZoneBtnKamera">📷 Ambil Foto</button>
+              <button type="button" class="photo-zone" id="photoZoneBtnGaleri">🖼️ Galeri</button>
+            </div>
             <div class="photo-preview" id="photoPreview" style="display:none">
               <img id="photoImg" alt="Preview foto alat">
               <button type="button" id="photoRemove">×</button>
@@ -542,12 +547,17 @@
   });
   kondisiManualInput.addEventListener('input', function(){ kondisi = kondisiManualInput.value.trim(); });
 
-  var fFoto = document.getElementById('fFoto');
-  var photoZoneBtn = document.getElementById('photoZoneBtn');
+  var fFotoKamera = document.getElementById('fFotoKamera');
+  var fFotoGaleri = document.getElementById('fFotoGaleri');
+  var photoZoneBtnKamera = document.getElementById('photoZoneBtnKamera');
+  var photoZoneBtnGaleri = document.getElementById('photoZoneBtnGaleri');
+  var photoZoneRow = document.getElementById('photoZoneRow');
   var photoPreview = document.getElementById('photoPreview');
   var photoImg = document.getElementById('photoImg');
   var photoCheck = document.getElementById('photoCheck');
   var fotoBase64 = '';
+  var lastLocation = null;   // {lat, lon, lines:[...]}
+  var lastHeading = null;    // derajat kompas, kalau sensor tersedia & diizinkan
 
   /* Skor ketajaman sederhana (varian Laplacian pada citra abu-abu yang diperkecil).
      Ini heuristik ringan di browser, bukan pengecekan sempurna — hanya penanda
@@ -585,10 +595,108 @@
     photoCheck.textContent = jelas ? '✓ Foto tampak jelas' : '⚠ Foto tampak buram — coba ambil ulang di tempat lebih terang';
   }
 
-  photoZoneBtn.addEventListener('click', function(){ fFoto.click(); });
-  fFoto.addEventListener('change', function(){
-    var file = fFoto.files[0];
-    if(!file) return;
+  /* ==== Lokasi GPS + alamat (reverse geocode) + arah kompas, gaya "GPS Map Camera" ==== */
+  function mintaIzinKompas(){
+    return new Promise(function(resolve){
+      if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+        DeviceOrientationEvent.requestPermission().then(function(state){ resolve(state === 'granted'); }).catch(function(){ resolve(false); });
+      }else{ resolve(true); }
+    });
+  }
+  function bacaKompasSekali(){
+    return new Promise(function(resolve){
+      var selesai = false;
+      function handler(e){
+        if(selesai) return;
+        var h = (e.webkitCompassHeading != null) ? e.webkitCompassHeading : e.alpha;
+        if(h != null){
+          selesai = true;
+          lastHeading = Math.round(h);
+          window.removeEventListener('deviceorientation', handler);
+          resolve();
+        }
+      }
+      window.addEventListener('deviceorientation', handler);
+      setTimeout(function(){ if(!selesai){ window.removeEventListener('deviceorientation', handler); resolve(); } }, 900);
+    });
+  }
+  function derajatKeArah(deg){
+    if(deg == null) return '';
+    var dirs = ['N','NE','E','SE','S','SW','W','NW'];
+    return dirs[Math.round(deg/45) % 8];
+  }
+  function ambilLokasi(){
+    return new Promise(function(resolve){
+      if(!navigator.geolocation){ resolve(null); return; }
+      photoCheck.style.display = 'inline-flex';
+      photoCheck.className = 'photo-check checking';
+      photoCheck.textContent = '📍 Mengambil lokasi…';
+      navigator.geolocation.getCurrentPosition(function(pos){
+        var lat = pos.coords.latitude, lon = pos.coords.longitude;
+        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lon+'&zoom=16&addressdetails=1', { headers:{ 'Accept-Language':'id' } })
+          .then(function(r){ return r.json(); })
+          .then(function(data){
+            var a = data.address || {};
+            var desa = a.village || a.suburb || a.neighbourhood || a.hamlet || '';
+            var kec = a.suburb || a.city_district || a.subdistrict || '';
+            var kab = a.county || a.city || a.regency || '';
+            var prov = a.state || '';
+            var lines = [];
+            if(desa) lines.push(desa);
+            if(kec) lines.push('Kecamatan ' + kec);
+            if(kab) lines.push(kab);
+            if(prov) lines.push(prov);
+            resolve({ lat:lat, lon:lon, lines:lines });
+          })
+          .catch(function(){ resolve({ lat:lat, lon:lon, lines:[] }); });
+      }, function(){ resolve(null); }, { enableHighAccuracy:true, timeout:8000, maximumAge:60000 });
+    });
+  }
+
+  /* Overlay pojok kanan-atas ala GPS Map Camera: tanggal/jam, arah kompas, alamat. */
+  function gambarOverlayGps(ctx, w, h){
+    var now = new Date();
+    var jam = ('0'+now.getHours()).slice(-2)+'.'+('0'+now.getMinutes()).slice(-2)+'.'+('0'+now.getSeconds()).slice(-2);
+    var baris = [ fmtDate(now) + '  ' + jam ];
+    if(lastHeading != null) baris.push(lastHeading + '° ' + derajatKeArah(lastHeading));
+    if(lastLocation && lastLocation.lines && lastLocation.lines.length){
+      lastLocation.lines.forEach(function(l){ baris.push(l); });
+    }else if(lastLocation){
+      baris.push(lastLocation.lat.toFixed(5)+', '+lastLocation.lon.toFixed(5));
+    }
+
+    var fs = Math.max(11, Math.round(w * 0.033));
+    var lineH = fs * 1.3;
+    var pad = fs * 0.55;
+    ctx.font = '600 '+fs+'px Inter, sans-serif';
+    ctx.textBaseline = 'top';
+
+    var maxW = 0;
+    baris.forEach(function(l){ maxW = Math.max(maxW, ctx.measureText(l).width); });
+
+    var boxW = maxW + pad*2;
+    var boxH = baris.length * lineH + pad*1.2;
+    var boxX = w - boxW - 8;
+    var boxY = 8;
+
+    ctx.fillStyle = 'rgba(0,0,0,.42)';
+    ctx.beginPath();
+    var r = 5;
+    ctx.moveTo(boxX+r, boxY);
+    ctx.arcTo(boxX+boxW, boxY, boxX+boxW, boxY+boxH, r);
+    ctx.arcTo(boxX+boxW, boxY+boxH, boxX, boxY+boxH, r);
+    ctx.arcTo(boxX, boxY+boxH, boxX, boxY, r);
+    ctx.arcTo(boxX, boxY, boxX+boxW, boxY, r);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    baris.forEach(function(l, i){
+      ctx.fillText(l, boxX+pad, boxY+pad*0.6+i*lineH);
+    });
+  }
+
+  function prosesFile(file){
     photoCheck.style.display = 'inline-flex';
     photoCheck.className = 'photo-check checking';
     photoCheck.textContent = 'Memeriksa foto…';
@@ -604,10 +712,10 @@
         var ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // Bar timestamp ala aplikasi "timestamp camera" di pojok kiri bawah foto
+        // Bar timestamp + info tiket, pojok kiri bawah (branding RDI, seperti sebelumnya)
         var now = new Date();
-        var jam = ('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2)+':'+('0'+now.getSeconds()).slice(-2);
-        var baris1 = fmtDate(now) + '  ' + jam;
+        var jamBar = ('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2)+':'+('0'+now.getSeconds()).slice(-2);
+        var baris1 = fmtDate(now) + '  ' + jamBar;
         var baris2 = 'RDI Gudang Tools · Tiket ' + currentTicket;
         var fs = Math.max(12, Math.round(canvas.width / 40));
         ctx.font = 'bold '+fs+'px Inter, sans-serif';
@@ -622,22 +730,42 @@
         ctx.font = fs*0.82+'px Inter, sans-serif';
         ctx.fillText(baris2, padX, canvas.height-barH+padY*0.8+lineGap);
 
+        // Overlay GPS pojok kanan atas ala GPS Map Camera
+        gambarOverlayGps(ctx, canvas.width, canvas.height);
+
         var dataUrl = canvas.toDataURL('image/jpeg', 0.72);
         fotoBase64 = dataUrl.split(',')[1];
         photoImg.src = dataUrl;
         photoPreview.style.display = 'inline-block';
-        photoZoneBtn.style.display = 'none';
+        photoZoneRow.style.display = 'none';
         tandaiHasilFoto(canvas);
       };
       img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
-  });
+  }
+
+  function tanganiFileTerpilih(file){
+    if(!file) return;
+    mintaIzinKompas().then(function(){
+      return Promise.all([ ambilLokasi(), bacaKompasSekali() ]);
+    }).then(function(hasil){
+      lastLocation = hasil[0];
+      prosesFile(file);
+    });
+  }
+
+  photoZoneBtnKamera.addEventListener('click', function(){ fFotoKamera.click(); });
+  photoZoneBtnGaleri.addEventListener('click', function(){ fFotoGaleri.click(); });
+  fFotoKamera.addEventListener('change', function(){ tanganiFileTerpilih(fFotoKamera.files[0]); });
+  fFotoGaleri.addEventListener('change', function(){ tanganiFileTerpilih(fFotoGaleri.files[0]); });
+
   document.getElementById('photoRemove').addEventListener('click', function(){
-    fFoto.value = ''; fotoBase64 = '';
+    fFotoKamera.value = ''; fFotoGaleri.value = ''; fotoBase64 = '';
     photoPreview.style.display = 'none';
-    photoZoneBtn.style.display = 'block';
+    photoZoneRow.style.display = 'flex';
     photoCheck.style.display = 'none';
+    lastLocation = null; lastHeading = null;
   });
 
 
@@ -732,7 +860,7 @@
     var tool = resolveTool();
     if(!tool){ showError('Pilih alat / spesifikasi, atau isi manual di "Pilih ukuran lain".'); return; }
     if(!kondisi){ showError('Pilih kondisi alat, atau isi manual kalau pilih "Lainnya".'); return; }
-    if(!fotoBase64){ showError('Foto kondisi alat wajib diisi.'); photoZoneBtn.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+    if(!fotoBase64){ showError('Foto kondisi alat wajib diisi.'); photoZoneRow.scrollIntoView({behavior:'smooth', block:'center'}); return; }
 
     var qty = parseInt(document.getElementById('fQty').value,10) || 1;
     var catatan = document.getElementById('fCatatan').value.trim();
@@ -800,7 +928,8 @@
     document.getElementById('fCatatan').value='';
     chipsWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); kondisi='';
     kondisiManualInput.style.display='none'; kondisiManualInput.value='';
-    fFoto.value=''; fotoBase64=''; photoPreview.style.display='none'; photoZoneBtn.style.display='block'; photoCheck.style.display='none';
+    fFotoKamera.value=''; fFotoGaleri.value=''; fotoBase64=''; photoPreview.style.display='none'; photoZoneRow.style.display='flex'; photoCheck.style.display='none';
+    lastLocation = null; lastHeading = null;
     clearError();
   });
 
