@@ -2,7 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#c25f18">
 <title>Pengajuan Asah — RDI Tools</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +33,7 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    min-height:100vh;
+    min-height:100vh; min-height:100dvh;
     background:
       radial-gradient(1100px 700px at 50% -10%, #2a2e32 0%, var(--bg) 55%),
       repeating-linear-gradient(135deg, rgba(255,255,255,.018) 0 2px, transparent 2px 26px);
@@ -310,6 +312,7 @@
         <div class="stamp">Diterima</div>
         <div class="tnum">No. Tiket<br><b id="doneTicket">—</b></div>
         <p id="doneDetail">Pengajuan asah telah tercatat. Gudang akan mengonfirmasi &amp; menjadwalkan pengiriman ke vendor.</p>
+        <a id="btnDownloadFoto" download style="display:none;margin-top:22px;border:2px solid var(--spark-dark);color:var(--ink);padding:11px 20px;border-radius:8px;font-weight:600;font-size:13.5px;text-decoration:none">⬇ Unduh Foto Lampiran</a><br>
         <button id="btnAgain">+ Ajukan Alat Lain</button>
       </div>
     </div>
@@ -555,7 +558,7 @@
   var photoPreview = document.getElementById('photoPreview');
   var photoImg = document.getElementById('photoImg');
   var photoCheck = document.getElementById('photoCheck');
-  var fotoBase64 = '';
+  var fotoBlob = null, fotoUrl = '';
   var lastLocation = null;   // {lat, lon, lines:[...]}
   var lastHeading = null;    // derajat kompas, kalau sensor tersedia & diizinkan
 
@@ -617,7 +620,7 @@
         }
       }
       window.addEventListener('deviceorientation', handler);
-      setTimeout(function(){ if(!selesai){ window.removeEventListener('deviceorientation', handler); resolve(); } }, 900);
+      setTimeout(function(){ if(!selesai){ window.removeEventListener('deviceorientation', handler); resolve(); } }, 300);
     });
   }
   function ambilLokasi(){
@@ -782,44 +785,48 @@
     ctx.shadowBlur = 0;
   }
 
-  function prosesFile(file){
+  function decodeFoto(file){
+    var maxW = 800;
+    function gambar(src, w, h){
+      var sc = Math.min(1, maxW / w);
+      var c = document.createElement('canvas');
+      c.width = Math.round(w*sc); c.height = Math.round(h*sc);
+      c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+      return c;
+    }
+    if(window.createImageBitmap){
+      return createImageBitmap(file).then(function(b){ var c = gambar(b, b.width, b.height); if(b.close) b.close(); return c; });
+    }
+    return new Promise(function(res, rej){
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function(){ var c = gambar(img, img.width, img.height); URL.revokeObjectURL(url); res(c); };
+      img.onerror = rej; img.src = url;
+    });
+  }
+
+  /* Foto di-decode PARALEL dengan pengambilan lokasi, lalu watermark digambar setelah keduanya siap. */
+  function tanganiFileTerpilih(file){
+    if(!file) return;
     photoCheck.style.display = 'inline-flex';
     photoCheck.className = 'photo-check checking';
     photoCheck.textContent = 'Memeriksa foto…';
-    var reader = new FileReader();
-    reader.onload = function(ev){
-      var img = new Image();
-      img.onload = function(){
-        var maxW = 900;
-        var scale = Math.min(1, maxW / img.width);
-        var canvas = document.createElement('canvas');
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
-        var ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        // Watermark GPS Map Camera-style: badge perusahaan, jam, tanggal, alamat, koordinat
-        gambarWatermarkGps(ctx, canvas.width, canvas.height);
-
-        var dataUrl = canvas.toDataURL('image/jpeg', 0.72);
-        fotoBase64 = dataUrl.split(',')[1];
-        photoImg.src = dataUrl;
+    var pFoto = decodeFoto(file);
+    var pLok = mintaIzinKompas().then(function(){ return Promise.all([ ambilLokasi(), bacaKompasSekali() ]); });
+    Promise.all([pFoto, pLok]).then(function(r){
+      var canvas = r[0]; lastLocation = r[1][0];
+      gambarWatermarkGps(canvas.getContext('2d'), canvas.width, canvas.height);
+      canvas.toBlob(function(blob){
+        fotoBlob = blob;
+        if(fotoUrl) URL.revokeObjectURL(fotoUrl);
+        fotoUrl = URL.createObjectURL(blob);
+        photoImg.src = fotoUrl;
         photoPreview.style.display = 'inline-block';
         photoZoneRow.style.display = 'none';
         tandaiHasilFoto(canvas);
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function tanganiFileTerpilih(file){
-    if(!file) return;
-    mintaIzinKompas().then(function(){
-      return Promise.all([ ambilLokasi(), bacaKompasSekali() ]);
-    }).then(function(hasil){
-      lastLocation = hasil[0];
-      prosesFile(file);
+      }, 'image/jpeg', 0.65);
+    }).catch(function(){
+      photoCheck.className = 'photo-check bad';
+      photoCheck.textContent = '⚠ Foto gagal diproses — coba ambil ulang';
     });
   }
 
@@ -829,7 +836,7 @@
   fFotoGaleri.addEventListener('change', function(){ tanganiFileTerpilih(fFotoGaleri.files[0]); });
 
   document.getElementById('photoRemove').addEventListener('click', function(){
-    fFotoKamera.value = ''; fFotoGaleri.value = ''; fotoBase64 = '';
+    fFotoKamera.value = ''; fFotoGaleri.value = ''; fotoBlob = null;
     photoPreview.style.display = 'none';
     photoZoneRow.style.display = 'flex';
     photoCheck.style.display = 'none';
@@ -884,30 +891,88 @@
     cfgModal.style.display='none';
   });
 
-  var offlineFlag = document.getElementById('offlineFlag');
-  function getQueue(){ try{ return JSON.parse(localStorage.getItem(LS_QUEUE)||'[]'); }catch(e){ return []; } }
-  function setQueue(q){ localStorage.setItem(LS_QUEUE, JSON.stringify(q)); }
-  function updateOfflineFlag(){
-    var q = getQueue();
-    offlineFlag.style.display = (!navigator.onLine || q.length) ? 'flex' : 'none';
-    offlineFlag.querySelector('.dot').nextSibling.textContent =
-      !navigator.onLine ? ' Tidak ada koneksi — pengajuan akan disimpan & dikirim otomatis nanti'
-      : ' '+q.length+' pengajuan menunggu dikirim…';
+  /* ==== Antrian offline: IndexedDB (foto disimpan sebagai Blob, bukan base64 di localStorage) ==== */
+  var idbP = null, memQ = [];
+  function idb(){
+    if(idbP) return idbP;
+    idbP = new Promise(function(res, rej){
+      if(!window.indexedDB){ rej(new Error('no idb')); return; }
+      var r = indexedDB.open('pa_db', 1);
+      r.onupgradeneeded = function(){ r.result.createObjectStore('queue', {keyPath:'uid'}); };
+      r.onsuccess = function(){ res(r.result); };
+      r.onerror = function(){ rej(r.error); };
+    });
+    return idbP;
   }
+  function tx(mode, fn){
+    return idb().then(function(db){
+      return new Promise(function(res, rej){
+        var t = db.transaction('queue', mode), req = fn(t.objectStore('queue'));
+        t.oncomplete = function(){ res(req && req.result); };
+        t.onerror = t.onabort = function(){ rej(t.error); };
+      });
+    });
+  }
+  function qPut(it){ return tx('readwrite', function(s){ return s.put(it); }); }
+  function qDel(uid){
+    memQ = memQ.filter(function(x){ return x.uid !== uid; });
+    return tx('readwrite', function(s){ return s.delete(uid); }).catch(function(){});
+  }
+  function qAll(){ return tx('readonly', function(s){ return s.getAll(); }).catch(function(){ return []; }).then(function(a){ return (a||[]).concat(memQ); }); }
+  // Migrasi antrian lama (localStorage) ke IndexedDB, sekali saja
+  (function migrasi(){
+    try{
+      var old = JSON.parse(localStorage.getItem(LS_QUEUE)||'[]');
+      if(!old.length) return;
+      Promise.all(old.map(function(it){ it.uid = it.uid || (Date.now().toString(36)+Math.random().toString(36).slice(2,8)); return qPut(it); }))
+        .then(function(){ localStorage.removeItem(LS_QUEUE); }).catch(function(){});
+    }catch(e){}
+  })();
+
+  var offlineFlag = document.getElementById('offlineFlag');
+  function updateOfflineFlag(){
+    qAll().then(function(q){
+      offlineFlag.style.display = (!navigator.onLine || q.length) ? 'flex' : 'none';
+      offlineFlag.querySelector('.dot').nextSibling.textContent =
+        !navigator.onLine ? ' Tidak ada koneksi — pengajuan akan disimpan & dikirim otomatis nanti'
+        : ' '+q.length+' pengajuan menunggu dikirim…';
+    });
+  }
+  function blobToB64(b){
+    return new Promise(function(res, rej){
+      var r = new FileReader();
+      r.onload = function(){ res(String(r.result).split(',')[1]); };
+      r.onerror = function(){ rej(r.error); };
+      r.readAsDataURL(b);
+    });
+  }
+  /* Kirim satu pengajuan. Gagal (timeout / HTTP error / ditolak server) => reject. */
+  function kirim(it){
+    var fotoP = (typeof it.foto === 'string') ? Promise.resolve(it.foto) : blobToB64(it.foto);
+    return fotoP.then(function(b64){
+      var body = Object.assign({}, it, { foto:b64, fotoNama: it.ticket + '.jpg' });
+      var ctrl = new AbortController();
+      var t = setTimeout(function(){ ctrl.abort(); }, 25000);
+      return fetch(getApiUrl(), { method:'POST', body:JSON.stringify(body), signal:ctrl.signal })
+        .then(function(r){ clearTimeout(t); if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); },
+              function(e){ clearTimeout(t); throw e; })
+        .then(function(txt){
+          var j = null; try{ j = JSON.parse(txt); }catch(e){}
+          if(j && j.ok === false) throw new Error(j.error || 'ditolak server');
+        });
+    });
+  }
+  var flushing = false, retryDelay = 5000;
   function flushQueue(){
-    var apiUrl = getApiUrl();
-    if(!apiUrl || !navigator.onLine) return;
-    var q = getQueue();
-    if(!q.length) return;
-    var remaining = q.slice();
-    function sendNext(){
-      if(!remaining.length){ setQueue([]); updateOfflineFlag(); return; }
-      var payload = remaining[0];
-      fetch(apiUrl, {method:'POST', body: JSON.stringify(payload)})
-        .then(function(){ remaining.shift(); setQueue(remaining); updateOfflineFlag(); sendNext(); })
-        .catch(function(){ });
-    }
-    sendNext();
+    if(flushing || !navigator.onLine || !getApiUrl()) return;
+    flushing = true;
+    qAll().then(function(items){
+      return items.reduce(function(chain, it){
+        return chain.then(function(){ return kirim(it).then(function(){ return qDel(it.uid); }); });
+      }, Promise.resolve());
+    }).then(function(){ retryDelay = 5000; })
+      .catch(function(){ setTimeout(flushQueue, retryDelay); retryDelay = Math.min(retryDelay*2, 120000); })
+      .then(function(){ flushing = false; updateOfflineFlag(); });
   }
   window.addEventListener('online', flushQueue);
   window.addEventListener('load', function(){ updateOfflineFlag(); flushQueue(); });
@@ -928,12 +993,13 @@
     var tool = resolveTool();
     if(!tool){ showError('Pilih alat / spesifikasi, atau isi manual di "Pilih ukuran lain".'); return; }
     if(!kondisi){ showError('Pilih kondisi alat, atau isi manual kalau pilih "Lainnya".'); return; }
-    if(!fotoBase64){ showError('Foto kondisi alat wajib diisi.'); photoZoneRow.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+    if(!fotoBlob){ showError('Foto kondisi alat wajib diisi.'); photoZoneRow.scrollIntoView({behavior:'smooth', block:'center'}); return; }
 
     var qty = parseInt(document.getElementById('fQty').value,10) || 1;
     var catatan = document.getElementById('fCatatan').value.trim();
 
     var payload = {
+      uid: Date.now().toString(36)+Math.random().toString(36).slice(2,8),
       ticket: currentTicket,
       tanggalPengajuan: fmtDate(new Date()),
       namaPengaju: operator,
@@ -943,7 +1009,7 @@
       qty: qty,
       kondisi: kondisi,
       catatan: catatan,
-      foto: fotoBase64,
+      foto: fotoBlob,
       token: SHARED_TOKEN
     };
 
@@ -954,28 +1020,20 @@
   function submitPayload(payload){
     btnSubmit.disabled = true;
     btnSubmit.textContent = 'Mengirim…';
-    var apiUrl = getApiUrl();
 
     function finish(queued){
       showSuccess(payload, queued);
       btnSubmit.disabled = false;
       btnSubmit.textContent = 'Ajukan Asah';
     }
-
-    if(!apiUrl || !navigator.onLine){
-      var q = getQueue(); q.push(payload); setQueue(q); updateOfflineFlag();
-      finish(true);
-      return;
+    function simpanAntrian(){
+      return qPut(payload).catch(function(){ memQ.push(payload); }).then(function(){ updateOfflineFlag(); finish(true); });
     }
-
-    fetch(apiUrl, {method:'POST', body: JSON.stringify(payload)})
-      .then(function(){ finish(false); })
-      .catch(function(){
-        var q = getQueue(); q.push(payload); setQueue(q); updateOfflineFlag();
-        finish(true);
-      });
+    if(!getApiUrl() || !navigator.onLine){ simpanAntrian(); return; }
+    kirim(payload).then(function(){ finish(false); }, simpanAntrian);
   }
 
+  var dlLink = document.getElementById('btnDownloadFoto'), dlUrl = '';
   function showSuccess(payload, queued){
     document.getElementById('formView').style.display = 'none';
     document.getElementById('successView').style.display = 'block';
@@ -983,6 +1041,11 @@
     document.getElementById('doneDetail').textContent = queued
       ? 'Belum ada koneksi ke server — pengajuan tersimpan di perangkat ini dan akan terkirim otomatis begitu online kembali.'
       : 'Pengajuan asah untuk ' + payload.spesifikasi + ' (' + payload.qty + ' unit) telah tercatat. Gudang akan verifikasi & menjadwalkan pengiriman ke vendor.';
+    if(dlUrl) URL.revokeObjectURL(dlUrl);
+    if(payload.foto instanceof Blob){
+      dlUrl = URL.createObjectURL(payload.foto);
+      dlLink.href = dlUrl; dlLink.download = payload.ticket + '.jpg'; dlLink.style.display = 'inline-block';
+    }else{ dlLink.style.display = 'none'; }
   }
 
   document.getElementById('btnAgain').addEventListener('click', function(){
@@ -996,10 +1059,12 @@
     document.getElementById('fCatatan').value='';
     chipsWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); kondisi='';
     kondisiManualInput.style.display='none'; kondisiManualInput.value='';
-    fFotoKamera.value=''; fFotoGaleri.value=''; fotoBase64=''; photoPreview.style.display='none'; photoZoneRow.style.display='flex'; photoCheck.style.display='none';
+    fFotoKamera.value=''; fFotoGaleri.value=''; fotoBlob = null; photoPreview.style.display='none'; photoZoneRow.style.display='flex'; photoCheck.style.display='none';
     lastLocation = null; lastHeading = null;
     clearError();
   });
+
+  if('serviceWorker' in navigator){ window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
 
 })();
 </script>
