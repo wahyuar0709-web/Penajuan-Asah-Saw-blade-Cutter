@@ -204,6 +204,54 @@
   .cfg-actions .save{ background:var(--grad); border-color:transparent; color:#fff; }
   .cfg-actions .close{ background:transparent; color:var(--blue); }
   @media (prefers-reduced-motion:reduce){ .checkmark{ animation:none; } }
+
+  /* ---------- Picker mesin & alat (pengganti dropdown bawaan) ---------- */
+  .pk-native{ position:absolute!important; width:1px; height:1px; opacity:0; pointer-events:none; overflow:hidden; clip:rect(0 0 0 0); }
+  .pick{ display:flex; align-items:center; gap:10px; width:100%; min-height:54px; padding:9px 14px; text-align:left; background:#fff;
+    border:1.5px solid var(--line); border-radius:16px; font-family:'Poppins',sans-serif; color:var(--ink); cursor:pointer; transition:border-color .15s, box-shadow .15s; }
+  .pick:active{ background:var(--tint); }
+  .pick[aria-expanded=true]{ border-color:var(--blue); box-shadow:0 0 0 3px rgba(10,102,240,.12); }
+  .pick:disabled{ opacity:.45; cursor:not-allowed; }
+  .pick-body{ flex:1; min-width:0; }
+  .pick-ph{ color:#94a3c0; font-size:15px; }
+  .pick .chev{ flex:none; }
+  .mesin-row .pick{ flex:1; }
+  .opt-mesin{ display:flex; align-items:center; gap:12px; }
+  .code-badge{ flex:none; min-width:68px; text-align:center; padding:5px 8px; border-radius:10px; background:var(--tint); color:var(--blue); font-weight:700; font-size:13px; font-variant-numeric:tabular-nums; }
+  .opt-name{ font-size:15px; font-weight:600; line-height:1.3; }
+  .opt-plain{ font-size:14px; font-weight:600; line-height:1.35; }
+  .opt-tool .l1{ display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-size:13px; font-weight:700; color:var(--blue); }
+  .brand-chip{ padding:2px 10px; border-radius:999px; background:var(--tint); color:var(--ink-soft); font-size:11.5px; font-weight:600; }
+  .opt-tool .l2{ margin-top:3px; font-size:16.5px; font-weight:600; line-height:1.3; color:var(--ink); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+  .pick .opt-tool .l2{ font-size:15px; }
+  .bahan-badge{ display:inline-block; margin-right:8px; padding:1px 9px; border-radius:8px; font-size:12px; font-weight:700; letter-spacing:.2px; vertical-align:1px; }
+  .bahan-TCT{ background:var(--ok-bg); color:var(--ok); }
+  .bahan-PCD{ background:var(--navy); color:#fff; }
+  .opt-tool .l3{ margin-top:2px; font-size:12px; color:var(--ink-soft); }
+  .sheet-back{ display:none; position:fixed; inset:0; z-index:30; background:rgba(20,20,50,.65); align-items:flex-end; justify-content:center; }
+  .sheet-back.open{ display:flex; }
+  .pk-sheet{ width:100%; max-width:440px; max-height:82vh; max-height:82dvh; display:flex; flex-direction:column; overflow:hidden; outline:none;
+    background:#fff; border-radius:28px 28px 0 0; padding-bottom:env(safe-area-inset-bottom,0px); box-shadow:0 -20px 50px -20px rgba(0,0,0,.5); animation:sheetUp .2s ease-out both; }
+  @keyframes sheetUp{ from{ transform:translateY(24px); opacity:0; } to{ transform:none; opacity:1; } }
+  .pk-head{ display:flex; align-items:center; gap:8px; padding:18px 20px 10px; }
+  .pk-head h3{ flex:1; margin:0; font-size:17px; font-weight:700; }
+  .pk-clear{ background:none; border:none; padding:6px 4px; font-family:'Poppins',sans-serif; font-size:13px; font-weight:600; color:var(--warn); cursor:pointer; }
+  .pk-x{ width:36px; height:36px; border-radius:50%; border:none; background:var(--tint); color:var(--blue); font-size:22px; line-height:1; cursor:pointer; }
+  .pk-sheet input.pk-search{ width:auto; margin:0 20px 8px; font-size:16px; border:1.5px solid var(--line); border-radius:999px; padding:10px 16px; }
+  .pk-sheet input.pk-search:focus{ border-color:var(--blue); }
+  .pk-list{ overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:2px 12px 14px; }
+  .pk-group{ position:sticky; top:0; z-index:1; background:#fff; padding:10px 8px 6px; font-size:12px; font-weight:600; color:var(--ink-soft); }
+  .pk-row{ display:flex; align-items:center; gap:12px; width:100%; min-height:58px; margin:2px 0; padding:11px 12px; text-align:left; background:transparent;
+    border:1.5px solid transparent; border-radius:16px; font-family:'Poppins',sans-serif; color:var(--ink); cursor:pointer; }
+  .pk-row:active{ background:var(--tint); }
+  .pk-row[aria-selected=true]{ background:var(--tint); border-color:var(--blue); }
+  .pk-row .pk-body{ flex:1; min-width:0; }
+  .pk-manual .opt-plain{ color:var(--blue); }
+  .pk-tick{ flex:none; position:relative; width:22px; height:22px; border-radius:50%; border:2px solid var(--line); }
+  .pk-row[aria-selected=true] .pk-tick{ background:var(--grad); border-color:transparent; }
+  .pk-row[aria-selected=true] .pk-tick::after{ content:''; position:absolute; left:6px; top:2.5px; width:5px; height:10px; border:solid #fff; border-width:0 2.5px 2.5px 0; transform:rotate(45deg); }
+  .pk-note{ padding:14px 12px; font-size:13px; line-height:1.5; color:var(--ink-soft); }
+  @media (prefers-reduced-motion:reduce){ .pk-sheet{ animation:none; } }
 </style>
 </head>
 <body>
@@ -265,6 +313,11 @@
                 <input type="text" id="mKode" placeholder="Kode alat, mis. XYZ-SB-01">
                 <input type="text" id="mBrand" placeholder="Brand / merk">
                 <input type="text" id="mSpek" placeholder="Spesifikasi / ukuran">
+                <div class="tool-preview" style="margin:4px 0 0">Jenis bahan <span class="req" style="color:var(--warn)">*</span></div>
+                <div class="chips" id="bahanChips" role="radiogroup" aria-label="Jenis bahan mata pisau" style="margin-top:2px">
+                  <button type="button" class="chip" role="radio" aria-checked="false" data-v="TCT">TCT</button>
+                  <button type="button" class="chip" role="radio" aria-checked="false" data-v="PCD">PCD</button>
+                </div>
               </div>
             </div>
           </div>
@@ -347,8 +400,9 @@
           </div>
 
           <div class="field" style="margin-bottom:22px">
-            <label for="fCatatan">Catatan <span class="hint">opsional</span></label>
-            <textarea id="fCatatan" placeholder="Contoh: gigi pecah 2 buah di sisi kiri…"></textarea>
+            <label for="fCatatan">Catatan: kode unik alat <span class="req">*</span></label>
+            <div class="tool-preview" style="margin:0 0 2px">Tulis kode unik yang tertera di alat, biasanya di bawah ukuran. Keterangan kerusakan boleh ditambahkan.</div>
+            <textarea id="fCatatan" placeholder="Contoh: 4521-0387. Gigi pecah 2 buah di sisi kiri" required aria-required="true"></textarea>
           </div>
 
           <button class="submit" id="btnSubmit">Ajukan Asah</button>
@@ -358,7 +412,7 @@
           <svg class="waves" viewBox="0 0 440 60" preserveAspectRatio="none" aria-hidden="true">
             <path d="M0 0 H440 V26 C360 6 300 4 230 26 S80 52 0 26 Z" fill="#fff"/>
           </svg>
-          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span style="opacity:.7;font-size:11px">Versi 3 · 30 Sep 2026</span>
+          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span style="opacity:.7;font-size:11px">Versi 6 · 30 Sep 2026</span>
         </div>
       </div>
 
@@ -413,7 +467,7 @@
 (function(){
   "use strict";
 
-  var DATA = {"machines":[{"code":"RDS001","name":"Panel saw","tools":[{"kode":"Leu-SB-01","nama":"Saw Blade-Leuco","spek":"180 X 4,85-5,65 X 45_Z36","brand":"Leuco"},{"kode":"Leu-SB-02","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z72","brand":"Leuco"},{"kode":"Leu-SB-03","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z84","brand":"Leuco"},{"kode":"Leu-SB-05","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z72","brand":"Leuco"}]},{"code":"RDS002","name":"Fourside edge banding","tools":[{"kode":"Leu-CT-01","nama":"Cutter-Leuco","spek":"150 X 42,9/80 X 45/70_L","brand":"Leuco"},{"kode":"Leu-CT-02","nama":"Cutter-Leuco","spek":"150 X 42,9/80 X 45/70_R","brand":"Leuco"},{"kode":"Leu-CT-03","nama":"Cutter-Leuco","spek":"180 X 43 X 35_Z8+8_L","brand":"Leuco"},{"kode":"Leu-CT-04","nama":"Cutter-Leuco","spek":"180 X 43 X 35_Z8+8_R","brand":"Leuco"},{"kode":"Leu-CT-05","nama":"Cutter-Leuco","spek":"200 X 42,9/60 X 60_L","brand":"Leuco"},{"kode":"Leu-CT-06","nama":"Cutter-Leuco","spek":"200 X 42,9/60 X 60_R","brand":"Leuco"},{"kode":"Leu-CT-07","nama":"Cutter-Leuco","spek":"250 X 8 X 60_Z54+27_L","brand":"Leuco"},{"kode":"Leu-CT-08","nama":"Cutter-Leuco","spek":"250 X 8 X 60_Z54+27_R","brand":"Leuco"}]},{"code":"RDS003","name":"Single Edging","tools":[{"kode":"Leu-CT-09","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_L","brand":"Leuco"},{"kode":"Leu-CT-10","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_R","brand":"Leuco"}]},{"code":"RDS004","name":"Double Edging","tools":[{"kode":"Leu-CT-09","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_L","brand":"Leuco"},{"kode":"Leu-CT-10","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_R","brand":"Leuco"}]},{"code":"RDS015","name":"Panel saw","tools":[{"kode":"Leu-SB-02","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z72","brand":"Leuco"},{"kode":"LEU-CT-49","nama":"MILLING CUTTER","spek":"125x33.1/40.1x30_Z3+3","brand":"Leuco"}]},{"code":"RDS017","name":"CNC Cutting/Cut & Drill","tools":[{"kode":"AKE-SB-01","nama":"Saw blade-Ake","spek":"200 X 4,8-5,8/3,5 X 45_Z36","brand":"Ake"},{"kode":"AKE-SB-04","nama":"Saw Blade-Ake","spek":"400 X 4,4/3,2 X 60_Z72","brand":"Ake"},{"kode":"Hau-SB-01","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Hau-SB-02","nama":"Saw blade-Haupt","spek":"400 X 4,4 X 60_Z84","brand":"Haupt"},{"kode":"Hau-SB-07","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Lei-CT-01","nama":"Cutter-Leitz","spek":"200,3D30Z20/20/20/36/20/20","brand":"Leitz"},{"kode":"Lei-SB-01","nama":"Saw blade-Leitz","spek":"280 X 4/3 X 30_Z72","brand":"Leitz"},{"kode":"Leu-SB-06","nama":"Saw blade-Leuco","spek":"400 X 4,4 X 60_Z84","brand":"Leuco"}]},{"code":"RDS018","name":"CNC Cutting/Cut & Drill","tools":[{"kode":"AKE-SB-01","nama":"Saw blade-Ake","spek":"200 X 4,8-5,8/3,5 X 45_Z36","brand":"Ake"},{"kode":"AKE-SB-04","nama":"Saw Blade-Ake","spek":"400 X 4,4/3,2 X 60_Z72","brand":"Ake"},{"kode":"Hau-SB-01","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Hau-SB-02","nama":"Saw blade-Haupt","spek":"400 X 4,4 X 60_Z84","brand":"Haupt"},{"kode":"Hau-SB-07","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Hau-SB-08","nama":"Saw Blade-Haupt","spek":"400X4,4X60_Z84","brand":"Haupt"},{"kode":"Lei-CT-01","nama":"Cutter-Leitz","spek":"200,3D30Z20/20/20/36/20/20","brand":"Leitz"},{"kode":"Lei-SB-01","nama":"Saw blade-Leitz","spek":"280 X 4/3 X 30_Z72","brand":"Leitz"},{"kode":"Leu-SB-06","nama":"Saw blade-Leuco","spek":"400 X 4,4 X 60_Z84","brand":"Leuco"}]},{"code":"RDS019","name":"CNC Cutting/Cut & Drill","tools":[{"kode":"AKE-SB-01","nama":"Saw blade-Ake","spek":"200 X 4,8-5,8/3,5 X 45_Z36","brand":"Ake"},{"kode":"AKE-SB-04","nama":"Saw Blade-Ake","spek":"400 X 4,4/3,2 X 60_Z72","brand":"Ake"},{"kode":"Hau-SB-01","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Hau-SB-02","nama":"Saw blade-Haupt","spek":"400 X 4,4 X 60_Z84","brand":"Haupt"},{"kode":"Hau-SB-07","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt"},{"kode":"Hau-SB-08","nama":"Saw Blade-Haupt","spek":"400X4,4X60_Z84","brand":"Haupt"},{"kode":"Lei-CT-01","nama":"Cutter-Leitz","spek":"200,3D30Z20/20/20/36/20/20","brand":"Leitz"},{"kode":"Lei-SB-01","nama":"Saw blade-Leitz","spek":"280 X 4/3 X 30_Z72","brand":"Leitz"},{"kode":"Leu-SB-06","nama":"Saw blade-Leuco","spek":"400 X 4,4 X 60_Z84","brand":"Leuco"}]},{"code":"RDS020","name":"Fourside Planner","tools":[{"kode":"Leu-CT-16","nama":"Cutter-Leuco","spek":"180 X 7,5 X 50","brand":"Leuco"},{"kode":"Leu-CT-17","nama":"Cutter-Leuco","spek":"200 X 12 X 50_Z16","brand":"Leuco"},{"kode":"Leu-CT-18","nama":"Cutter-Leuco","spek":"200 X 21,5 X 60_Z12","brand":"Leuco"},{"kode":"Leu-CT-19","nama":"Cutter-Leuco","spek":"200 X 23,5 X 60_Z12","brand":"Leuco"}]},{"code":"RDS021","name":"Fourside Planner","tools":[{"kode":"Leu-CT-16","nama":"Cutter-Leuco","spek":"180 X 7,5 X 50","brand":"Leuco"},{"kode":"Leu-CT-17","nama":"Cutter-Leuco","spek":"200 X 12 X 50_Z16","brand":"Leuco"},{"kode":"Leu-CT-18","nama":"Cutter-Leuco","spek":"200 X 21,5 X 60_Z12","brand":"Leuco"},{"kode":"Leu-CT-19","nama":"Cutter-Leuco","spek":"200 X 23,5 X 60_Z12","brand":"Leuco"}]},{"code":"RDS028","name":"Corner Cutter","tools":[{"kode":"Guo-SB-01","nama":"Saw Blade-Guo","spek":"255 X 3,2/2,2 X 25,4_Z100","brand":"Guo"},{"kode":"Hau-SB-06","nama":"Saw Blade-Haupt","spek":"255 X 3,2 X 25,4_Z100","brand":"Haupt"}]},{"code":"RDS030","name":"Multiblade","tools":[{"kode":"Hau-SB-03","nama":"Saw blade-Haupt","spek":"270 X 2,8 X 100_Z60","brand":"Haupt"}]},{"code":"RDS036","name":"Cross Cut","tools":[{"kode":"Hau-SB-04","nama":"Saw Blade-Haupt","spek":"300 X 3,2 X 30_Z60","brand":"Haupt"}]},{"code":"RDS038","name":"Double and Milling (KOMPLE)","tools":[{"kode":"Leu-CT-22","nama":"Cutter-Leuco","spek":"220 X 8,3 X 60_Z6","brand":"Leuco"},{"kode":"Leu-CT-37","nama":"Cutter-Leuco","spek":"220 X 8 X 60_Z12","brand":"Leuco"},{"kode":"Leu-CT-41","nama":"Cutter-Leuco","spek":"150 X 4/7 X 55_Z18","brand":"Leuco"}]},{"code":"RDS040","name":"Paper Cut","tools":[{"kode":"Hau-SB-05","nama":"Saw Blade-Haupt","spek":"480 X 3,8 X 25,4_Z120","brand":"Haupt"},{"kode":"Luc-SB-01","nama":"Saw Blade-Luckgem","spek":"480 X 3,8 X 25,4_Z120","brand":"Luckgem"}]},{"code":"RDS041","name":"Curve Edging","tools":[{"kode":"Leu-CT-11","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_L","brand":"Leuco"},{"kode":"Leu-CT-12","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_R","brand":"Leuco"},{"kode":"Leu-CT-13","nama":"Cutter-Leuco","spek":"100 X 48 X 30_Z3+3","brand":"Leuco"},{"kode":"Leu-CT-14","nama":"Cutter-Leuco","spek":"100 X 65 X 30_Z3+3","brand":"Leuco"},{"kode":"Leu-CT-15","nama":"Cutter-Leuco","spek":"125 X 48 X 30_Z3+3","brand":"Leuco"}]},{"code":"RDS042","name":"Curve Edging","tools":[{"kode":"Leu-CT-11","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_L","brand":"Leuco"},{"kode":"Leu-CT-12","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_R","brand":"Leuco"},{"kode":"Leu-CT-13","nama":"Cutter-Leuco","spek":"100 X 48 X 30_Z3+3","brand":"Leuco"},{"kode":"Leu-CT-14","nama":"Cutter-Leuco","spek":"100 X 65 X 30_Z3+3","brand":"Leuco"},{"kode":"Leu-CT-15","nama":"Cutter-Leuco","spek":"125 X 48 X 30_Z3+3","brand":"Leuco"}]},{"code":"RDS043","name":"Fourside Planner","tools":[{"kode":"Leu-CT-20","nama":"Cutter-Leuco","spek":"200 X 7,5 X 60_Z12","brand":"Leuco"},{"kode":"Leu-CT-39","nama":"Cutter-Leuco","spek":"200 X 6,5 X 60_Z12","brand":"Leuco"},{"kode":"Leu-CT-40","nama":"Cutter-Leuco","spek":"200 X 7,7 X 60_Z12","brand":"Leuco"},{"kode":"Leu-SB-24","nama":"Saw blade-Leuco","spek":"250 X 3.4/2.2 X 60_Z60","brand":"Leuco"}]}],"brands":["Ake","Guo","Haupt","Leitz","Leuco","Luckgem"]};
+  var DATA = {"machines":[{"code":"RDS001","name":"Panel saw","tools":[{"kode":"Leu-SB-01","nama":"Saw Blade-Leuco","spek":"180 X 4,85-5,65 X 45_Z36","brand":"Leuco","bahan":"TCT"},{"kode":"Leu-SB-02","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z72","brand":"Leuco","bahan":"TCT"},{"kode":"Leu-SB-03","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z84","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-SB-05","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z72","brand":"Leuco","bahan":"TCT"}]},{"code":"RDS002","name":"Fourside edge banding","tools":[{"kode":"Leu-CT-01","nama":"Cutter-Leuco","spek":"150 X 42,9/80 X 45/70_L","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-02","nama":"Cutter-Leuco","spek":"150 X 42,9/80 X 45/70_R","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-03","nama":"Cutter-Leuco","spek":"180 X 43 X 35_Z8+8_L","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-04","nama":"Cutter-Leuco","spek":"180 X 43 X 35_Z8+8_R","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-05","nama":"Cutter-Leuco","spek":"200 X 42,9/60 X 60_L","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-06","nama":"Cutter-Leuco","spek":"200 X 42,9/60 X 60_R","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-07","nama":"Cutter-Leuco","spek":"250 X 8 X 60_Z54+27_L","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-08","nama":"Cutter-Leuco","spek":"250 X 8 X 60_Z54+27_R","brand":"Leuco","bahan":"PCD"}]},{"code":"RDS003","name":"Single Edging","tools":[{"kode":"Leu-CT-09","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_L","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-10","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_R","brand":"Leuco","bahan":"PCD"}]},{"code":"RDS004","name":"Double Edging","tools":[{"kode":"Leu-CT-09","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_L","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-10","nama":"Cutter-Leuco","spek":"125 X 43/80 X 45/70_R","brand":"Leuco","bahan":"PCD"}]},{"code":"RDS015","name":"Panel saw","tools":[{"kode":"Leu-SB-02","nama":"Saw Blade-Leuco","spek":"450 X 4,8/3,5 X 60_Z72","brand":"Leuco","bahan":"TCT"},{"kode":"LEU-CT-49","nama":"MILLING CUTTER","spek":"125x33.1/40.1x30_Z3+3","brand":"Leuco","bahan":"PCD"}]},{"code":"RDS017","name":"CNC Cutting/Cut & Drill","tools":[{"kode":"AKE-SB-01","nama":"Saw blade-Ake","spek":"200 X 4,8-5,8/3,5 X 45_Z36","brand":"Ake","bahan":"TCT"},{"kode":"AKE-SB-04","nama":"Saw Blade-Ake","spek":"400 X 4,4/3,2 X 60_Z72","brand":"Ake","bahan":"TCT"},{"kode":"Hau-SB-01","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt","bahan":"TCT"},{"kode":"Hau-SB-02","nama":"Saw blade-Haupt","spek":"400 X 4,4 X 60_Z84","brand":"Haupt","bahan":"TCT"},{"kode":"Hau-SB-07","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt","bahan":"PCD"},{"kode":"Lei-CT-01","nama":"Cutter-Leitz","spek":"200,3D30Z20/20/20/36/20/20","brand":"Leitz","bahan":"PCD"},{"kode":"Lei-SB-01","nama":"Saw blade-Leitz","spek":"280 X 4/3 X 30_Z72","brand":"Leitz","bahan":"PCD"},{"kode":"Leu-SB-06","nama":"Saw blade-Leuco","spek":"400 X 4,4 X 60_Z84","brand":"Leuco","bahan":"TCT"}]},{"code":"RDS018","name":"CNC Cutting/Cut & Drill","tools":[{"kode":"AKE-SB-01","nama":"Saw blade-Ake","spek":"200 X 4,8-5,8/3,5 X 45_Z36","brand":"Ake","bahan":"TCT"},{"kode":"AKE-SB-04","nama":"Saw Blade-Ake","spek":"400 X 4,4/3,2 X 60_Z72","brand":"Ake","bahan":"TCT"},{"kode":"Hau-SB-01","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt","bahan":"TCT"},{"kode":"Hau-SB-02","nama":"Saw blade-Haupt","spek":"400 X 4,4 X 60_Z84","brand":"Haupt","bahan":"TCT"},{"kode":"Hau-SB-07","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt","bahan":"PCD"},{"kode":"Hau-SB-08","nama":"Saw Blade-Haupt","spek":"400X4,4X60_Z84","brand":"Haupt","bahan":"PCD"},{"kode":"Lei-CT-01","nama":"Cutter-Leitz","spek":"200,3D30Z20/20/20/36/20/20","brand":"Leitz","bahan":"PCD"},{"kode":"Lei-SB-01","nama":"Saw blade-Leitz","spek":"280 X 4/3 X 30_Z72","brand":"Leitz","bahan":"PCD"},{"kode":"Leu-SB-06","nama":"Saw blade-Leuco","spek":"400 X 4,4 X 60_Z84","brand":"Leuco","bahan":"TCT"}]},{"code":"RDS019","name":"CNC Cutting/Cut & Drill","tools":[{"kode":"AKE-SB-01","nama":"Saw blade-Ake","spek":"200 X 4,8-5,8/3,5 X 45_Z36","brand":"Ake","bahan":"TCT"},{"kode":"AKE-SB-04","nama":"Saw Blade-Ake","spek":"400 X 4,4/3,2 X 60_Z72","brand":"Ake","bahan":"TCT"},{"kode":"Hau-SB-01","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt","bahan":"TCT"},{"kode":"Hau-SB-02","nama":"Saw blade-Haupt","spek":"400 X 4,4 X 60_Z84","brand":"Haupt","bahan":"TCT"},{"kode":"Hau-SB-07","nama":"Saw Blade-Haupt","spek":"200 X 4,3/5,3 X 45_Z40","brand":"Haupt","bahan":"PCD"},{"kode":"Hau-SB-08","nama":"Saw Blade-Haupt","spek":"400X4,4X60_Z84","brand":"Haupt","bahan":"PCD"},{"kode":"Lei-CT-01","nama":"Cutter-Leitz","spek":"200,3D30Z20/20/20/36/20/20","brand":"Leitz","bahan":"PCD"},{"kode":"Lei-SB-01","nama":"Saw blade-Leitz","spek":"280 X 4/3 X 30_Z72","brand":"Leitz","bahan":"PCD"},{"kode":"Leu-SB-06","nama":"Saw blade-Leuco","spek":"400 X 4,4 X 60_Z84","brand":"Leuco","bahan":"TCT"}]},{"code":"RDS020","name":"Fourside Planner","tools":[{"kode":"Leu-CT-16","nama":"Cutter-Leuco","spek":"180 X 7,5 X 50","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-17","nama":"Cutter-Leuco","spek":"200 X 12 X 50_Z16","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-18","nama":"Cutter-Leuco","spek":"200 X 21,5 X 60_Z12","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-19","nama":"Cutter-Leuco","spek":"200 X 23,5 X 60_Z12","brand":"Leuco","bahan":"PCD"}]},{"code":"RDS021","name":"Fourside Planner","tools":[{"kode":"Leu-CT-16","nama":"Cutter-Leuco","spek":"180 X 7,5 X 50","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-17","nama":"Cutter-Leuco","spek":"200 X 12 X 50_Z16","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-18","nama":"Cutter-Leuco","spek":"200 X 21,5 X 60_Z12","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-19","nama":"Cutter-Leuco","spek":"200 X 23,5 X 60_Z12","brand":"Leuco","bahan":"PCD"}]},{"code":"RDS028","name":"Corner Cutter","tools":[{"kode":"Guo-SB-01","nama":"Saw Blade-Guo","spek":"255 X 3,2/2,2 X 25,4_Z100","brand":"Guo","bahan":"TCT"},{"kode":"Hau-SB-06","nama":"Saw Blade-Haupt","spek":"255 X 3,2 X 25,4_Z100","brand":"Haupt","bahan":"TCT"}]},{"code":"RDS030","name":"Multiblade","tools":[{"kode":"Hau-SB-03","nama":"Saw blade-Haupt","spek":"270 X 2,8 X 100_Z60","brand":"Haupt","bahan":"TCT"}]},{"code":"RDS036","name":"Cross Cut","tools":[{"kode":"Hau-SB-04","nama":"Saw Blade-Haupt","spek":"300 X 3,2 X 30_Z60","brand":"Haupt","bahan":"TCT"}]},{"code":"RDS038","name":"Double and Milling (KOMPLE)","tools":[{"kode":"Leu-CT-22","nama":"Cutter-Leuco","spek":"220 X 8,3 X 60_Z6","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-37","nama":"Cutter-Leuco","spek":"220 X 8 X 60_Z12","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-41","nama":"Cutter-Leuco","spek":"150 X 4/7 X 55_Z18","brand":"Leuco","bahan":"PCD"}]},{"code":"RDS040","name":"Paper Cut","tools":[{"kode":"Hau-SB-05","nama":"Saw Blade-Haupt","spek":"480 X 3,8 X 25,4_Z120","brand":"Haupt","bahan":"TCT"},{"kode":"Luc-SB-01","nama":"Saw Blade-Luckgem","spek":"480 X 3,8 X 25,4_Z120","brand":"Luckgem","bahan":"TCT"}]},{"code":"RDS041","name":"Curve Edging","tools":[{"kode":"Leu-CT-11","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_L","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-12","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_R","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-13","nama":"Cutter-Leuco","spek":"100 X 48 X 30_Z3+3","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-14","nama":"Cutter-Leuco","spek":"100 X 65 X 30_Z3+3","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-15","nama":"Cutter-Leuco","spek":"125 X 48 X 30_Z3+3","brand":"Leuco","bahan":"PCD"}]},{"code":"RDS042","name":"Curve Edging","tools":[{"kode":"Leu-CT-11","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_L","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-12","nama":"Cutter-Leuco","spek":"100 X 30,2 X 30_Z3+3_R","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-13","nama":"Cutter-Leuco","spek":"100 X 48 X 30_Z3+3","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-14","nama":"Cutter-Leuco","spek":"100 X 65 X 30_Z3+3","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-15","nama":"Cutter-Leuco","spek":"125 X 48 X 30_Z3+3","brand":"Leuco","bahan":"PCD"}]},{"code":"RDS043","name":"Fourside Planner","tools":[{"kode":"Leu-CT-20","nama":"Cutter-Leuco","spek":"200 X 7,5 X 60_Z12","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-39","nama":"Cutter-Leuco","spek":"200 X 6,5 X 60_Z12","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-CT-40","nama":"Cutter-Leuco","spek":"200 X 7,7 X 60_Z12","brand":"Leuco","bahan":"PCD"},{"kode":"Leu-SB-24","nama":"Saw blade-Leuco","spek":"250 X 3.4/2.2 X 60_Z60","brand":"Leuco","bahan":"TCT"}]}],"brands":["Ake","Guo","Haupt","Leitz","Leuco","Luckgem"]};
 
   var LS_API = 'pa_api_url';
   var DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbz9vHxUYy-SEqIM7Fl03YHYUQJPiyUwveXX2jk8gOvJS86WO9RMYbJfOu7jYIaF_Wfc/exec';
@@ -433,6 +487,96 @@
   var alatSel = document.getElementById('fAlat');
   var toolPreview = document.getElementById('toolPreview');
 
+  // ---------- Picker: pengganti dropdown bawaan browser ----------
+  var pkBack = document.createElement('div'); pkBack.className = 'sheet-back';
+  pkBack.innerHTML = '<div class="pk-sheet" role="dialog" aria-modal="true" tabindex="-1"><div class="pk-head"><h3></h3><button type="button" class="pk-clear">Hapus pilihan</button><button type="button" class="pk-x" aria-label="Tutup">&times;</button></div><input type="text" class="pk-search" autocomplete="off"><div class="pk-list" role="listbox"></div></div>';
+  document.body.appendChild(pkBack);
+  var pkSheet = pkBack.firstChild, pkTitle = pkSheet.querySelector('h3'), pkClear = pkSheet.querySelector('.pk-clear'),
+      pkX = pkSheet.querySelector('.pk-x'), pkSearch = pkSheet.querySelector('.pk-search'), pkList = pkSheet.querySelector('.pk-list'), pkCur = null;
+  function mk(tag, cls, txt){ var e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+  function norm(x){ return String(x).toLowerCase().replace(/\s+/g, ''); }
+  function optBody(o, kind){
+    var d = o.dataset, w = mk('div', 'pick-body pk-body');
+    if(kind === 'mesin' && d.code){
+      var r = mk('div', 'opt-mesin'); r.appendChild(mk('span', 'code-badge', d.code)); r.appendChild(mk('span', 'opt-name', d.name + (d.baru ? ' (baru)' : ''))); w.appendChild(r);
+    }else if(d.kode){
+      var b = mk('div', 'opt-tool'), l1 = mk('div', 'l1'); l1.appendChild(mk('span', null, d.kode));
+      if(d.brand && d.brand !== '-') l1.appendChild(mk('span', 'brand-chip', d.brand));
+      b.appendChild(l1); var l2 = mk('div', 'l2'); if(d.bahan){ l2.appendChild(mk('span', 'bahan-badge bahan-' + d.bahan, d.bahan)); } l2.appendChild(document.createTextNode(d.spek)); b.appendChild(l2); if(d.hint) b.appendChild(mk('div', 'l3', d.hint)); w.appendChild(b);
+    }else{ w.appendChild(mk('div', 'opt-plain', o.textContent)); }
+    return w;
+  }
+  function buildList(q){
+    var sel = pkCur.sel, nq = norm(q), cur = sel.selectedIndex;
+    pkList.innerHTML = '';
+    function addRow(o){
+      if(o.disabled){ pkList.appendChild(mk('div', 'pk-note', o.textContent)); return; }
+      if(o.value === '') return;
+      if(nq && norm(o.textContent).indexOf(nq) < 0) return;
+      var row = mk('button', 'pk-row'); row.type = 'button'; row.setAttribute('role', 'option');
+      row.setAttribute('aria-selected', o.index === cur ? 'true' : 'false');
+      if(!o.dataset.code && !o.dataset.kode) row.classList.add('pk-manual');
+      row.appendChild(optBody(o, pkCur.cfg.kind)); row.appendChild(mk('span', 'pk-tick'));
+      row.addEventListener('click', function(){ sel.selectedIndex = o.index; sel.dispatchEvent(new Event('change', {bubbles:true})); pkCur.refresh(); closePicker(); });
+      pkList.appendChild(row);
+    }
+    Array.prototype.forEach.call(sel.children, function(ch){
+      if(ch.tagName === 'OPTGROUP'){
+        var n = pkList.childNodes.length;
+        Array.prototype.forEach.call(ch.children, addRow);
+        if(pkList.childNodes.length > n) pkList.insertBefore(mk('div', 'pk-group', ch.label), pkList.childNodes[n]);
+      }else addRow(ch);
+    });
+    if(!pkList.childNodes.length) pkList.appendChild(mk('div', 'pk-note', 'Tidak ada yang cocok. Coba kata kunci lain.'));
+    pkClear.style.display = (pkCur.cfg.clearable && sel.value !== '') ? '' : 'none';
+  }
+  function closePicker(){
+    if(!pkCur) return;
+    pkBack.classList.remove('open'); document.body.style.overflow = '';
+    pkCur.btn.setAttribute('aria-expanded', 'false'); pkCur.btn.focus(); pkCur = null;
+  }
+  pkX.addEventListener('click', closePicker);
+  pkBack.addEventListener('click', function(e){ if(e.target === pkBack) closePicker(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closePicker(); });
+  pkSearch.addEventListener('input', function(){ if(pkCur) buildList(pkSearch.value); });
+  pkClear.addEventListener('click', function(){ var c = pkCur; c.sel.value = ''; c.sel.dispatchEvent(new Event('change', {bubbles:true})); c.refresh(); closePicker(); });
+
+  function enhance(sel, cfg){
+    var btn = mk('button', 'pick'); btn.type = 'button'; btn.setAttribute('aria-haspopup', 'dialog'); btn.setAttribute('aria-expanded', 'false');
+    var body = mk('div', 'pick-body'); btn.appendChild(body);
+    btn.insertAdjacentHTML('beforeend', '<svg class="chev" width="14" height="9" viewBox="0 0 14 9" aria-hidden="true"><path d="M1 1l6 6 6-6" stroke="#0a66f0" stroke-width="2" fill="none" stroke-linecap="round"/></svg>');
+    sel.parentNode.insertBefore(btn, sel);
+    sel.classList.add('pk-native'); sel.tabIndex = -1; sel.setAttribute('aria-hidden', 'true');
+    function refresh(){
+      var o = sel.options[sel.selectedIndex];
+      btn.disabled = sel.disabled; body.innerHTML = '';
+      if(sel.disabled || !o || o.value === ''){
+        body.appendChild(mk('span', 'pick-ph', sel.disabled && sel.options[0] ? sel.options[0].textContent : cfg.placeholder));
+      }else body.appendChild(optBody(o, cfg.kind));
+    }
+    var vd = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+    Object.defineProperty(sel, 'value', { configurable:true, get:function(){ return vd.get.call(sel); }, set:function(v){ vd.set.call(sel, v); refresh(); } });
+    sel.focus = function(){ btn.focus(); };
+    new MutationObserver(refresh).observe(sel, { childList:true, subtree:true, attributes:true, attributeFilter:['disabled'] });
+    function open(){
+      if(sel.disabled) return;
+      pkCur = { sel:sel, cfg:cfg, btn:btn, refresh:refresh };
+      pkTitle.textContent = cfg.title; pkSearch.placeholder = cfg.searchPh; pkSearch.value = '';
+      pkSearch.style.display = sel.querySelectorAll('option').length > 8 ? '' : 'none';
+      buildList('');
+      pkBack.classList.add('open'); document.body.style.overflow = 'hidden'; btn.setAttribute('aria-expanded', 'true');
+      pkSheet.focus();
+      var on = pkList.querySelector('[aria-selected="true"]'); if(on) on.scrollIntoView({ block:'center' });
+    }
+    btn.addEventListener('click', open);
+    var lbl = document.querySelector('label[for="' + sel.id + '"]');
+    if(lbl) lbl.addEventListener('click', function(e){ e.preventDefault(); open(); });
+    refresh();
+  }
+  enhance(mesinSel, { kind:'mesin', title:'Pilih mesin', placeholder:'Pilih mesin', searchPh:'Cari kode atau nama mesin…' });
+  enhance(alatSel, { kind:'alat', title:'Pilih alat / spesifikasi', placeholder:'Pilih alat', searchPh:'Cari kode, brand, atau ukuran…' });
+  enhance(document.getElementById('fAlatAlt'), { kind:'alat', title:'Cari dari semua alat', placeholder:'Cari dari semua alat / semua mesin', searchPh:'Cari kode, brand, atau ukuran…', clearable:true });
+
   function loadCustomMachines(){
     try{ return JSON.parse(localStorage.getItem(LS_CUSTOM_MACHINES) || '[]'); }catch(e){ return []; }
   }
@@ -443,6 +587,7 @@
     var opt = document.createElement('option');
     opt.value = m.code;
     opt.textContent = m.code + ' — ' + m.name;
+    opt.dataset.code = m.code; opt.dataset.name = m.name;
     groupBawaan.appendChild(opt);
   });
   mesinSel.appendChild(groupBawaan);
@@ -456,6 +601,7 @@
       var opt = document.createElement('option');
       opt.value = m.code;
       opt.textContent = m.code + ' — ' + m.name + ' (baru)';
+      opt.dataset.code = m.code; opt.dataset.name = m.name; opt.dataset.baru = '1';
       groupCustom.appendChild(opt);
     });
     if(custom.length && !mesinSel.contains(groupCustom)) mesinSel.appendChild(groupCustom);
@@ -465,7 +611,7 @@
   var ALL_TOOLS = [];
   DATA.machines.forEach(function(m){
     m.tools.forEach(function(t){
-      ALL_TOOLS.push({ kode:t.kode, brand:t.brand, spek:t.spek, mesin:m.code+' — '+m.name });
+      ALL_TOOLS.push({ kode:t.kode, brand:t.brand, spek:t.spek, bahan:t.bahan||'', mesin:m.code+' — '+m.name });
     });
   });
   ALL_TOOLS.sort(function(a,b){ return a.kode.localeCompare(b.kode); });
@@ -474,7 +620,8 @@
   ALL_TOOLS.forEach(function(t, i){
     var o = document.createElement('option');
     o.value = i;
-    o.textContent = t.kode + ' · ' + t.brand + ' · ' + t.spek + '  (biasanya di ' + t.mesin + ')';
+    o.textContent = t.kode + ' · ' + t.brand + ' · ' + (t.bahan ? t.bahan + ' · ' : '') + t.spek + '  (biasanya di ' + t.mesin + ')';
+    o.dataset.kode = t.kode; o.dataset.brand = t.brand; o.dataset.spek = t.spek; o.dataset.bahan = t.bahan || ''; o.dataset.hint = 'Biasanya di ' + t.mesin;
     altSel.appendChild(o);
   });
   var manualOpt = document.createElement('option');
@@ -502,7 +649,8 @@
     m.tools.forEach(function(t, i){
       var o = document.createElement('option');
       o.value = i;
-      o.textContent = t.kode + ' · ' + t.brand + ' · ' + t.spek;
+      o.textContent = t.kode + ' · ' + t.brand + ' · ' + (t.bahan ? t.bahan + ' · ' : '') + t.spek;
+      o.dataset.kode = t.kode; o.dataset.brand = t.brand; o.dataset.spek = t.spek; o.dataset.bahan = t.bahan || '';
       alatSel.appendChild(o);
     });
   });
@@ -511,7 +659,7 @@
     var m = machineByCode[mesinSel.value];
     if(!m || alatSel.value===''){ toolPreview.innerHTML=''; return; }
     var t = m.tools[alatSel.value];
-    toolPreview.innerHTML = '<b>'+t.kode+'</b> — '+t.nama+' &middot; '+t.spek;
+    toolPreview.innerHTML = '<b>'+t.kode+'</b> — '+t.nama+' &middot; '+(t.bahan ? '<b>'+t.bahan+'</b> &middot; ' : '')+t.spek;
     altSel.value = ''; toggleManualGrid(false);
   });
 
@@ -527,12 +675,14 @@
   altSel.addEventListener('change', function(){
     if(altSel.value === 'manual'){ toggleManualGrid(true); }
     else{
-      toggleManualGrid(false);
+      toggleManualGrid(false); clearBahan();
       if(altSel.value !== '') alatSel.value = '';
       toolPreview.textContent = '';
     }
   });
+  function clearBahan(){ bahan=''; if(typeof bahanWrap!=='undefined' && bahanWrap) bahanWrap.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); x.setAttribute('aria-checked','false'); }); }
   function resetAlt(){
+    clearBahan();
     altSel.value = '';
     toggleManualGrid(false);
     altBox.style.display = 'none';
@@ -548,7 +698,7 @@
       var brand = document.getElementById('mBrand').value.trim();
       var spek = document.getElementById('mSpek').value.trim();
       if(!kode || !spek) return null;
-      return { kode:kode, brand:brand || '-', spek:spek };
+      return { kode:kode, brand:brand || '-', spek:spek, bahan:bahan };
     }
     if(altSel.value !== ''){
       return ALL_TOOLS[altSel.value];
@@ -556,7 +706,7 @@
     var m = machineByCode[mesinSel.value];
     if(m && alatSel.value !== ''){
       var t = m.tools[alatSel.value];
-      return { kode:t.kode, brand:t.brand, spek:t.spek };
+      return { kode:t.kode, brand:t.brand, spek:t.spek, bahan:t.bahan || '' };
     }
     return null;
   }
@@ -1071,6 +1221,15 @@
   function showError(msg){ errBox.textContent = msg; errBox.style.display='block'; }
   function clearError(){ errBox.style.display='none'; }
 
+  var bahan = '';
+  var bahanWrap = document.getElementById('bahanChips');
+  bahanWrap.querySelectorAll('.chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      bahanWrap.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); x.setAttribute('aria-checked','false'); });
+      c.classList.add('on'); c.setAttribute('aria-checked','true'); bahan = c.getAttribute('data-v');
+    });
+  });
+
   var btnSubmit = document.getElementById('btnSubmit');
   btnSubmit.addEventListener('click', function(){
     clearError();
@@ -1082,12 +1241,17 @@
     if(!m){ showError('Pilih mesin terlebih dahulu.'); mesinSel.focus(); return; }
     var tool = resolveTool();
     if(!tool){ showError('Pilih alat / spesifikasi, atau isi manual di "Pilih ukuran lain".'); return; }
+    if(altSel.value === 'manual' && !bahan){ showError('Pilih jenis bahan alat: TCT atau PCD.'); bahanWrap.scrollIntoView({behavior:'smooth', block:'center'}); return; }
     if(!kondisi){ showError('Pilih kondisi alat, atau isi manual kalau pilih "Lainnya".'); return; }
     if(!fotoBlob){ showError('Foto seluruh alat wajib diisi dan harus lolos pengecekan (jelas, tidak buram).'); photoZoneRow.scrollIntoView({behavior:'smooth', block:'center'}); return; }
     if(!fFull.checked){ showError('Centang konfirmasi bahwa seluruh alat terlihat dari tepi ke tepi.'); fullWrap.scrollIntoView({behavior:'smooth', block:'center'}); return; }
 
     var qty = parseInt(document.getElementById('fQty').value,10) || 1;
     var catatan = document.getElementById('fCatatan').value.trim();
+    if(catatan.length < 3){
+      showError('Catatan wajib diisi dengan kode unik yang tertera di alat (biasanya di bawah ukuran).');
+      var fc = document.getElementById('fCatatan'); fc.scrollIntoView({behavior:'smooth', block:'center'}); fc.focus(); return;
+    }
     var KOND_OK = ['Tumpul','Gompal','Patah','Aus / Gundul'];
     var kondisiKirim = KOND_OK.indexOf(kondisi) >= 0 ? kondisi : 'Lainnya';
     if(kondisiKirim === 'Lainnya' && kondisi !== 'Lainnya') catatan = ('Kondisi: ' + kondisi + (catatan ? '. ' + catatan : '')).slice(0, 500);
@@ -1102,7 +1266,8 @@
       kodeAlat: tool.kode,
       manual: altSel.value === 'manual',
       brand: tool.brand,
-      spesifikasi: tool.spek,
+      spesifikasi: (tool.bahan ? tool.bahan + ' · ' : '') + tool.spek,
+      bahan: tool.bahan || '',
       qty: qty,
       kondisi: kondisiKirim,
       catatan: catatan,
@@ -1164,6 +1329,7 @@
     mesinSel.value=''; mesinSel.dispatchEvent(new Event('change'));
     document.getElementById('fQty').value='1';
     document.getElementById('fCatatan').value='';
+    bahan=''; bahanWrap.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); x.setAttribute('aria-checked','false'); });
     chipsWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); kondisi='';
     kondisiManualInput.style.display='none'; kondisiManualInput.value='';
     fFotoKamera.value=''; fFotoGaleri.value=''; fotoBlob = null; photoPreview.style.display='none'; photoZoneRow.style.display='flex'; photoCheck.style.display='none';
