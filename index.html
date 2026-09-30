@@ -358,7 +358,7 @@
           <svg class="waves" viewBox="0 0 440 60" preserveAspectRatio="none" aria-hidden="true">
             <path d="M0 0 H440 V26 C360 6 300 4 230 26 S80 52 0 26 Z" fill="#fff"/>
           </svg>
-          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.
+          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span style="opacity:.7;font-size:11px">Versi 3 · 30 Sep 2026</span>
         </div>
       </div>
 
@@ -1172,7 +1172,19 @@
     clearError();
   });
 
-  if('serviceWorker' in navigator){ window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
+  if('serviceWorker' in navigator){
+    var hadCtl = !!navigator.serviceWorker.controller, reloaded = false;
+    // Versi baru aktif -> muat ulang sekali (kecuali operator sedang memegang foto yang belum dikirim)
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if(hadCtl && !reloaded && !fotoBlob){ reloaded = true; location.reload(); }
+    });
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js', { updateViaCache:'none' }).then(function(reg){
+        reg.update().catch(function(){});
+        document.addEventListener('visibilitychange', function(){ if(!document.hidden) reg.update().catch(function(){}); });
+      }).catch(function(){});
+    });
+  }
 
 })();
 </script>
