@@ -2,231 +2,245 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#c25f18">
+<meta name="theme-color" content="#2a2a5e">
 <title>Pengajuan Asah — RDI Tools</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#1a1c1e;
-    --bg-2:#212427;
-    --metal:#3a3f45;
-    --metal-line:#4a5057;
-    --kraft:#e9ddc0;
-    --kraft-2:#ded0ab;
-    --kraft-shadow:#c9b98c;
-    --ink:#28241b;
-    --ink-soft:#5b5442;
-    --spark:#ef7b2c;
-    --spark-dark:#c25f18;
-    --ok:#3f7a4c;
-    --ok-bg:#e4efe1;
-    --warn:#b3392b;
-    --warn-bg:#f4e2dd;
-    --steel-text:#c7ccd1;
-    --steel-dim:#7d868d;
+    --navy:#2a2a5e;
+    --navy-2:#1d1e4a;
+    --blue:#0a66f0;
+    --sky:#14a6ff;
+    --cyan:#28d4ff;
+    --ink:#1b2850;
+    --ink-soft:#5d6c8e;
+    --line:#c8d5ea;
+    --tint:#eef4fd;
+    --ok:#0c9463;
+    --ok-bg:#e0f6ed;
+    --warn:#d93a3a;
+    --warn-bg:#fde9e8;
+    --grad:linear-gradient(135deg,#0a66f0 0%,#14a6ff 100%);
     font-size:16px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  html{background:#1d1e4a;}
   body{
     min-height:100vh; min-height:100dvh;
-    background:
-      radial-gradient(1100px 700px at 50% -10%, #2a2e32 0%, var(--bg) 55%),
-      repeating-linear-gradient(135deg, rgba(255,255,255,.018) 0 2px, transparent 2px 26px);
-    font-family:'Inter',system-ui,sans-serif;
-    color:var(--steel-text);
-    display:flex;
-    justify-content:center;
-    padding:28px 14px 60px;
-  }
-  .floor-label{
-    position:fixed; top:16px; left:0; right:0; text-align:center;
-    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em;
-    color:var(--steel-dim); pointer-events:none; text-transform:uppercase;
-  }
-  .wrap{ width:100%; max-width:460px; margin-top:26px; }
-  .hanger{ display:flex; justify-content:center; margin-bottom:-14px; position:relative; z-index:2; }
-  .hanger svg{ filter:drop-shadow(0 3px 3px rgba(0,0,0,.45)); }
-  .ticket{
-    position:relative;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,0) 8%),
-      var(--kraft);
-    border-radius:6px;
-    box-shadow:0 22px 50px -18px rgba(0,0,0,.65), 0 2px 0 rgba(255,255,255,.15) inset;
+    background:linear-gradient(180deg,var(--navy) 0%,var(--navy-2) 100%) fixed;
+    font-family:'Poppins',system-ui,sans-serif;
     color:var(--ink);
-    overflow:hidden;
+    display:flex; justify-content:center;
+    padding:22px 14px calc(70px + env(safe-area-inset-bottom,0px));
+    -webkit-tap-highlight-color:transparent;
   }
-  .ticket::before{
-    content:''; position:absolute; inset:0; pointer-events:none; opacity:.5;
-    background-image: radial-gradient(rgba(0,0,0,.05) 1px, transparent 1px);
-    background-size:3px 3px;
+  .wrap{ width:100%; max-width:440px; }
+  .card{
+    background:#fff; border-radius:30px; overflow:hidden;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.55);
   }
-  .punch{
-    width:20px; height:20px; border-radius:50%;
-    background:radial-gradient(circle at 35% 32%, #3a3d40, #16171a 70%);
-    box-shadow:inset 0 2px 3px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05);
-    position:absolute; top:14px; left:50%; transform:translateX(-50%);
-    z-index:3;
+
+  /* ---------- Kepala biru bergelombang ---------- */
+  .hero{
+    position:relative; color:#fff; text-align:center;
+    padding:34px 26px 78px;
+    background:linear-gradient(165deg,#0a5ff0 0%,#149eff 58%,#2ad6ff 100%);
   }
-  .head{ padding:34px 26px 18px; text-align:center; border-bottom:2px dashed var(--kraft-shadow); position:relative; }
-  .eyebrow{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; color:var(--ink-soft); text-transform:uppercase; }
-  .title{ font-family:'Oswald',sans-serif; font-weight:700; font-size:29px; letter-spacing:.01em; margin:6px 0 4px; color:var(--ink); }
-  .sub{ font-size:13px; color:var(--ink-soft); }
+  .logo{
+    width:58px; height:58px; margin:0 auto 14px; border-radius:50%;
+    border:2px solid rgba(255,255,255,.85); display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,.14);
+  }
+  .company{ font-size:12.5px; font-weight:500; opacity:.88; margin:0 0 6px; }
+  .hero h1{ font-size:28px; line-height:1.15; font-weight:700; margin:0 0 6px; }
+  .hero p.lead{ font-size:13px; line-height:1.5; margin:0 auto; max-width:300px; opacity:.92; }
+  .waves{ position:absolute; left:0; right:0; bottom:-1px; width:100%; height:84px; display:block; }
+
+  .sheet{ padding:2px 24px 8px; }
   .ticket-meta{
-    display:flex; justify-content:space-between; margin-top:16px;
-    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft);
-    border-top:1px solid var(--kraft-shadow); padding-top:10px;
+    display:flex; justify-content:space-between; gap:12px; margin:0 0 20px;
+    font-size:12px; color:var(--ink-soft);
   }
-  .ticket-meta b{ color:var(--ink); }
-  .body{ padding:22px 24px 26px; }
-  .field{ margin-bottom:18px; }
-  .field label{ display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:6px; letter-spacing:.01em; }
-  .field label .req{ color:var(--warn); }
-  .field label .hint{ font-weight:400; color:var(--kraft-shadow); margin-left:4px; }
+  .ticket-meta b{ display:block; font-size:13.5px; color:var(--ink); font-weight:600; }
+  .ticket-meta span:last-child{ text-align:right; }
+
+  .field{ margin-bottom:20px; }
+  .field > label{ display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:4px; }
+  .field > label .req{ color:var(--warn); }
+  .field > label .hint{ font-weight:400; color:#94a3c0; margin-left:4px; }
   input[type=text], input[type=number], select, textarea{
-    width:100%; font-family:'Inter',sans-serif; font-size:15px; color:var(--ink);
-    background:rgba(255,255,255,.35); border:none;
-    border-bottom:2px solid var(--ink-soft);
-    padding:10px 4px 9px; outline:none; transition:border-color .15s, background .15s;
-    appearance:none; -webkit-appearance:none; border-radius:2px 2px 0 0;
+    width:100%; font-family:'Poppins',sans-serif; font-size:15px; color:var(--ink);
+    background:transparent; border:none; border-bottom:1.5px solid var(--line);
+    padding:9px 2px 9px; outline:none; border-radius:0;
+    appearance:none; -webkit-appearance:none; transition:border-color .15s;
   }
   select{
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9'><path d='M1 1l6 6 6-6' stroke='%2328241b' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
-    background-repeat:no-repeat; background-position:right 6px center; padding-right:26px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9'><path d='M1 1l6 6 6-6' stroke='%230a66f0' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat; background-position:right 4px center; padding-right:26px;
   }
-  input:focus, select:focus, textarea:focus{ border-color:var(--spark); background:rgba(255,255,255,.55); }
-  textarea{ resize:vertical; min-height:64px; border:2px solid var(--ink-soft); border-radius:4px; padding:9px 10px; background:rgba(255,255,255,.35);}
-  textarea:focus{ border-color:var(--spark); }
-  ::placeholder{ color:#9a927a; }
-  select:disabled, input:disabled{ opacity:.4; }
-  .tool-preview{ margin-top:7px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); min-height:16px; }
+  input:focus, select:focus, textarea:focus{ border-color:var(--blue); }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible{ outline:2px solid var(--sky); outline-offset:2px; }
+  textarea{ resize:vertical; min-height:70px; border:1.5px solid var(--line); border-radius:14px; padding:10px 12px; margin-top:4px; }
+  ::placeholder{ color:#a3afc9; }
+  select:disabled, input:disabled{ opacity:.45; }
+  .tool-preview{ margin-top:7px; font-size:12px; color:var(--ink-soft); min-height:16px; }
   .tool-preview b{ color:var(--ink); }
   .link-btn{
     display:inline-block; margin-top:9px; background:none; border:none; padding:0;
-    font-family:'Inter',sans-serif; font-size:12.5px; font-weight:600; color:var(--spark-dark);
-    cursor:pointer; text-decoration:underline; text-underline-offset:2px;
+    font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:600; color:var(--blue); cursor:pointer;
   }
-  .alt-box{ margin-top:12px; padding-top:12px; border-top:1px dashed var(--kraft-shadow); }
-  .manual-grid{ display:grid; grid-template-columns:1fr; gap:8px; margin-top:8px; }
+  .alt-box{ margin-top:12px; padding:12px 14px 14px; background:var(--tint); border-radius:16px; }
+  .alt-box select, .alt-box input{ border-bottom-color:#b9c9e4; }
+  .manual-grid{ display:grid; grid-template-columns:1fr; gap:6px; margin-top:8px; }
   .manual-grid input{ font-size:13.5px; }
   .mesin-row{ display:flex; gap:10px; align-items:center; }
   .mesin-row select{ flex:1; }
-  .qty-row{ display:flex; align-items:stretch; gap:10px; }
-  .stepper{ display:flex; align-items:center; border:2px solid var(--ink-soft); border-radius:6px; overflow:hidden; background:rgba(255,255,255,.35); }
-  .stepper button{ width:42px; border:none; background:transparent; font-size:20px; color:var(--ink); cursor:pointer; font-weight:600; }
-  .stepper button:active{ background:rgba(0,0,0,.08); }
-  .stepper input{ width:52px; text-align:center; border:none; border-left:1px solid var(--kraft-shadow); border-right:1px solid var(--kraft-shadow); background:transparent; padding:9px 0; }
-  .unit-toggle{ display:flex; border:2px solid var(--ink-soft); border-radius:6px; overflow:hidden; flex:1; }
-  .unit-toggle button{ flex:1; border:none; background:transparent; padding:0 8px; font-size:13px; color:var(--ink-soft); cursor:pointer; font-family:'Inter',sans-serif; }
-  .unit-toggle button.on{ background:var(--ink-soft); color:var(--kraft); font-weight:600; }
-  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
-  .chip{ padding:8px 13px; border-radius:999px; border:2px solid var(--ink-soft); font-size:13.5px; color:var(--ink-soft); cursor:pointer; font-weight:500; background:transparent; transition:all .12s; }
-  .chip.on{ background:var(--spark); border-color:var(--spark-dark); color:#241000; font-weight:700; box-shadow:0 2px 0 var(--spark-dark); }
-  .photo-zone-row{ display:flex; gap:8px; }
-  .photo-zone{
-    flex:1; padding:14px 8px; border:2px dashed var(--ink-soft); border-radius:8px;
-    background:rgba(255,255,255,.25); color:var(--ink-soft); font-family:'Inter',sans-serif;
-    font-size:13px; font-weight:600; cursor:pointer; text-align:center;
+
+  .qty-row{ display:flex; }
+  .stepper{ display:flex; align-items:center; border:1.5px solid var(--line); border-radius:999px; overflow:hidden; }
+  .stepper button{ width:46px; height:42px; border:none; background:transparent; font-size:20px; color:var(--blue); cursor:pointer; font-weight:600; }
+  .stepper button:active{ background:var(--tint); }
+  .stepper input{ width:56px; text-align:center; border:none; padding:9px 0; font-weight:600; }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .chip{
+    padding:8px 15px; border-radius:999px; border:1.5px solid var(--blue); background:transparent;
+    font-family:'Poppins',sans-serif; font-size:13px; font-weight:500; color:var(--blue); cursor:pointer;
+    transition:background-color .12s,color .12s;
   }
-  .photo-zone:active{ background:rgba(255,255,255,.4); }
-  .photo-preview{ position:relative; margin-top:10px; display:inline-block; }
-  .photo-preview img{ width:120px; height:120px; object-fit:cover; border-radius:8px; border:2px solid var(--ink-soft); display:block; }
+  .chip.on{ background:var(--grad); border-color:transparent; color:#fff; font-weight:600; box-shadow:0 6px 14px -6px rgba(10,102,240,.7); }
+  #fKondisiManual{ margin-top:8px; }
+
+  /* ---------- Panduan & pengecekan foto ---------- */
+  .shot-guide{ background:var(--tint); border-radius:18px; padding:14px 14px 12px; margin:6px 0 12px; }
+  .shot-demo{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 0 12px; }
+  .shot-demo figure{ margin:0; text-align:center; }
+  .shot-demo svg{ width:100%; height:auto; display:block; border-radius:12px; }
+  .shot-demo figcaption{ font-size:11.5px; font-weight:600; margin-top:6px; line-height:1.35; }
+  .shot-demo .ok{ color:var(--ok); }
+  .shot-demo .bad{ color:var(--warn); }
+  .shot-tips{ margin:0; padding:0 0 0 18px; font-size:12.5px; line-height:1.55; color:var(--ink); }
+  .shot-tips li{ margin-bottom:3px; }
+  .photo-zone-row{ display:flex; gap:10px; }
+  .photo-zone{
+    flex:1; display:flex; align-items:center; justify-content:center; gap:7px;
+    padding:12px 8px; border-radius:999px; font-family:'Poppins',sans-serif;
+    font-size:13px; font-weight:600; cursor:pointer;
+  }
+  .photo-zone.main{ border:none; background:var(--grad); color:#fff; box-shadow:0 8px 16px -8px rgba(10,102,240,.8); }
+  .photo-zone.alt{ border:1.5px solid var(--blue); background:transparent; color:var(--blue); }
+  .photo-preview{ position:relative; margin-top:12px; }
+  .photo-preview img{ width:100%; max-height:300px; object-fit:contain; background:var(--navy-2); border-radius:16px; display:block; }
+  .photo-preview .cap{
+    position:absolute; left:10px; top:10px; background:rgba(29,30,74,.78); color:#fff;
+    font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:999px;
+  }
   .photo-preview button{
-    position:absolute; top:-8px; right:-8px; width:24px; height:24px; border-radius:50%;
-    background:var(--warn); color:#fff; border:2px solid var(--kraft); font-size:14px; line-height:1;
+    position:absolute; top:-8px; right:-6px; width:28px; height:28px; border-radius:50%;
+    background:var(--warn); color:#fff; border:2px solid #fff; font-size:15px; line-height:1;
     cursor:pointer; font-weight:700;
   }
-  .photo-check{
-    display:inline-flex; align-items:center; gap:6px; margin-top:9px; margin-left:10px;
-    font-size:12.5px; font-weight:600; padding:6px 11px; border-radius:999px;
-  }
-  .photo-check.ok{ background:var(--ok-bg); color:var(--ok); }
+  .photo-check{ margin-top:10px; font-size:12.5px; font-weight:500; line-height:1.5; padding:10px 14px; border-radius:14px; }
+  .photo-check.ok{ background:var(--ok-bg); color:var(--ok); font-weight:600; }
   .photo-check.bad{ background:var(--warn-bg); color:var(--warn); }
-  .photo-check.checking{ background:rgba(0,0,0,.06); color:var(--ink-soft); }
-  .divider{ border:none; border-top:1px dashed var(--kraft-shadow); margin:22px 0 18px; }
-  .submit-wrap{ margin-top:6px; }
+  .photo-check.checking{ background:var(--tint); color:var(--ink-soft); }
+  .confirm{ display:flex; gap:10px; align-items:flex-start; margin-top:10px; font-size:12.5px; line-height:1.5; color:var(--ink); cursor:pointer; }
+  .confirm input{ width:20px; height:20px; margin:1px 0 0; accent-color:var(--blue); flex:none; }
+
   button.submit{
-    width:100%; padding:16px; font-family:'Oswald',sans-serif; font-size:18px;
-    letter-spacing:.06em; font-weight:600; color:#2a1200; text-transform:uppercase;
-    background:linear-gradient(180deg, #ff9548, var(--spark) 55%, var(--spark-dark));
-    border:none; border-radius:8px; cursor:pointer;
-    box-shadow:0 5px 0 var(--spark-dark), 0 10px 18px -8px rgba(194,95,24,.6);
-    transition:transform .08s;
+    width:100%; padding:15px; font-family:'Poppins',sans-serif; font-size:16px; font-weight:600; color:#fff;
+    background:var(--grad); border:none; border-radius:999px; cursor:pointer; margin-top:4px;
+    box-shadow:0 12px 22px -10px rgba(10,102,240,.85); transition:transform .08s;
   }
-  button.submit:active{ transform:translateY(3px); box-shadow:0 2px 0 var(--spark-dark); }
-  button.submit:disabled{ opacity:.55; cursor:progress; box-shadow:0 5px 0 var(--spark-dark); }
-  .footnote{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:12px; line-height:1.5; }
-  .errbox{ background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn); border-radius:6px; padding:9px 11px; font-size:12.5px; margin-bottom:14px; display:none; }
-  .offline-flag{ display:none; align-items:center; gap:6px; background:#fff2df; border:1px solid #d7a24d; color:#7a5410; font-size:12px; padding:7px 10px; border-radius:6px; margin-bottom:14px; }
-  .dot{ width:7px; height:7px; border-radius:50%; background:#d7a24d; flex:none; }
-  .success{ display:none; padding:44px 24px 40px; text-align:center; position:relative; }
-  .stamp{
-    display:inline-block; border:5px solid var(--ok); color:var(--ok);
-    font-family:'Oswald',sans-serif; font-weight:700; font-size:27px; letter-spacing:.06em;
-    padding:10px 22px; border-radius:10px; transform:rotate(-8deg) scale(0);
-    text-transform:uppercase; animation:stampin .38s cubic-bezier(.2,1.4,.4,1) .1s forwards;
+  button.submit:active{ transform:translateY(2px); }
+  button.submit:disabled{ opacity:.6; cursor:progress; }
+  .errbox{ background:var(--warn-bg); color:var(--warn); border-radius:14px; padding:10px 14px; font-size:12.5px; line-height:1.5; margin-bottom:16px; display:none; }
+  .offline-flag{ display:none; align-items:center; gap:8px; background:#fff4de; color:#8a5a08; font-size:12px; line-height:1.4; padding:9px 14px; border-radius:14px; margin-bottom:16px; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:#f0a020; flex:none; }
+
+  /* ---------- Kaki biru ---------- */
+  .foot{ position:relative; margin-top:18px; padding:54px 24px 24px; text-align:center; color:#fff; font-size:12px; line-height:1.55;
+    background:linear-gradient(165deg,#0a5ff0 0%,#149eff 60%,#2ad6ff 100%); }
+  .foot .waves{ top:-1px; bottom:auto; height:60px; }
+  .foot b{ font-weight:600; }
+
+  /* ---------- Layar sukses ---------- */
+  .success{
+    display:none; position:relative; text-align:center; color:#fff; min-height:520px;
+    padding:56px 26px 110px; background:linear-gradient(165deg,#0a5ff0 0%,#149eff 58%,#2ad6ff 100%);
   }
-  @keyframes stampin{ 0%{ transform:rotate(-8deg) scale(2.4); opacity:0; } 60%{ opacity:1; } 100%{ transform:rotate(-8deg) scale(1); opacity:1; } }
-  .success .tnum{ margin-top:20px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); }
-  .success .tnum b{ color:var(--ink); font-size:15px; }
-  .success p{ font-size:13.5px; color:var(--ink-soft); max-width:280px; margin:14px auto 0; line-height:1.55; }
-  .success button{ margin-top:22px; background:none; border:2px solid var(--ink-soft); color:var(--ink); padding:11px 20px; border-radius:8px; font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px; cursor:pointer; }
+  .success .waves{ height:96px; bottom:-1px; }
+  .success .waves.top{ top:auto; }
+  .checkmark{ width:78px; height:78px; margin:0 auto 16px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center;
+    animation:pop .4s cubic-bezier(.2,1.4,.4,1) both; }
+  @keyframes pop{ from{ transform:scale(.4); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  .success h2{ margin:0 0 4px; font-size:26px; font-weight:700; }
+  .success .tnum{ font-size:12.5px; opacity:.9; margin-top:14px; }
+  .success .tnum b{ display:block; font-size:17px; font-weight:600; margin-top:2px; opacity:1; }
+  .success p{ font-size:13px; line-height:1.6; max-width:290px; margin:14px auto 0; opacity:.95; }
+  .btn-pill{ display:inline-block; margin-top:14px; padding:12px 24px; border-radius:999px; font-family:'Poppins',sans-serif; font-weight:600; font-size:13.5px; text-decoration:none; cursor:pointer; }
+  .btn-white{ background:#fff; color:var(--blue); border:none; }
+  .btn-line{ background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.9); }
+  .success .actions{ position:relative; z-index:1; }
+
   .gear{
-    position:fixed; bottom:16px; right:16px; width:38px; height:38px; border-radius:50%;
-    background:var(--bg-2); border:1px solid var(--metal-line); color:var(--steel-dim);
-    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; z-index:10;
+    position:fixed; bottom:calc(14px + env(safe-area-inset-bottom,0px)); right:14px; width:40px; height:40px; border-radius:50%;
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.35); color:#fff;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; z-index:10;
   }
-  .cfg-modal{ display:none; position:fixed; inset:0; background:rgba(10,10,10,.6); z-index:20; align-items:center; justify-content:center; padding:20px; }
-  .cfg-box{ background:var(--bg-2); border:1px solid var(--metal-line); border-radius:10px; padding:20px; width:100%; max-width:360px; color:var(--steel-text); }
-  .cfg-box h3{ margin:0 0 4px; font-family:'Oswald',sans-serif; font-size:17px; }
-  .cfg-box p{ font-size:12px; color:var(--steel-dim); margin:0 0 14px; line-height:1.5; }
-  .cfg-box input{ background:#181a1c; color:var(--steel-text); border:1px solid var(--metal-line); border-radius:5px; padding:9px 10px; margin-bottom:10px; }
-  .cfg-box input:focus{ border-color:var(--spark); }
-  .cfg-actions{ display:flex; gap:8px; margin-top:14px; }
-  .cfg-actions button{ flex:1; padding:10px; border-radius:6px; border:1px solid var(--metal-line); cursor:pointer; font-family:'Inter',sans-serif; font-weight:600; font-size:13px; }
-  .cfg-actions .save{ background:var(--spark); border-color:var(--spark-dark); color:#241000; }
-  .cfg-actions .close{ background:transparent; color:var(--steel-text); }
+  .cfg-modal{ display:none; position:fixed; inset:0; background:rgba(20,20,50,.65); z-index:20; align-items:center; justify-content:center; padding:20px; }
+  .cfg-box{ background:#fff; border-radius:24px; padding:22px; width:100%; max-width:360px; color:var(--ink); }
+  .cfg-box h3{ margin:0 0 4px; font-size:17px; font-weight:700; }
+  .cfg-box p{ font-size:12px; color:var(--ink-soft); margin:0 0 14px; line-height:1.55; }
+  .cfg-box input{ margin-bottom:8px; }
+  .cfg-actions{ display:flex; gap:10px; margin-top:16px; }
+  .cfg-actions button{ flex:1; padding:11px; border-radius:999px; border:1.5px solid var(--blue); cursor:pointer; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; }
+  .cfg-actions .save{ background:var(--grad); border-color:transparent; color:#fff; }
+  .cfg-actions .close{ background:transparent; color:var(--blue); }
+  @media (prefers-reduced-motion:reduce){ .checkmark{ animation:none; } }
 </style>
 </head>
 <body>
-  <div class="floor-label">PT RAYARD DELI INDONESIA · GUDANG TOOLS</div>
-
   <div class="wrap">
-    <div class="hanger">
-      <svg width="60" height="20" viewBox="0 0 60 20"><path d="M30 0 C 30 12, 12 8, 12 18 C 12 8, 48 8, 48 18 C 48 8, 30 12, 30 0" stroke="#4a5057" stroke-width="2.4" fill="none"/></svg>
-    </div>
-
-    <div class="ticket">
-      <div class="punch"></div>
+    <div class="card">
 
       <div id="formView">
-        <div class="head">
-          <div class="eyebrow">Form Internal · Gudang RDI</div>
-          <div class="title">Pengajuan Asah</div>
-          <div class="sub">Ajukan alat potong tumpul untuk dikirim ke vendor asah</div>
-          <div class="ticket-meta">
-            <span>No. Tiket<br><b id="ticketNo">—</b></span>
-            <span style="text-align:right">Tanggal<br><b id="ticketDate">—</b></span>
+        <header class="hero">
+          <div class="logo" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="9" stroke="#fff" stroke-width="2"/><circle cx="16" cy="16" r="2.4" fill="#fff"/><circle cx="16" cy="16" r="12.6" stroke="#fff" stroke-width="4" stroke-dasharray="2.6 2.6" opacity=".95"/></svg>
           </div>
-        </div>
+          <p class="company">PT Rayard Deli Indonesia · Gudang Tools</p>
+          <h1>Pengajuan Asah</h1>
+          <p class="lead">Ajukan alat potong tumpul untuk dikirim ke vendor asah</p>
+          <svg class="waves" viewBox="0 0 440 84" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 44 C70 8 130 12 200 40 S340 76 440 30 V84 H0 Z" fill="rgba(255,255,255,.22)"/>
+            <path d="M0 62 C80 34 150 40 220 60 S360 86 440 52 V84 H0 Z" fill="#fff"/>
+          </svg>
+        </header>
 
-        <div class="body">
+        <div class="sheet">
+          <div class="ticket-meta">
+            <span>No. Tiket<b id="ticketNo">—</b></span>
+            <span>Tanggal<b id="ticketDate">—</b></span>
+          </div>
+
           <div class="offline-flag" id="offlineFlag"><span class="dot"></span> Tidak ada koneksi — pengajuan akan disimpan &amp; dikirim otomatis nanti</div>
-          <div class="errbox" id="errBox"></div>
+          <div class="errbox" id="errBox" role="alert"></div>
 
           <div class="field">
-            <label>Nama Pengaju / Operator <span class="req">*</span></label>
+            <label for="fOperator">Nama pengaju / operator <span class="req">*</span></label>
             <input type="text" id="fOperator" placeholder="Nama lengkap operator produksi" list="operatorList" autocomplete="off">
             <datalist id="operatorList"></datalist>
           </div>
 
           <div class="field">
-            <label>Mesin <span class="req">*</span></label>
+            <label for="fMesin">Mesin <span class="req">*</span></label>
             <div class="mesin-row">
               <select id="fMesin">
                 <option value="">— Pilih mesin —</option>
@@ -236,7 +250,7 @@
           </div>
 
           <div class="field">
-            <label>Alat / Spesifikasi <span class="req">*</span><span class="hint">brand &amp; ukuran</span></label>
+            <label for="fAlat">Alat / spesifikasi <span class="req">*</span><span class="hint">brand &amp; ukuran</span></label>
             <select id="fAlat" disabled>
               <option value="">Pilih mesin dahulu…</option>
             </select>
@@ -256,18 +270,18 @@
           </div>
 
           <div class="field">
-            <label>Jumlah (Qty) <span class="req">*</span></label>
+            <label>Jumlah (qty) <span class="req">*</span></label>
             <div class="qty-row">
               <div class="stepper">
-                <button type="button" id="qtyMinus">−</button>
-                <input type="text" id="fQty" value="1" inputmode="numeric">
-                <button type="button" id="qtyPlus">+</button>
+                <button type="button" id="qtyMinus" aria-label="Kurangi">−</button>
+                <input type="text" id="fQty" value="1" inputmode="numeric" aria-label="Jumlah">
+                <button type="button" id="qtyPlus" aria-label="Tambah">+</button>
               </div>
             </div>
           </div>
 
           <div class="field">
-            <label>Kondisi Alat <span class="req">*</span></label>
+            <label>Kondisi alat <span class="req">*</span></label>
             <div class="chips" id="kondisiChips">
               <button type="button" class="chip" data-v="Tumpul">Tumpul</button>
               <button type="button" class="chip" data-v="Gompal">Gompal</button>
@@ -275,54 +289,104 @@
               <button type="button" class="chip" data-v="Aus / Gundul">Aus / Gundul</button>
               <button type="button" class="chip" data-v="Lainnya">Lainnya</button>
             </div>
-            <input type="text" id="fKondisiManual" placeholder="Tulis kondisi alat…" style="display:none; margin-top:10px">
+            <input type="text" id="fKondisiManual" placeholder="Tulis kondisi alat…" style="display:none">
           </div>
 
           <div class="field">
-            <label>Foto Kondisi Alat <span class="req">*</span></label>
+            <label>Foto seluruh alat <span class="req">*</span></label>
+            <div class="shot-guide">
+              <div class="shot-demo">
+                <figure>
+                  <svg viewBox="0 0 160 120" role="img" aria-label="Contoh benar: seluruh alat terlihat">
+                    <rect width="160" height="120" fill="#dfe9f8"/>
+                    <path d="M14 30V14h16M130 14h16v16M146 90v16h-16M30 106H14V90" stroke="#0c9463" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <circle cx="80" cy="60" r="33" fill="#c7d3e6" stroke="#5d6c8e" stroke-width="2"/>
+                    <circle cx="80" cy="60" r="36.5" fill="none" stroke="#5d6c8e" stroke-width="5" stroke-dasharray="3.4 3.4"/>
+                    <circle cx="80" cy="60" r="7" fill="#dfe9f8" stroke="#5d6c8e" stroke-width="2"/>
+                  </svg>
+                  <figcaption class="ok">✓ Seluruh alat masuk bingkai, gigi terlihat tajam</figcaption>
+                </figure>
+                <figure>
+                  <svg viewBox="0 0 160 120" role="img" aria-label="Contoh salah: alat terpotong dan buram">
+                    <defs><filter id="blr"><feGaussianBlur stdDeviation="2.6"/></filter><clipPath id="clp"><rect width="160" height="120"/></clipPath></defs>
+                    <rect width="160" height="120" fill="#dfe9f8"/>
+                    <g clip-path="url(#clp)" filter="url(#blr)">
+                      <circle cx="108" cy="72" r="52" fill="#c7d3e6" stroke="#5d6c8e" stroke-width="2"/>
+                      <circle cx="108" cy="72" r="56" fill="none" stroke="#5d6c8e" stroke-width="5" stroke-dasharray="3.4 3.4"/>
+                    </g>
+                  </svg>
+                  <figcaption class="bad">✗ Terpotong di tepi atau buram</figcaption>
+                </figure>
+              </div>
+              <ul class="shot-tips">
+                <li>Foto <b>seluruh badan alat</b> dari tepi ke tepi, tidak ada bagian yang terpotong.</li>
+                <li>Taruh alat di alas polos, arahkan kamera tegak lurus dari atas, jarak sekitar 40 cm.</li>
+                <li>Bagian gigi atau mata potong yang tumpul atau rusak harus terlihat jelas.</li>
+                <li>Cahaya cukup, tahan HP diam sampai fokus, jangan pakai zoom.</li>
+              </ul>
+            </div>
             <input type="file" id="fFotoKamera" accept="image/*" capture="environment" style="display:none">
             <input type="file" id="fFotoGaleri" accept="image/*" style="display:none">
             <div class="photo-zone-row" id="photoZoneRow">
-              <button type="button" class="photo-zone" id="photoZoneBtnKamera">📷 Ambil Foto</button>
-              <button type="button" class="photo-zone" id="photoZoneBtnGaleri">🖼️ Galeri</button>
+              <button type="button" class="photo-zone main" id="photoZoneBtnKamera">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.6"/></svg>
+                Ambil foto
+              </button>
+              <button type="button" class="photo-zone alt" id="photoZoneBtnGaleri">Pilih dari galeri</button>
             </div>
             <div class="photo-preview" id="photoPreview" style="display:none">
-              <img id="photoImg" alt="Preview foto alat">
-              <button type="button" id="photoRemove">×</button>
+              <img id="photoImg" alt="Foto seluruh alat">
+              <span class="cap">Foto seluruh alat</span>
+              <button type="button" id="photoRemove" aria-label="Hapus foto">×</button>
             </div>
-            <div class="photo-check" id="photoCheck" style="display:none"></div>
+            <div class="photo-check" id="photoCheck" style="display:none" role="status"></div>
+            <label class="confirm" id="fullWrap" style="display:none">
+              <input type="checkbox" id="fFull">
+              <span>Saya sudah memeriksa: seluruh alat terlihat dari tepi ke tepi dan tidak ada bagian yang terpotong.</span>
+            </label>
           </div>
 
-
-          <div class="field" style="margin-bottom:6px">
-            <label>Catatan <span class="hint">opsional</span></label>
+          <div class="field" style="margin-bottom:22px">
+            <label for="fCatatan">Catatan <span class="hint">opsional</span></label>
             <textarea id="fCatatan" placeholder="Contoh: gigi pecah 2 buah di sisi kiri…"></textarea>
           </div>
 
-          <hr class="divider">
+          <button class="submit" id="btnSubmit">Ajukan Asah</button>
+        </div>
 
-          <div class="submit-wrap">
-            <button class="submit" id="btnSubmit">Ajukan Asah</button>
-          </div>
-          <div class="footnote">Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.</div>
+        <div class="foot">
+          <svg class="waves" viewBox="0 0 440 60" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 0 H440 V26 C360 6 300 4 230 26 S80 52 0 26 Z" fill="#fff"/>
+          </svg>
+          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.
         </div>
       </div>
 
       <div class="success" id="successView">
-        <div class="stamp">Diterima</div>
-        <div class="tnum">No. Tiket<br><b id="doneTicket">—</b></div>
+        <div class="checkmark" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0a66f0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </div>
+        <h2>Diterima</h2>
+        <div class="tnum">No. Tiket<b id="doneTicket">—</b></div>
         <p id="doneDetail">Pengajuan asah telah tercatat. Gudang akan mengonfirmasi &amp; menjadwalkan pengiriman ke vendor.</p>
-        <a id="btnDownloadFoto" download style="display:none;margin-top:22px;border:2px solid var(--spark-dark);color:var(--ink);padding:11px 20px;border-radius:8px;font-weight:600;font-size:13.5px;text-decoration:none">⬇ Unduh Foto Lampiran</a><br>
-        <button id="btnAgain">+ Ajukan Alat Lain</button>
+        <div class="actions">
+          <a id="btnDownloadFoto" class="btn-pill btn-white" download style="display:none">⬇ Unduh foto lampiran</a><br>
+          <button id="btnAgain" class="btn-pill btn-line">+ Ajukan alat lain</button>
+        </div>
+        <svg class="waves" viewBox="0 0 440 96" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 40 C70 6 140 10 210 38 S350 74 440 28 V96 H0 Z" fill="rgba(255,255,255,.22)"/>
+          <path d="M0 66 C80 40 150 46 220 64 S360 90 440 58 V96 H0 Z" fill="#fff" opacity=".95"/>
+        </svg>
       </div>
+
     </div>
   </div>
 
-  <div class="gear" id="gearBtn" title="Pengaturan">⚙</div>
+  <div class="gear" id="gearBtn" title="Pengaturan" role="button" aria-label="Pengaturan">⚙</div>
 
   <div class="cfg-modal" id="cfgModal">
     <div class="cfg-box">
-      <h3>Pengaturan Koneksi</h3>
+      <h3>Pengaturan koneksi</h3>
       <p>Tempel URL Web App Google Apps Script (deploy sebagai "Web app", akses "Anyone"). Cukup diisi sekali per perangkat.</p>
       <input type="text" id="cfgApiUrl" placeholder="https://script.google.com/macros/s/…/exec" style="width:100%">
       <div class="cfg-actions">
@@ -334,13 +398,13 @@
 
   <div class="cfg-modal" id="mesinModal">
     <div class="cfg-box">
-      <h3>Tambah Mesin Baru</h3>
-      <p>Mesin ini tersimpan di perangkat ini dan langsung bisa dipilih. Alat untuk mesin baru belum terdaftar otomatis — gunakan "Pilih ukuran lain" di bawah untuk cari alat dari mesin lain, atau isi manual.</p>
+      <h3>Tambah mesin baru</h3>
+      <p>Mesin ini tersimpan di perangkat ini dan langsung bisa dipilih. Alat untuk mesin baru belum terdaftar otomatis — gunakan "Pilih ukuran lain" untuk cari alat dari mesin lain, atau isi manual.</p>
       <input type="text" id="newMesinCode" placeholder="Kode mesin, mis. RDS050" style="width:100%">
       <input type="text" id="newMesinName" placeholder="Nama proses / mesin, mis. Rip Saw" style="width:100%">
       <div class="cfg-actions">
         <button class="close" id="mesinClose">Batal</button>
-        <button class="save" id="mesinSave">Tambah &amp; Pilih</button>
+        <button class="save" id="mesinSave">Tambah &amp; pilih</button>
       </div>
     </div>
   </div>
@@ -356,7 +420,7 @@
   function getApiUrl(){ return localStorage.getItem(LS_API) || DEFAULT_API_URL; }
   // Token penyaring sederhana — harus sama persis dengan SHARED_TOKEN di PengajuanAsah_Backend.gs.
   // Bukan enkripsi/keamanan kuat, hanya menyaring bot/iseng yang menemukan URL Apps Script.
-  var SHARED_TOKEN = 'Lxaq90chpA0ZzFiMNPWk-KZr';
+  var SHARED_TOKEN = 'VjAb48xWwzFkrtJlP0TaJUYK';
 
   var LS_OPERATORS = 'pa_operators';
   var LS_QUEUE = 'pa_queue';
@@ -562,40 +626,47 @@
   var lastLocation = null;   // {lat, lon, lines:[...]}
   var lastHeading = null;    // derajat kompas, kalau sensor tersedia & diizinkan
 
-  /* Skor ketajaman sederhana (varian Laplacian pada citra abu-abu yang diperkecil).
-     Ini heuristik ringan di browser, bukan pengecekan sempurna — hanya penanda
-     bantu, operator tetap bisa lanjut kirim meski hasilnya "kurang jelas". */
-  function nilaiKetajaman(canvasSumber){
-    var w = 220;
-    var scale = w / canvasSumber.width;
-    var h = Math.max(1, Math.round(canvasSumber.height * scale));
+  /* ==== Pengecekan otomatis foto: buram / terlalu gelap / terlalu terang ====
+     Dijalankan pada foto ASLI (sebelum watermark digambar, supaya teks watermark tidak
+     dihitung sebagai "tajam"). Ukuran analisis 400 px. Ketajaman = persentil ke-99 dari
+     |Laplacian|: foto tajam biasanya 40+, foto buram jelas di bawah 22.
+     Foto yang tidak lolos DITOLAK dan operator diminta foto ulang.
+     Kalau terlalu sering salah tolak, turunkan BLUR_MIN (mis. 22); kalau buram lolos, naikkan (mis. 34). */
+  var BLUR_MIN = 28, GELAP_MAX = 45, TERANG_MIN = 235;
+  function periksaFoto(src){
+    var w = 400, h = Math.max(8, Math.round(src.height * w / src.width));
     var c = document.createElement('canvas'); c.width = w; c.height = h;
-    var cx = c.getContext('2d');
-    cx.drawImage(canvasSumber, 0, 0, w, h);
-    var data = cx.getImageData(0, 0, w, h).data;
-    var gray = new Float32Array(w*h);
-    for(var i=0, p=0; i<data.length; i+=4, p++){
-      gray[p] = 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
-    }
-    var sum = 0, sumSq = 0, n = 0;
-    for(var y=1; y<h-1; y++){
-      for(var x=1; x<w-1; x++){
-        var idx = y*w+x;
-        var lap = gray[idx-1] + gray[idx+1] + gray[idx-w] + gray[idx+w] - 4*gray[idx];
-        sum += lap; sumSq += lap*lap; n++;
+    var cx = c.getContext('2d'); cx.drawImage(src, 0, 0, w, h);
+    var d = cx.getImageData(0, 0, w, h).data;
+    var g = new Float32Array(w*h), sum = 0, i, p;
+    for(i=0, p=0; i<d.length; i+=4, p++){ g[p] = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]; sum += g[p]; }
+    var mean = sum / (w*h);
+    var hist = new Uint32Array(256), n = 0, x, y, lap;
+    for(y=1; y<h-1; y++){
+      for(x=1; x<w-1; x++){
+        p = y*w + x;
+        lap = g[p-1] + g[p+1] + g[p-w] + g[p+w] - 4*g[p];
+        hist[Math.min(255, Math.round(Math.abs(lap)))]++; n++;
       }
     }
-    if(!n) return 0;
-    var mean = sum/n;
-    return (sumSq/n) - (mean*mean);
+    var target = n * 0.99, acc = 0, tajam = 0, k;
+    for(k=0; k<256; k++){ acc += hist[k]; if(acc >= target){ tajam = k; break; } }
+    if(mean < GELAP_MAX) return { ok:false, msg:'Foto terlalu gelap. Cari tempat lebih terang atau nyalakan lampu, lalu foto ulang.' };
+    if(mean > TERANG_MIN) return { ok:false, msg:'Foto terlalu silau. Hindari cahaya langsung ke alat, lalu foto ulang.' };
+    if(tajam < BLUR_MIN) return { ok:false, msg:'Foto buram. Tahan HP diam, tunggu fokus, pastikan alat tidak terlalu dekat, lalu foto ulang.' };
+    return { ok:true, msg:'✓ Foto jelas dan lolos pengecekan' };
   }
-
-  function tandaiHasilFoto(canvasSumber){
-    var skor = nilaiKetajaman(canvasSumber);
-    var jelas = skor > 140;
-    photoCheck.style.display = 'inline-flex';
-    photoCheck.className = 'photo-check ' + (jelas ? 'ok' : 'bad');
-    photoCheck.textContent = jelas ? '✓ Foto tampak jelas' : '⚠ Foto tampak buram — coba ambil ulang di tempat lebih terang';
+  var fullWrap = document.getElementById('fullWrap'), fFull = document.getElementById('fFull');
+  function resetKonfirmasi(){ fullWrap.style.display = 'none'; fFull.checked = false; }
+  function tolakFoto(msg){
+    fotoBlob = null;
+    fFotoKamera.value = ''; fFotoGaleri.value = '';
+    photoPreview.style.display = 'none';
+    photoZoneRow.style.display = 'flex';
+    resetKonfirmasi();
+    photoCheck.style.display = 'block';
+    photoCheck.className = 'photo-check bad';
+    photoCheck.textContent = '✗ ' + msg;
   }
 
   /* ==== Lokasi GPS + alamat (reverse geocode) + arah kompas, gaya "GPS Map Camera" ==== */
@@ -722,7 +793,7 @@
     var fsCoord = Math.max(10, Math.round(w*0.029));
 
     // Bungkus alamat jadi maksimal 2 baris (butuh font alamat sudah di-set dulu untuk ukur lebar)
-    ctx.font = '500 '+fsAddr+'px Inter, sans-serif';
+    ctx.font = '500 '+fsAddr+'px Poppins, sans-serif';
     var alamatLines = alamatFull ? bungkusTeks(ctx, alamatFull, w - pad*2, 2) : [];
 
     var brandH = fsBrand*2.1, timeH = fsTime*1.2, dateH = fsDate*1.55, addrLineH = fsAddr*1.32, coordH = fsCoord*1.6;
@@ -746,32 +817,32 @@
     ctx.fillStyle = 'rgba(255,255,255,.88)';
     roundRectPath(ctx, pad, y, badgeW, badgeH, badgeH/2); ctx.fill();
     ctx.fillStyle = '#c0392b';
-    ctx.font = '800 '+Math.round(fsBrand*0.95)+'px Inter, sans-serif';
+    ctx.font = '800 '+Math.round(fsBrand*0.95)+'px Poppins, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('RDI', pad+badgeW/2, y+badgeH*0.18);
     ctx.textAlign = 'left';
     ctx.fillStyle = '#fff';
-    ctx.font = '700 '+fsBrand+'px Inter, sans-serif';
+    ctx.font = '700 '+fsBrand+'px Poppins, sans-serif';
     ctx.shadowBlur = 4;
     ctx.fillText('PT. RAYARD DELI INDONESIA', pad+badgeW+pad*0.4, y+(badgeH-fsBrand)/2);
     y += brandH;
 
     // Jam besar
-    ctx.font = '800 '+fsTime+'px Oswald, Inter, sans-serif';
+    ctx.font = '800 '+fsTime+'px Poppins, sans-serif';
     ctx.fillStyle = '#ff8a3d';
     ctx.shadowBlur = 6;
     ctx.fillText(jam, pad, y);
     y += timeH;
 
     // Tanggal
-    ctx.font = '600 '+fsDate+'px Inter, sans-serif';
+    ctx.font = '600 '+fsDate+'px Poppins, sans-serif';
     ctx.fillStyle = '#fff';
     ctx.shadowBlur = 4;
     ctx.fillText(tanggal, pad, y);
     y += dateH;
 
     // Alamat (hasil reverse-geocode, maks 3 baris)
-    ctx.font = '500 '+fsAddr+'px Inter, sans-serif';
+    ctx.font = '500 '+fsAddr+'px Poppins, sans-serif';
     alamatLines.forEach(function(l){
       ctx.fillText(l, pad, y);
       y += addrLineH;
@@ -779,7 +850,7 @@
 
     // Koordinat, selalu ditampilkan sebagai baris terakhir
     if(koordLine){
-      ctx.font = '600 '+fsCoord+'px Inter, sans-serif';
+      ctx.font = '600 '+fsCoord+'px Poppins, sans-serif';
       ctx.fillText(koordLine, pad, y);
     }
     ctx.shadowBlur = 0;
@@ -804,29 +875,35 @@
     });
   }
 
-  /* Foto di-decode PARALEL dengan pengambilan lokasi, lalu watermark digambar setelah keduanya siap. */
+  /* Foto di-decode PARALEL dengan pengambilan lokasi. Pengecekan jelas/buram dilakukan
+     lebih dulu; kalau ditolak, operator langsung diminta foto ulang tanpa menunggu lokasi. */
   function tanganiFileTerpilih(file){
     if(!file) return;
-    photoCheck.style.display = 'inline-flex';
+    resetKonfirmasi();
+    photoCheck.style.display = 'block';
     photoCheck.className = 'photo-check checking';
     photoCheck.textContent = 'Memeriksa foto…';
-    var pFoto = decodeFoto(file);
     var pLok = mintaIzinKompas().then(function(){ return Promise.all([ ambilLokasi(), bacaKompasSekali() ]); });
-    Promise.all([pFoto, pLok]).then(function(r){
-      var canvas = r[0]; lastLocation = r[1][0];
-      gambarWatermarkGps(canvas.getContext('2d'), canvas.width, canvas.height);
-      canvas.toBlob(function(blob){
-        fotoBlob = blob;
-        if(fotoUrl) URL.revokeObjectURL(fotoUrl);
-        fotoUrl = URL.createObjectURL(blob);
-        photoImg.src = fotoUrl;
-        photoPreview.style.display = 'inline-block';
-        photoZoneRow.style.display = 'none';
-        tandaiHasilFoto(canvas);
-      }, 'image/jpeg', 0.65);
+    decodeFoto(file).then(function(canvas){
+      var v = periksaFoto(canvas);
+      if(!v.ok){ tolakFoto(v.msg); return; }
+      return pLok.then(function(r){
+        lastLocation = r[0];
+        gambarWatermarkGps(canvas.getContext('2d'), canvas.width, canvas.height);
+        canvas.toBlob(function(blob){
+          fotoBlob = blob;
+          if(fotoUrl) URL.revokeObjectURL(fotoUrl);
+          fotoUrl = URL.createObjectURL(blob);
+          photoImg.src = fotoUrl;
+          photoPreview.style.display = 'block';
+          photoZoneRow.style.display = 'none';
+          photoCheck.className = 'photo-check ok';
+          photoCheck.textContent = v.msg;
+          fullWrap.style.display = 'flex';
+        }, 'image/jpeg', 0.65);
+      });
     }).catch(function(){
-      photoCheck.className = 'photo-check bad';
-      photoCheck.textContent = '⚠ Foto gagal diproses — coba ambil ulang';
+      tolakFoto('Foto gagal diproses. Coba ambil ulang.');
     });
   }
 
@@ -840,6 +917,7 @@
     photoPreview.style.display = 'none';
     photoZoneRow.style.display = 'flex';
     photoCheck.style.display = 'none';
+    resetKonfirmasi();
     lastLocation = null; lastHeading = null;
   });
 
@@ -932,10 +1010,12 @@
   var offlineFlag = document.getElementById('offlineFlag');
   function updateOfflineFlag(){
     qAll().then(function(q){
-      offlineFlag.style.display = (!navigator.onLine || q.length) ? 'flex' : 'none';
+      var nFail = q.filter(function(x){ return x.failed; }).length;
+      q = q.filter(function(x){ return !x.failed; });
+      offlineFlag.style.display = (!navigator.onLine || q.length || nFail) ? 'flex' : 'none';
       offlineFlag.querySelector('.dot').nextSibling.textContent =
         !navigator.onLine ? ' Tidak ada koneksi — pengajuan akan disimpan & dikirim otomatis nanti'
-        : ' '+q.length+' pengajuan menunggu dikirim…';
+        : (q.length ? ' '+q.length+' pengajuan menunggu dikirim…' : '') + (nFail ? ' '+nFail+' pengajuan DITOLAK server — hubungi gudang' : '');
     });
   }
   function blobToB64(b){
@@ -946,6 +1026,9 @@
       r.readAsDataURL(b);
     });
   }
+  // INVALID/UNAUTHORIZED tidak akan berhasil walau diulang; LIMIT/PAUSED harus ditampilkan ke operator saat kirim pertama
+  function isPerm(e){ return e && (e.code === 'INVALID' || e.code === 'UNAUTHORIZED'); }
+  function isFatalNow(e){ return e && (isPerm(e) || e.code === 'LIMIT' || e.code === 'PAUSED'); }
   /* Kirim satu pengajuan. Gagal (timeout / HTTP error / ditolak server) => reject. */
   function kirim(it){
     var fotoP = (typeof it.foto === 'string') ? Promise.resolve(it.foto) : blobToB64(it.foto);
@@ -958,7 +1041,8 @@
               function(e){ clearTimeout(t); throw e; })
         .then(function(txt){
           var j = null; try{ j = JSON.parse(txt); }catch(e){}
-          if(j && j.ok === false) throw new Error(j.error || 'ditolak server');
+          if(j && j.ok === false){ var er = new Error(j.error || 'ditolak server'); er.code = j.code || ''; throw er; }
+          return j || {};
         });
     });
   }
@@ -968,7 +1052,13 @@
     flushing = true;
     qAll().then(function(items){
       return items.reduce(function(chain, it){
-        return chain.then(function(){ return kirim(it).then(function(){ return qDel(it.uid); }); });
+        return chain.then(function(){
+          if(it.failed) return;
+          return kirim(it).then(function(){ return qDel(it.uid); }, function(e){
+            if(isPerm(e)){ it.failed = true; it.err = e.message; return qPut(it).catch(function(){}); }
+            throw e;
+          });
+        });
       }, Promise.resolve());
     }).then(function(){ retryDelay = 5000; })
       .catch(function(){ setTimeout(flushQueue, retryDelay); retryDelay = Math.min(retryDelay*2, 120000); })
@@ -993,10 +1083,14 @@
     var tool = resolveTool();
     if(!tool){ showError('Pilih alat / spesifikasi, atau isi manual di "Pilih ukuran lain".'); return; }
     if(!kondisi){ showError('Pilih kondisi alat, atau isi manual kalau pilih "Lainnya".'); return; }
-    if(!fotoBlob){ showError('Foto kondisi alat wajib diisi.'); photoZoneRow.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+    if(!fotoBlob){ showError('Foto seluruh alat wajib diisi dan harus lolos pengecekan (jelas, tidak buram).'); photoZoneRow.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+    if(!fFull.checked){ showError('Centang konfirmasi bahwa seluruh alat terlihat dari tepi ke tepi.'); fullWrap.scrollIntoView({behavior:'smooth', block:'center'}); return; }
 
     var qty = parseInt(document.getElementById('fQty').value,10) || 1;
     var catatan = document.getElementById('fCatatan').value.trim();
+    var KOND_OK = ['Tumpul','Gompal','Patah','Aus / Gundul'];
+    var kondisiKirim = KOND_OK.indexOf(kondisi) >= 0 ? kondisi : 'Lainnya';
+    if(kondisiKirim === 'Lainnya' && kondisi !== 'Lainnya') catatan = ('Kondisi: ' + kondisi + (catatan ? '. ' + catatan : '')).slice(0, 500);
 
     var payload = {
       uid: Date.now().toString(36)+Math.random().toString(36).slice(2,8),
@@ -1004,10 +1098,13 @@
       tanggalPengajuan: fmtDate(new Date()),
       namaPengaju: operator,
       mesin: mesinCode + ' — ' + m.name,
+      kodeMesin: mesinCode,
+      kodeAlat: tool.kode,
+      manual: altSel.value === 'manual',
       brand: tool.brand,
-      spesifikasi: tool.kode + ' · ' + tool.spek,
+      spesifikasi: tool.spek,
       qty: qty,
-      kondisi: kondisi,
+      kondisi: kondisiKirim,
       catatan: catatan,
       foto: fotoBlob,
       token: SHARED_TOKEN
@@ -1030,7 +1127,17 @@
       return qPut(payload).catch(function(){ memQ.push(payload); }).then(function(){ updateOfflineFlag(); finish(true); });
     }
     if(!getApiUrl() || !navigator.onLine){ simpanAntrian(); return; }
-    kirim(payload).then(function(){ finish(false); }, simpanAntrian);
+    kirim(payload).then(function(j){
+      if(j && j.ticket) payload.ticket = j.ticket;   // tiket final dari server
+      finish(false);
+    }, function(e){
+      if(isFatalNow(e)){
+        showError('Ditolak server: ' + e.message);
+        btnSubmit.disabled = false; btnSubmit.textContent = 'Ajukan Asah';
+        return;
+      }
+      simpanAntrian();
+    });
   }
 
   var dlLink = document.getElementById('btnDownloadFoto'), dlUrl = '';
@@ -1061,6 +1168,7 @@
     kondisiManualInput.style.display='none'; kondisiManualInput.value='';
     fFotoKamera.value=''; fFotoGaleri.value=''; fotoBlob = null; photoPreview.style.display='none'; photoZoneRow.style.display='flex'; photoCheck.style.display='none';
     lastLocation = null; lastHeading = null;
+    resetKonfirmasi();
     clearError();
   });
 
