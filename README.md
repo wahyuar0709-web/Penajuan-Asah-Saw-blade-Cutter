@@ -15,6 +15,69 @@ index.html  ──POST JSON──▶  PengajuanAsah_Backend.gs  ──▶  Sheet
 
 ---
 
+## QR Akses Operator
+
+<p align="center">
+  <img src="qr-pengajuan-asah.png" alt="QR akses aplikasi Pengajuan Asah" width="260">
+</p>
+
+**URL yang dipakai QR:**
+
+```
+https://wahyuar0709-web.github.io/Penajuan-Asah-Saw-blade-Cutter/
+```
+
+Operator tinggal scan QR ini dengan kamera HP → form langsung terbuka → **langsung jalan**, tidak perlu install aplikasi, tidak perlu login, tidak perlu setting apa pun. `DEFAULT_API_URL` dan `SHARED_TOKEN` sudah berisi backend yang aktif, jadi begitu halaman terbuka, form sudah siap kirim.
+
+### Kenapa QR ini tidak perlu diganti
+
+QR itu berisi **URL**, bukan isi aplikasi. App ini disajikan lewat **GitHub Pages** di URL tersebut, dan setiap kali ada commit baru, file `index.html` / `sw.js` / `manifest.webmanifest` otomatis tergantikan di URL yang sama.
+
+Artinya: **update kode, update backend, tambah mesin, ubah tampilan — QR yang sudah dicetak dan ditempel di mesin tetap sama dan tetap berlaku.** Tidak perlu cetak ulang, tidak perlu ganti poster.
+
+Kalau ada Service Worker yang sudah terpasang di HP operator, halamannya pun otomatis dapat versi baru.
+
+### Kapan QR perlu diganti
+
+Hanya kalau **URL-nya berubah**:
+
+| Kejadian | Perlu QR baru? |
+|---|---|
+| Update kode / backend / master alat | ❌ tidak |
+| Tambah fitur, ubah tampilan, bug fix | ❌ tidak |
+| Ganti domain hosting (mis. pakai domain perusahaan) | ✅ ya |
+| Rename repo atau owner di GitHub | ✅ ya |
+| Pindah ke hosting lain | ✅ ya |
+
+Kalau salah satu terjadi: edit `URL` di `tools/make-qr.py`, jalankan ulang, commit ulang `qr-pengajuan-asah.png` + `qr-pengajuan-asah.svg`.
+
+```bash
+pip install segno
+python tools/make-qr.py
+```
+
+### Cara cetak & menempel (supaya mudah discan)
+
+- Gunakan file **`qr-pengajuan-asah.svg`** untuk dicetak (vektor, tidak pecah saat diperbesar). PNG 848×848 px juga cukup untuk A5.
+- **Ukuran minimum** QR di kertas: **4 cm × 4 cm**. Untuk ditempel di area kerja / pos operator, A5 (15 × 21 cm) paling pas.
+- Cetak **hitam di atas putih** dengan kontras penuh. Jangan dibalik (putih di atas hitam).
+- QR sudah punya *error correction* level M, jadi masih terbaca walau ada coretan, noda, atau sedikit kusam di bagian tertentu.
+- Tambahkan teks singkat di bawah QR, misalnya:
+
+  ```
+  ⚠ ALAT POTONG TUMPUL — AJUKAN DI SINI
+  1. Scan QR di atas
+  2. Pilih mesin → pilih alat → foto alat
+  3. Tekan "Ajukan Asah"
+  ```
+
+### Kalau HP operator tidak mau kebuka
+
+Halaman ini butuh **HTTPS** (GitHub Pages sudah otomatis) — itu syarat wajib agar Service Worker dan kamera bisa jalan.
+Kalau HP diblokir jaringan kantor, operator tetap bisa isi form (antrean offline), tapi **tidak bisa** membuka halaman untuk pertama kali. Pastikan URL GitHub Pages tidak diblokir firewall.
+
+---
+
 ## Fitur
 
 | Fitur | Keterangan |
@@ -44,7 +107,16 @@ index.html  ──POST JSON──▶  PengajuanAsah_Backend.gs  ──▶  Sheet
 | `sw.js` | Service Worker. Cache shell (`index.html`, `manifest`, `icon`) supaya form tetap terbuka offline. **POST tidak pernah di-cache** |
 | `manifest.webmanifest` | Metadata PWA (nama, ikon, warna tema) |
 | `icon.svg` | Ikon aplikasi (SVG, dipakai sebagai `maskable`) |
+| `qr-pengajuan-asah.png` | QR akses operator (848 × 848 px). Cewek untuk dikirim via WhatsApp / ditempel di HP |
+| `qr-pengajuan-asah.svg` | QR versi vektor untuk dicetak (tidak pecah saat diperbesar) |
+| `tools/make-qr.py` | Generator QR. **Hanya** perlu dijalankan kalau URL hosting berubah |
 | `README.md` | Dokumen ini |
+
+> **Penting:** seluruh file di repo ini disajikan lewat **GitHub Pages** di URL
+> `https://wahyuar0709-web.github.io/Penajuan-Asah-Saw-blade-Cutter/`.
+> GitHub Pages memakai folder `main` sebagai root, dan folder `tools/` ikut
+> served tapi tidak dipakai form — tidak masalah. Kalau nanti `tools/` mengganggu,
+> pindahkan ke `docs/tools/`.
 
 > Versi saat ini: **v6** — footer form `Versi 6 · 30 Sep 2026`, cache Service Worker `pa-v6`, backend `v3`.
 
