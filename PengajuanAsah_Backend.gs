@@ -1,5 +1,5 @@
 /**
- * PengajuanAsah_Backend.gs  —  v3
+ * PengajuanAsah_Backend.gs  —  v4
  * -------------------------------------------------------------
  * Backend form "index.html" (Pengajuan Asah). Bound ke spreadsheet
  * "Monitoring Saw blade & cutter".
@@ -13,6 +13,15 @@
  *      sebagai teks. Baris uji dihapus otomatis.
  *   5. Deploy > Manage deployments > Edit (pensil) > Version: New version.
  *      Execute as: Me | Who has access: Anyone.
+ *
+ * PERUBAHAN v4
+ *  - Master data ditarik frontend secara live lewat GET ?action=master
+ *    (di-cache 5 menit). Kode mesin / alat / stok yang ditambah di sheet
+ *    langsung muncul di form TANPA edit index.html dan tanpa reinstall.
+ *    Urutan sumber di frontend: server -> cache localStorage -> data bawaan.
+ *  - Kolom "Jenis Bahan" / "Bahan" di Master Tools ikut dikirim sebagai
+ *    "bahan" (TCT / PCD). Kalau kolomnya tidak ada, frontend memakai nilai
+ *    TCT/PCD yang sudah tertanam di index.html sebagai cadangan.
  *
  * PERUBAHAN v3
  *  - Batas harian pengajuan (MAX_PER_HARI) dan foto (MAX_FOTO_PER_HARI).
@@ -68,7 +77,7 @@ var C = { TS: 0, TGL: 1, NAMA: 2, MESIN: 3, BRAND: 4, SPEK: 5, QTY: 6, KOND: 7, 
 var STATUS_LIST = ['BARU', 'DIVERIFIKASI', 'DIKIRIM VENDOR', 'SELESAI', 'DITOLAK'];
 var KONDISI_OK = ['Tumpul', 'Gompal', 'Patah', 'Aus / Gundul', 'Lainnya'];
 var MAX_FOTO_B64 = 1500000;
-var MASTER_CACHE_KEY = 'master_v3';
+var MASTER_CACHE_KEY = 'master_v4';
 var MASTER_CACHE_SEC = 300;
 
 /* ============================== POST ============================== */
@@ -409,16 +418,19 @@ function getMaster_() {
     }
   }
 
-  // Master alat (brand, spek, nama) - kolom kode wajib
+  // Master alat (brand, spek, nama, bahan) - kolom kode wajib
   var info = {}, allTools = [];
   var mK = need_(mt, 'kode alat', MASTER_SHEET);
   var mN = col_(mt, 'nama alat'), mB = col_(mt, 'brand'), mS = col_(mt, 'specification');
+  // "jenis bahan" lebih spesifik daripada "bahan"; coba yang itu dulu.
+  var mBa = col_(mt, 'jenis bahan'); if (mBa < 0) mBa = col_(mt, 'bahan');
   mt.rows.forEach(function (r) {
     var kode = String(r[mK] || '').trim();
     if (!kode) return;
     var s = stok[kode.toUpperCase()] || {};
     var t = { kode: kode, nama: mN < 0 ? '' : String(r[mN] || '').trim(), brand: (mB < 0 ? '' : String(r[mB] || '').trim()) || '-',
-              spek: mS < 0 ? '' : String(r[mS] || '').trim(), siap: s.siap, menunggu: s.menunggu, status: s.status || '' };
+              spek: mS < 0 ? '' : String(r[mS] || '').trim(), bahan: mBa < 0 ? '' : String(r[mBa] || '').trim().toUpperCase(),
+              siap: s.siap, menunggu: s.menunggu, status: s.status || '' };
     info[kode.toUpperCase()] = t;
     allTools.push(t);
   });
@@ -439,7 +451,8 @@ function getMaster_() {
     var i = info[kode.toUpperCase()] || {};
     m.tools.push({
       kode: kode, nama: i.nama || (pN < 0 ? '' : String(r[pN] || '').trim()), brand: i.brand || '-',
-      spek: (pS < 0 ? '' : String(r[pS] || '').trim()) || i.spek || '', siap: i.siap, menunggu: i.menunggu, status: i.status || ''
+      spek: (pS < 0 ? '' : String(r[pS] || '').trim()) || i.spek || '', bahan: i.bahan || '',
+      siap: i.siap, menunggu: i.menunggu, status: i.status || ''
     });
   });
 

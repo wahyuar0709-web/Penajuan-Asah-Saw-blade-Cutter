@@ -83,7 +83,7 @@ Kalau HP diblokir jaringan kantor, operator tetap bisa isi form (antrean offline
 | Fitur | Keterangan |
 |---|---|
 | Form PWA | Satu file HTML, bisa dipasang ke home screen (`manifest.webmanifest`), jalan saat offline |
-| Master mesin & alat | Daftar mesin (`RDS001` dan seterusnya) + kode alat & spesifikasi tertanam di dalam `index.html`; picker custom dengan pencarian |
+| Master mesin & alat (live) | Ditarik otomatis dari backend lewat `GET ?action=master`. Kode mesin / alat / stok baru langsung muncul di HP operator — **tanpa edit `index.html`, tanpa install ulang**. Lihat [Master Data Live](#master-data-live) |
 | Alat manual | Kalau alat tidak ada di daftar, operator bisa cari dari semua mesin atau isi kode/brand/spec sendiri + jenis bahan (TCT/PCD) → ditandai `[MANUAL]` di sheet |
 | Cek foto otomatis | Ditolak kalau **terlalu gelap**, **terlaku silau**, atau **buram** (persentil-99 nilai Laplacian di bawah `BLUR_MIN`) |
 | Watermark GPS | Foto diberi cap koordinat + alamat (reverse geocode Nominatim) + arah kompas, gaya "GPS Map Camera" |
@@ -118,7 +118,7 @@ Kalau HP diblokir jaringan kantor, operator tetap bisa isi form (antrean offline
 > served tapi tidak dipakai form — tidak masalah. Kalau nanti `tools/` mengganggu,
 > pindahkan ke `docs/tools/`.
 
-> Versi saat ini: **v6** — footer form `Versi 6 · 30 Sep 2026`, cache Service Worker `pa-v6`, backend `v3`.
+> Versi saat ini: **frontend v7** — footer form `Versi 7 · 3 Okt 2026`, cache Service Worker `pa-v7`. Backend `v4`.
 
 ---
 
@@ -151,7 +151,9 @@ Kolom ditulis **berdasarkan nama header**, bukan posisi. Menyisipkan kolom lain 
 ### 2. `Master Tools` (wajib)
 
 Header yang **wajib ada**: kolom yang diawali `kode alat`.
-Opsional: `nama alat`, `brand`, `specification`.
+Opsional: `nama alat`, `brand`, `specification`, **`jenis bahan`** (atau `bahan`).
+
+Kolom bahan dipakai untuk badge **TCT / PCD** di form. Kalau kolomnya tidak ada, frontend memakai nilai TCT/PCD yang sudah tertanam di `index.html` sebagai cadangan — jadi kolom ini belum wajib, tapi sangat disarankan diisi supaya alat baru juga punya badge.
 
 ### 3. `Mapping Alat Mesin` (wajib)
 
@@ -201,7 +203,7 @@ Semua file statis bisa di-host di mana saja (GitHub Pages, Netlify, shared folde
 3. Naikkan versi di **tiga** tempat sekaligus supaya operator tidak memakai halaman lama:
    - `sw.js` baris 2: `var V = 'pa-v6'` → `'pa-v7'`
    - `index.html` baris 415: `Versi 6 · 30 Sep 2026` → `Versi 7 · <tanggal>`
-   - `index.html` `var DATA = {…}` (baris 470) kalau master mesin/alat berubah.
+   - `index.html` `var DATA = {…}` (baris 470) **hanya perlu** kalau master berubah DAN kamu mau data bawaan offline ikut diperbarui. Master yang dipakai form tetap datang dari backend — lihat [Master Data Live](#master-data-live).
 4. Upload. Halaman otomatis reload sekali saat Service Worker versi baru aktif — **kecuali** operator sedang memegang foto yang belum dikirim (reload ditunda).
 
 ### C. Di perangkat operator
@@ -292,7 +294,7 @@ Respons:
 | `BUSY` | Lock 20 detik tidak didapat | Otomatis coba lagi |
 | `SERVER` | Error lain di server | Lihat `Execution log` Apps Script |
 
-`GET ?action=master&token=…` mengembalikan `{ machines, allTools, warnings, generatedAt }` (di-cache 5 menit). Endpoint ini tersedia untuk tooling internal; **form sendiri memakai master data yang tertanam di `index.html`**, bukan memanggil endpoint ini — supaya form tetap bisa dibuka dan diisi penuh saat offline.
+`GET ?action=master&token=…` mengembalikan `{ machines, allTools, warnings, generatedAt }` (di-cache 5 menit) dan **dipakai langsung oleh form** — lihat [Master Data Live](#master-data-live). Field `siap`, `menunggu`, `status` ikut terkirim, tapi belum ditampilkan di picker (disiapkan untuk stockedisplay nanti).
 
 ---
 
@@ -309,12 +311,86 @@ Respons:
 
 ## Keterbatasan yang Perlu Diketahui
 
-- Master mesin/alat harus **diperbarui manual** di `index.html` (`var DATA`) supaya form offline tetap lengkap.
+- `var DATA` di `index.html` sekarang hanya **fallback** untuk kunjungan offline pertama. Master yang tampil di form datang dari backend. Kalau master backend berubah tapi `var DATA` belum diperbarui, operator yang online tetap langsung dapat data baru — operator offline masih melihat data lama sampai satu kali berhasil sinkron.
 - Batas harian memakai Script Properties per **script**, jadi semua operator berbagi kuota yang sama.
 - `LIMIT`/`PAUSED`/`INVALID`/`UNAUTHORIZED` **tidak** diantre ulang (percuma) — operator langsung diberi tahu.
 - Kegagalan jaringan (timeout 25 detik, HTTP error) **ditantre** otomatis dengan backoff 5 detik → 120 detik.
 - Email notifikasi memakai `MailApp` (terbatas kuota harian, sekitar 100 email/hari per akun).
 - Service Worker memakai strategi *network-first* untuk halaman dan *cache-first* untuk font. Semua cache lama dihapus saat versi naik.
+
+---
+
+## Master Data Live
+
+Kode mesin, kode alat, brand, spesifikasi, dan jenis bahan **tidak perlu ditulis manual** di `index.html` lagi. Form menariknya sendiri dari backend.
+
+```
+Spreadsheet "Mapping Alat Mesin" / "Master Tools" / "Stock Status"
+        ↓  (backend baca tiap 5 menit, di-cache)
+GET ?action=master&token=…
+        ↓  (form tarik saat dibuka / online / kembali ke layar / tiap 4 menit)
+dropdown Mesin & Alat di HP operator
+```
+
+### Alur kerja sehari-hari
+
+1. Gudang menambah kode mesin atau alat baru di sheet.
+2. Tunggu maks 5 menit (cache backend) atau paksa dengan `selfTest()` di Apps Script.
+3. Di HP operator: buka / kembalikan ke layar → daftar mesin & alat sudah baru.
+
+**Tidak ada yang perlu di-install ulang, tidak ada cache yang perlu dihapus di HP operator.**
+
+### Urutan sumber data
+
+Form selalu memakai sumber terbaru yang tersedia:
+
+| Prioritas | Sumber | Kapan dipakai |
+|---|---|---|
+| 1 | **Server** (`?action=master`) | Online — ini yang dipakai |
+| 2 | **Cache HP** (`localStorage`, key `pa_master`) | Offline, atau server gagal |
+| 3 | **Data bawaan** (`var DATA` di `index.html`) | Kunjungan offline pertama, sebelum cache pernah dibuat |
+
+Alasannya ada tiga: form harus **terbuka dan terisi penuh saat offline** (operator di lantai pabrik sering tanpa sinyal), dan|halaman pertama tidak boleh nunggu jaringan dulu.
+
+Kalau semuanya gagal, operator tetap bisa isi form lewat jalur **alat manual** (`+ Lainnya`), dan pengajuan tetap terkirim nanti saat online.
+
+### Kapan sinkron berjalan
+
+| Pemicu | Kapan |
+|---|---|
+| Halaman dibuka | Sekali saat load |
+| `online` | Begitu koneksi kembali |
+| `visibilitychange` | Begitu operator kembali ke layar (app dibiarkan terbuka sem.shift) |
+| Timer | Tiap 4 menit selama layar menyala |
+| `⚙` → `Simpan` | Setelah ganti URL backend, master langsung ditarik ulang |
+
+Bisa diubah lewat `MASTER_REFRESH_MS` di `index.html`.
+
+### Form yang sedang diisi tidak akan kacau
+
+Kalau operator sudah mulai mengisi (sudah pilih mesin, isi nama, atau pegang foto), data baru **tidak langsung diterapkan** — isiannya tidak boleh hilang di tengah jalan. Master baru tetap **disimpan ke cache**, jadi baru berlaku di opening berikutnya.
+
+Kalau form masih kosong, sinkron diterapkan seketika.
+
+### Indikator di layar
+
+Tepat di bawah baris "Tidak ada koneksi" ada pil kecil yang menunjukkan sumber data:
+
+| Pil | Arti |
+|---|---|
+| `Data mesin & alat: dari server gudang · 14.32` | Normal. Data paling baru |
+| `Data mesin & alat: dari cache HP · 09.15` | Offline / server tidak merespons, pakai cache |
+| `Data mesin & alat: data bawaan di aplikasi · belum bisa ditarik dari server` | Kunjungan offline pertama |
+| `… · Sheet "Stock Status" tidak ada: stok tidak ditampilkan` | `warnings` dari backend, tampil di pil yang sama |
+
+Kalau ada masalah (kode mesin tidak muncul, daftar tidak berubah), **pil itu jawaban pertamanya** — tekankan screenshot pil tersebut ke teknisi.
+
+### Kalau kode mesin baru tetap tidak muncul
+
+1. Cek `Mapping Alat Mesin`: kolom `Kode Mesin` harus berbentuk `RDSnnn` (mis. `RDS050`). `BELUM DISET` dan sejenisnya **diabaikan**.
+2. Cek `Master Tools`: kolom `Kode Alat` wajib ada, dan kode harus sama persis dengan yang di mapping.
+3. Jalankan `selfTest()` di Apps Script → baca `Execution log`. Kalau muncul `PERINGATAN`, perbaiki sesuai pesan.
+4. `selfTest()` sekaligus membersihkan cache master, jadi dijalankan ulang = paksa tarik data terbaru.
 
 ---
 

@@ -162,6 +162,10 @@
   button.submit:disabled{ opacity:.6; cursor:progress; }
   .errbox{ background:var(--warn-bg); color:var(--warn); border-radius:14px; padding:10px 14px; font-size:12.5px; line-height:1.5; margin-bottom:16px; display:none; }
   .offline-flag{ display:none; align-items:center; gap:8px; background:#fff4de; color:#8a5a08; font-size:12px; line-height:1.4; padding:9px 14px; border-radius:14px; margin-bottom:16px; }
+  .sync-tag{ display:none; align-items:center; gap:7px; background:var(--tint); color:var(--ink-soft); font-size:11.5px; font-weight:500; line-height:1.45; padding:7px 12px; border-radius:999px; margin:-6px 0 16px; }
+  .sync-tag i{ width:7px; height:7px; border-radius:50%; background:var(--ok); flex:0 0 auto; }
+  .sync-tag.warn{ background:var(--warn-bg); color:var(--warn); }
+  .sync-tag.warn i{ background:var(--warn); }
   .dot{ width:8px; height:8px; border-radius:50%; background:#f0a020; flex:none; }
 
   /* ---------- Kaki biru ---------- */
@@ -279,6 +283,7 @@
           </div>
 
           <div class="offline-flag" id="offlineFlag"><span class="dot"></span> Tidak ada koneksi — pengajuan akan disimpan &amp; dikirim otomatis nanti</div>
+          <div class="sync-tag" id="syncTag" role="status"><i></i><span id="syncText"></span></div>
           <div class="errbox" id="errBox" role="alert"></div>
 
           <div class="field">
@@ -412,7 +417,7 @@
           <svg class="waves" viewBox="0 0 440 60" preserveAspectRatio="none" aria-hidden="true">
             <path d="M0 0 H440 V26 C360 6 300 4 230 26 S80 52 0 26 Z" fill="#fff"/>
           </svg>
-          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span style="opacity:.7;font-size:11px">Versi 6 · 30 Sep 2026</span>
+          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span style="opacity:.7;font-size:11px">Versi 7 · 3 Okt 2026</span>
         </div>
       </div>
 
@@ -481,7 +486,12 @@
   var LS_CUSTOM_MACHINES = 'pa_custom_machines';
 
   var machineByCode = {};
-  DATA.machines.forEach(function(m){ machineByCode[m.code] = m; });
+  var ALL_TOOLS = [];
+  function indexMesin(){
+    machineByCode = {};
+    DATA.machines.forEach(function(m){ machineByCode[m.code] = m; });
+  }
+  indexMesin();
 
   var mesinSel = document.getElementById('fMesin');
   var alatSel = document.getElementById('fAlat');
@@ -583,14 +593,21 @@
   function saveCustomMachines(arr){ localStorage.setItem(LS_CUSTOM_MACHINES, JSON.stringify(arr)); }
 
   var groupBawaan = document.createElement('optgroup'); groupBawaan.label = 'Mesin terdaftar';
-  DATA.machines.forEach(function(m){
-    var opt = document.createElement('option');
-    opt.value = m.code;
-    opt.textContent = m.code + ' — ' + m.name;
-    opt.dataset.code = m.code; opt.dataset.name = m.name;
-    groupBawaan.appendChild(opt);
-  });
   mesinSel.appendChild(groupBawaan);
+
+  /* Semua fungsi render di bawah sengaja bisa dipanggil ulang: master data
+     bisa diganti dari backend tanpa perlu mengubah file ini. */
+  function renderMachineOptions(){
+    groupBawaan.innerHTML = '';
+    DATA.machines.forEach(function(m){
+      var opt = document.createElement('option');
+      opt.value = m.code;
+      opt.textContent = m.code + ' — ' + m.name;
+      opt.dataset.code = m.code; opt.dataset.name = m.name;
+      groupBawaan.appendChild(opt);
+    });
+  }
+  renderMachineOptions();
 
   var groupCustom = document.createElement('optgroup'); groupCustom.label = 'Mesin tambahan (perangkat ini)';
   function renderCustomMachineOptions(){
@@ -608,26 +625,192 @@
   }
   renderCustomMachineOptions();
 
-  var ALL_TOOLS = [];
-  DATA.machines.forEach(function(m){
-    m.tools.forEach(function(t){
-      ALL_TOOLS.push({ kode:t.kode, brand:t.brand, spek:t.spek, bahan:t.bahan||'', mesin:m.code+' — '+m.name });
+  function buildAllTools(){
+    ALL_TOOLS = [];
+    DATA.machines.forEach(function(m){
+      m.tools.forEach(function(t){
+        ALL_TOOLS.push({ kode:t.kode, brand:t.brand, spek:t.spek, bahan:t.bahan||'', mesin:m.code+' — '+m.name });
+      });
     });
-  });
-  ALL_TOOLS.sort(function(a,b){ return a.kode.localeCompare(b.kode); });
+    ALL_TOOLS.sort(function(a,b){ return a.kode.localeCompare(b.kode); });
+  }
+  buildAllTools();
 
   var altSel = document.getElementById('fAlatAlt');
-  ALL_TOOLS.forEach(function(t, i){
-    var o = document.createElement('option');
-    o.value = i;
-    o.textContent = t.kode + ' · ' + t.brand + ' · ' + (t.bahan ? t.bahan + ' · ' : '') + t.spek + '  (biasanya di ' + t.mesin + ')';
-    o.dataset.kode = t.kode; o.dataset.brand = t.brand; o.dataset.spek = t.spek; o.dataset.bahan = t.bahan || ''; o.dataset.hint = 'Biasanya di ' + t.mesin;
-    altSel.appendChild(o);
-  });
-  var manualOpt = document.createElement('option');
-  manualOpt.value = 'manual';
-  manualOpt.textContent = '+ Lainnya (isi manual)';
-  altSel.appendChild(manualOpt);
+  function renderAltOptions(){
+    var keep = altSel.value;
+    altSel.innerHTML = '';
+    ALL_TOOLS.forEach(function(t, i){
+      var o = document.createElement('option');
+      o.value = i;
+      o.textContent = t.kode + ' · ' + t.brand + ' · ' + (t.bahan ? t.bahan + ' · ' : '') + t.spek + '  (biasanya di ' + t.mesin + ')';
+      o.dataset.kode = t.kode; o.dataset.brand = t.brand; o.dataset.spek = t.spek; o.dataset.bahan = t.bahan || ''; o.dataset.hint = 'Biasanya di ' + t.mesin;
+      altSel.appendChild(o);
+    });
+    var manualOpt = document.createElement('option');
+    manualOpt.value = 'manual';
+    manualOpt.textContent = '+ Lainnya (isi manual)';
+    altSel.appendChild(manualOpt);
+    if(keep === 'manual'){ altSel.value = 'manual'; toggleManualGrid(true); }
+    else if(keep !== '' && ALL_TOOLS[keep]){ altSel.value = keep; }
+    else { altSel.value = ''; }
+  }
+  renderAltOptions();
+
+  /* ==== MASTER DATA LIVE =================================================
+     Sumber data, dari paling baru:
+       1. Backend   GET ?action=master  -> dipakai langsung, disimpan ke cache
+       2. Cache HP  localStorage        -> dipakai saat offline / server gagal
+       3. Bawaan    var DATA (di file)  -> supaya form tetap lengkap saat offline
+     Tarik ulang otomatis saat: halaman dibuka, kembali online, kembali ke
+     layar (app dibiarkan terbuka sem.shift), dan tiap MASTER_REFRESH_MS.
+     Form yang sedang diisi operator TIDAK pernah ditimpa — sync baru
+    diterapkan setelah reload berikutnya.
+     ====================================================================== */
+  var LS_MASTER = 'pa_master';
+  var MASTER_REFRESH_MS = 4 * 60 * 1000;   // polling selama layar menyala
+  var bahanByKode = {};
+  var masterAsal = 'bawaan';
+  var masterWaktu = null;
+  var masterPeringatan = '';
+  var syncBusy = false;
+
+  var syncTag = document.getElementById('syncTag'), syncText = document.getElementById('syncText');
+  function jamSingkat(d){
+    var j = d.getHours(), m = d.getMinutes();
+    return (j < 10 ? '0' : '') + j + '.' + (m < 10 ? '0' : '') + m;
+  }
+  function statusSync(){
+    if(!syncTag) return;
+    var ket = masterAsal === 'server' ? 'dari server gudang'
+            : masterAsal === 'cache'  ? 'dari cache HP'
+            : 'data bawaan di aplikasi';
+    var isi = 'Data mesin & alat: ' + ket + (masterWaktu ? ' · ' + jamSingkat(masterWaktu) : '');
+    var warn = masterAsal === 'bawaan' ? ' warn' : '';
+    if(masterPeringatan){ isi += ' · ' + masterPeringatan; warn = ' warn'; }
+    syncTag.className = 'sync-tag' + warn;
+    syncText.textContent = isi;
+    syncTag.style.display = 'flex';
+  }
+
+  function catatBahan(){
+    DATA.machines.forEach(function(m){
+      (m.tools || []).forEach(function(t){
+        if(t.bahan) bahanByKode[String(t.kode || '').toUpperCase()] = t.bahan;
+      });
+    });
+  }
+
+  function normalisasiMaster(raw){
+    var out = { machines:[], warnings: (raw && raw.warnings) || [] };
+    ((raw && raw.machines) || []).forEach(function(m){
+      if(!m || !m.code) return;
+      var tools = [];
+      (m.tools || []).forEach(function(t){
+        if(!t || !t.kode || !t.spek) return;
+        tools.push({
+          kode:  String(t.kode).trim(),
+          nama:  String(t.nama || '').trim(),
+          brand: String(t.brand || '-').trim() || '-',
+          spek:  String(t.spek).trim(),
+          bahan: String(t.bahan || '').trim()
+        });
+      });
+      out.machines.push({ code: String(m.code).trim(), name: String(m.name || m.code).trim(), tools: tools });
+    });
+    out.machines.sort(function(a,b){ return a.code.localeCompare(b.code); });
+    return out;
+  }
+
+  /* Backend boleh tidak punya kolom bahan (TCT/PCD).whatever yang sudah
+     diketahui dari data bawaan tetap dipakai supaya badge tidak hilang. */
+  function lengkapiBahan(master){
+    master.machines.forEach(function(m){
+      m.tools.forEach(function(t){
+        if(!t.bahan) t.bahan = bahanByKode[String(t.kode).toUpperCase()] || '';
+      });
+    });
+    return master;
+  }
+
+  function fingerprint(){ return JSON.stringify(DATA.machines); }
+
+  function formSedangDiisi(){
+    var op = document.getElementById('fOperator'), cat = document.getElementById('fCatatan');
+    return !!mesinSel.value || (op && !!op.value.trim()) || (cat && !!cat.value.trim()) ||
+           altSel.value !== '' || (typeof fotoBlob !== 'undefined' && !!fotoBlob);
+  }
+
+  function applyMaster(master, asal, waktu){
+    catatBahan();
+    DATA = { machines: master.machines, allTools: master.allTools || [], warnings: master.warnings || [] };
+    indexMesin();
+    renderMachineOptions();
+    renderCustomMachineOptions();      // mesin tambahan di HP tetap ikut
+    buildAllTools();
+    renderAltOptions();
+    if(mesinSel.value) mesinSel.dispatchEvent(new Event('change'));
+    masterAsal = asal; masterWaktu = waktu;
+    statusSync();
+  }
+
+  function simpanCacheMaster(raw){
+    try{ localStorage.setItem(LS_MASTER, JSON.stringify({ t: Date.now(), raw: raw })); }catch(e){}
+  }
+  function bacaCacheMaster(){
+    try{
+      var c = JSON.parse(localStorage.getItem(LS_MASTER) || 'null');
+      if(c && c.raw && c.raw.machines && c.raw.machines.length) return c;
+    }catch(e){}
+    return null;
+  }
+
+  function pakaiCache(){
+    var c = bacaCacheMaster();
+    if(!c) return false;
+    var master = lengkapiBahan(normalisasiMaster(c.raw));
+    if(!master.machines.length) return false;
+    if(fingerprint() === JSON.stringify(master.machines)){ masterAsal='cache'; masterWaktu=new Date(c.t); statusSync(); return true; }
+    if(formSedangDiisi()) return false;          // jangan ganggu operator
+    applyMaster(master, 'cache', new Date(c.t));
+    return true;
+  }
+
+  function fetchMaster(){
+    var base = getApiUrl();
+    if(!base) return Promise.reject(new Error('URL backend belum diisi'));
+    var url = base + (base.indexOf('?') < 0 ? '?' : '&') +
+              'action=master&token=' + encodeURIComponent(SHARED_TOKEN);
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = setTimeout(function(){ if(ctrl) ctrl.abort(); }, 15000);
+    return fetch(url, { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
+      .then(function(r){ clearTimeout(timer); if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); },
+            function(e){ clearTimeout(timer); throw e; })
+      .then(function(j){
+        if(!j || j.ok !== true || !j.master) throw new Error((j && j.error) || 'Master ditolak server');
+        return j.master;
+      });
+  }
+
+  function syncMaster(){
+    if(syncBusy || !navigator.onLine || !getApiUrl()){ pakaiCache(); return; }
+    syncBusy = true;
+    fetchMaster().then(function(raw){
+      var master = lengkapiBahan(normalisasiMaster(raw));
+      if(!master.machines.length) throw new Error('Master kosong: cek sheet "Mapping Alat Mesin"');
+      simpanCacheMaster(raw);
+      masterPeringatan = (master.warnings || []).join(' · ');
+      if(fingerprint() !== JSON.stringify(master.machines) && !formSedangDiisi()){
+        applyMaster(master, 'server', new Date());
+      }else{
+        masterAsal = 'server'; masterWaktu = new Date(); statusSync();
+      }
+    }).catch(function(){
+      pakaiCache();
+      if(masterAsal !== 'server' && !bacaCacheMaster()) masterPeringatan = 'belum bisa ditarik dari server';
+      statusSync();
+    }).then(function(){ syncBusy = false; });
+  }
 
   mesinSel.addEventListener('change', function(){
     var m = machineByCode[mesinSel.value];
@@ -1337,6 +1520,17 @@
     resetKonfirmasi();
     clearError();
   });
+
+  /* ==== Tarik master data dari backend ====
+     Halaman dibuka, kembali online, kembali ke layar, dan polling berkala.
+     Kode mesin / alat yang baru ditambah di spreadsheet muncul otomatis —
+     tidak perlu edit file ini, tidak perlu install ulang di HP operator. */
+  catatBahan();
+  statusSync();
+  syncMaster();
+  window.addEventListener('online', syncMaster);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) syncMaster(); });
+  setInterval(function(){ if(!document.hidden) syncMaster(); }, MASTER_REFRESH_MS);
 
   if('serviceWorker' in navigator){
     var hadCtl = !!navigator.serviceWorker.controller, reloaded = false;
