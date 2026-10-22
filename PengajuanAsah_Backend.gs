@@ -422,8 +422,8 @@ function getMaster_() {
   var info = {}, allTools = [];
   var mK = need_(mt, 'kode alat', MASTER_SHEET);
   var mN = col_(mt, 'nama alat'), mB = col_(mt, 'brand'), mS = col_(mt, 'specification');
-  // "jenis bahan" lebih spesifik daripada "bahan"; coba yang itu dulu.
-  var mBa = col_(mt, 'jenis bahan'); if (mBa < 0) mBa = col_(mt, 'bahan');
+  // "jenis bahan" lebih spesifik; lalu "material bahan" (header buku: "Material Bahan / 刀具材料"); terakhir "bahan".
+  var mBa = col_(mt, 'jenis bahan'); if (mBa < 0) mBa = col_(mt, 'material bahan'); if (mBa < 0) mBa = col_(mt, 'bahan');
   mt.rows.forEach(function (r) {
     var kode = String(r[mK] || '').trim();
     if (!kode) return;
