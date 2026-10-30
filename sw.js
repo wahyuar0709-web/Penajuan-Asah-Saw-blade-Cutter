@@ -1,21 +1,75 @@
-// Service Worker: halaman & font tetap bisa dibuka offline. POST (kirim data) tidak pernah di-cache.
-var V = 'pa-v7', SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
-self.addEventListener('install', function(e){ e.waitUntil(caches.open(V).then(function(c){ return c.addAll(SHELL); }).then(function(){ return self.skipWaiting(); })); });
-self.addEventListener('activate', function(e){
-  e.waitUntil(caches.keys().then(function(ks){ return Promise.all(ks.filter(function(k){ return k !== V; }).map(function(k){ return caches.delete(k); })); }).then(function(){ return self.clients.claim(); }));
+const APP_VERSION = 'v8';
+const CACHE_NAME = 'pa-' + APP_VERSION;
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
+
+self.addEventListener('install', function(event) {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.addAll(SHELL);
+    }).then(function() {
+      return self.skipWaiting();
+    })
+  );
 });
-self.addEventListener('fetch', function(e){
-  var r = e.request;
-  if(r.method !== 'GET') return;
-  var u = new URL(r.url);
-  if(u.hostname === 'script.google.com' || u.hostname.endsWith('googleusercontent.com') || u.hostname === 'nominatim.openstreetmap.org') return;
-  // network-first untuk halaman (dapat update), cache-first untuk font
-  if(r.mode === 'navigate'){
-    e.respondWith(fetch(r, {cache:'no-store'}).then(function(res){ var cp = res.clone(); caches.open(V).then(function(c){ c.put('./index.html', cp); }); return res; })
-      .catch(function(){ return caches.match('./index.html'); }));
+
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.filter(function(key) {
+        return key !== CACHE_NAME;
+      }).map(function(key) {
+        return caches.delete(key);
+      }));
+    }).then(function() {
+      return self.clients.claim();
+    })
+  );
+});
+
+self.addEventListener('fetch', function(event) {
+  var request = event.request;
+  if (request.method !== 'GET') return;
+
+  var url = new URL(request.url);
+  if (url.hostname === 'script.google.com' ||
+      url.hostname.endsWith('googleusercontent.com') ||
+      url.hostname === 'nominatim.openstreetmap.org') {
     return;
   }
-  e.respondWith(caches.match(r).then(function(hit){
-    return hit || fetch(r).then(function(res){ if(res.ok){ var cp = res.clone(); caches.open(V).then(function(c){ c.put(r, cp); }); } return res; });
-  }));
+
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request, { cache: 'no-store' }).then(function(response) {
+        var copy = response.clone();
+        caches.open(CACHE_NAME).then(function(cache) {
+          cache.put('./index.html', copy);
+        });
+        return response;
+      }).catch(function() {
+        return caches.match('./index.html');
+      })
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request).then(function(hit) {
+      if (hit) return hit;
+      return fetch(request).then(function(response) {
+        if (response && response.ok) {
+          var copy = response.clone();
+          caches.open(CACHE_NAME).then(function(cache) {
+            cache.put(request, copy);
+          });
+        }
+        return response;
+      });
+    })
+  );
 });
