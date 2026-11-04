@@ -118,7 +118,7 @@ Kalau HP diblokir jaringan kantor, operator tetap bisa isi form (antrean offline
 > served tapi tidak dipakai form — tidak masalah. Kalau nanti `tools/` mengganggu,
 > pindahkan ke `docs/tools/`.
 
-> Versi saat ini: **frontend v7** — footer form `Versi 7 · 3 Okt 2026`, cache Service Worker `pa-v7`. Backend `v4`.
+> Versi saat ini: **frontend v11** — footer form `Versi 11 · 5 Nov 2026`, cache Service Worker `pa-v11`. Backend `v4`.
 
 ---
 
@@ -200,11 +200,9 @@ Semua file statis bisa di-host di mana saja (GitHub Pages, Netlify, shared folde
    var SHARED_TOKEN   = '…';  // HARUS SAMA dengan SHARED_TOKEN di PengajuanAsah_Backend.gs
    ```
 
-3. Naikkan versi di **tiga** tempat sekaligus supaya operator tidak memakai halaman lama:
-   - `sw.js` baris 2: `var V = 'pa-v6'` → `'pa-v7'`
-   - `index.html` baris 415: `Versi 6 · 30 Sep 2026` → `Versi 7 · <tanggal>`
-   - `index.html` `var DATA = {…}` (baris 470) **hanya perlu** kalau master berubah DAN kamu mau data bawaan offline ikut diperbarui. Master yang dipakai form tetap datang dari backend — lihat [Master Data Live](#master-data-live).
-4. Upload. Halaman otomatis reload sekali saat Service Worker versi baru aktif — **kecuali** operator sedang memegang foto yang belum dikirim (reload ditunda).
+3. **Tidak perlu naik versi manual lagi.** Setiap push ke GitHub Pages otomatis terdeteksi: app membandingkan isi `index.html` di server dengan yang sedang dibuka (saat dibuka, kembali ke layar, kembali online, tiap 4 menit) lalu reload sendiri. Mengganti `var V` di `sw.js` dan teks versi di footer hanya kosmetik (opsional, berguna untuk memastikan versi di HP).
+   - `index.html` `var DATA = {…}` **hanya perlu** diubah kalau master berubah DAN kamu mau data bawaan offline ikut diperbarui. Master yang dipakai form tetap datang dari backend — lihat [Master Data Live](#master-data-live).
+4. Upload. Halaman otomatis reload sekali begitu versi baru terdeteksi — **kecuali** operator sedang mengisi form / memegang foto (reload ditunda sampai form kosong, dicek ulang tiap 4 menit / saat layar dibuka lagi).
 
 ### C. Di perangkat operator
 

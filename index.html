@@ -28,6 +28,19 @@
     --grad:linear-gradient(135deg,#0a66f0 0%,#14a6ff 100%);
     font-size:16px;
   }
+  #updBanner{
+    position:fixed; left:0; right:0; top:0; z-index:9999; display:none;
+    padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;
+    background:var(--grad); color:#fff; font-size:13px; line-height:1.4;
+    box-shadow:0 4px 14px rgba(0,0,0,.28);
+  }
+  #updBanner .row{max-width:520px; margin:0 auto; display:flex; align-items:center; gap:10px;}
+  #updBanner .txt{flex:1;}
+  #updBanner b{font-weight:600;}
+  #updBanner button{
+    flex:none; border:0; border-radius:8px; padding:8px 12px; font:inherit; font-weight:600;
+    background:#fff; color:var(--blue); cursor:pointer;
+  }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   html{background:#1d1e4a;}
@@ -259,6 +272,12 @@
 </style>
 </head>
 <body>
+  <div id="updBanner" role="status" aria-live="polite">
+    <div class="row">
+      <div class="txt" id="updTxt"></div>
+      <button type="button" id="updBtn" style="display:none">Muat ulang</button>
+    </div>
+  </div>
   <div class="wrap">
     <div class="card">
 
@@ -417,7 +436,7 @@
           <svg class="waves" viewBox="0 0 440 60" preserveAspectRatio="none" aria-hidden="true">
             <path d="M0 0 H440 V26 C360 6 300 4 230 26 S80 52 0 26 Z" fill="#fff"/>
           </svg>
-          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span style="opacity:.7;font-size:11px">Versi 9 · 4 Nov 2026</span>
+          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span style="opacity:.7;font-size:11px">Versi 11 · 5 Nov 2026</span>
         </div>
       </div>
 
@@ -1532,11 +1551,63 @@
   document.addEventListener('visibilitychange', function(){ if(!document.hidden) syncMaster(); });
   setInterval(function(){ if(!document.hidden) syncMaster(); }, MASTER_REFRESH_MS);
 
+  /* ==== Auto-update tanpa hapus cache =====================================
+     Dua jalur, tidak perlu naik versi manual:
+       A. Service Worker baru aktif -> reload sekali.
+       B. Cek isi index.html di server (hash) saat dibuka, kembali ke layar,
+          kembali online, dan tiap 4 menit. Beda -> reload.
+          Jalur B jalan walau yang berubah cuma index.html (sw.js tidak disentuh).
+     Reload ditunda bila operator sedang mengisi form / memegang foto, lalu
+     dicoba lagi di cek berikutnya (dan otomatis setelah form dikirim/direset). */
+  var reloaded = false, updateMenunggu = false, hashAwal = null, cekBusy = false;
+  var updBanner = document.getElementById('updBanner'), updTxt = document.getElementById('updTxt'), updBtn = document.getElementById('updBtn');
+  function bolehReload(){ return !fotoBlob && !formSedangDiisi(); }
+  function tampilBanner(html, tombol){
+    updTxt.innerHTML = html;
+    updBtn.style.display = tombol ? '' : 'none';
+    updBanner.style.display = 'block';
+  }
+  function reloadKalauAman(){
+    if(reloaded) return;
+    if(bolehReload()){
+      reloaded = true;
+      tampilBanner('<b>Versi baru ditemukan.</b> Memperbarui aplikasi…', false);
+      setTimeout(function(){ location.reload(); }, 1200);
+    }else{
+      updateMenunggu = true;
+      tampilBanner('<b>Versi baru tersedia.</b> Kirim / selesaikan form ini dulu, lalu ketuk <b>Muat ulang</b>. Form yang belum dikirim akan hilang.', true);
+    }
+  }
+  updBtn.addEventListener('click', function(){
+    if(formSedangDiisi() && !confirm('Isian form yang belum dikirim akan hilang. Muat ulang sekarang?')) return;
+    reloaded = true; location.reload();
+  });
+  // Setelah form dikirim / dikosongkan, update yang tertunda langsung dipasang
+  setInterval(function(){ if(updateMenunggu && !reloaded && bolehReload()) reloadKalauAman(); }, 5000);
+  function hashTeks(t){ var h = 5381, i = t.length; while(i) h = (h * 33) ^ t.charCodeAt(--i); return String(h >>> 0) + ':' + t.length; }
+  function ambilHashHalaman(){
+    return fetch('index.html', { cache: 'no-store' })
+      .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(hashTeks);
+  }
+  function cekVersiBaru(){
+    if(cekBusy || reloaded || !navigator.onLine) return;
+    if(updateMenunggu){ reloadKalauAman(); return; }
+    cekBusy = true;
+    ambilHashHalaman().then(function(h){
+      if(hashAwal === null) hashAwal = h;
+      else if(h !== hashAwal) reloadKalauAman();
+    }).catch(function(){}).then(function(){ cekBusy = false; });
+  }
+  window.addEventListener('load', function(){ cekVersiBaru(); });
+  window.addEventListener('online', cekVersiBaru);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) cekVersiBaru(); });
+  setInterval(function(){ if(!document.hidden) cekVersiBaru(); }, 4 * 60 * 1000);
+
   if('serviceWorker' in navigator){
-    var hadCtl = !!navigator.serviceWorker.controller, reloaded = false;
-    // Versi baru aktif -> muat ulang sekali (kecuali operator sedang memegang foto yang belum dikirim)
+    var hadCtl = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.addEventListener('controllerchange', function(){
-      if(hadCtl && !reloaded && !fotoBlob){ reloaded = true; location.reload(); }
+      if(hadCtl) reloadKalauAman();
     });
     window.addEventListener('load', function(){
       navigator.serviceWorker.register('sw.js', { updateViaCache:'none' }).then(function(reg){
