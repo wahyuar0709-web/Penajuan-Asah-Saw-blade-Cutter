@@ -1,5 +1,5 @@
 // Service Worker: halaman & font tetap bisa dibuka offline. POST (kirim data) tidak pernah di-cache.
-var V = 'pa-v8';
+var V = 'pa-v9';
 var SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', function (e) {
