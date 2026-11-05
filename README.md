@@ -118,7 +118,56 @@ Kalau HP diblokir jaringan kantor, operator tetap bisa isi form (antrean offline
 > served tapi tidak dipakai form — tidak masalah. Kalau nanti `tools/` mengganggu,
 > pindahkan ke `docs/tools/`.
 
-> Versi saat ini: **frontend v11** — footer form `Versi 11 · 5 Nov 2026`, cache Service Worker `pa-v11`. Backend `v4`.
+> Versi saat ini: **frontend v17** — footer form `Versi 17 · 5 Nov 2026`, cache Service Worker `pa-v17`. Backend `v5`.
+
+### Perubahan v17: watermark mengikuti format foto contoh (TimePhoto)
+
+- **Pojok kanan-atas, rata kanan, teks putih berbayang:** `5 Nov 2026 10.44.25 AM` → `8° N` (arah kompas) → `Kutanegara` → `Kecamatan Ciampel` → `Karawang` → `Jawa Barat`. Lingkaran kompas di pojok kiri-bawah. Badge RDI, jam oranye, dan koordinat dihapus.
+- **Alamat dari GPS** dipetakan ke 4 baris itu (desa/kelurahan, `Kecamatan …`, kabupaten tanpa kata "Kabupaten", provinsi tanpa kode pos). Kalau GPS/alamat tidak ada, dipakai `LOKASI_CADANGAN` = alamat pabrik dari foto contoh (`Kutanegara / Kecamatan Ciampel / Karawang / Jawa Barat`).
+- **Kompas** (`PAKAI_KOMPAS` di `index.html`): baris arah dan lingkaran kompas hanya muncul kalau sensor tersedia. Android tidak meminta izin; iOS menampilkan dialog izin "gerak & orientasi" sekali pada sentuhan pertama. Kalau ditolak/tidak ada sensor, dua elemen itu dihilangkan dan foto tetap jalan. `PAKAI_KOMPAS = false` mematikannya.
+- Nama bulan memakai singkatan Inggris seperti contoh (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec).
+
+### Perubahan v16: lokasi opsional, cadangan nama perusahaan
+
+- Lokasi **tidak wajib**. Kalau GPS tidak tersedia, baris alamat di watermark berisi `LOKASI_CADANGAN` (default `PT. Rayard Deli Indonesia`, bisa diganti dengan alamat lengkap di `index.html`). Koordinat **hanya** tampil kalau benar-benar dari GPS HP, tidak pernah dikarang. Catatan "(lokasi tidak tersedia)" dihapus.
+- `PAKAI_GPS = false` di `index.html` mematikan GPS sepenuhnya (tanpa dialog izin lokasi, tanpa menunggu).
+
+### Perbaikan v15: form macet di "Mengambil lokasi…"
+
+- **Penyebab:** foto baru selesai diproses setelah lokasi didapat. Di iOS `getCurrentPosition` dengan akurasi tinggi sering sangat lambat atau tidak pernah memanggil callback (terutama di dalam gedung/PWA), sehingga form tampak macet.
+- **Lokasi diminta lebih awal** di latar belakang: saat operator pertama menyentuh form dan saat menekan tombol foto (hasilnya di-cache 5 menit). Akurasi tinggi dimatikan (cukup perkiraan untuk watermark), batas waktu sendiri 12 detik.
+- **Foto hanya menunggu lokasi maksimal 4 detik.** Kalau lokasi belum ada, foto tetap lolos tanpa lokasi dan muncul catatan "(lokasi tidak tersedia)". Alamat (reverse geocode) dilengkapi di belakang layar bila lambat.
+- Teks "Mengambil lokasi…" tidak lagi menimpa status foto.
+- Kalau lokasi **wajib** ada di setiap foto, beri tahu agar foto ditolak tanpa lokasi.
+
+### Perbaikan v14: foto di iOS
+
+- **Tombol foto = `<label for=…>`.** "Ambil foto" dan "Pilih dari galeri" sekarang membuka picker lewat browser (bukan `input.click()` dari JS pada input `display:none`), cara yang paling andal di iOS Safari dan PWA.
+- **Decode foto tidak lagi bergantung pada `createImageBitmap`.** Urutan: `<img>` (membaca orientasi EXIF dengan benar dan bisa membuka HEIC) → `createImageBitmap` sebagai cadangan. Dulu, kalau `createImageBitmap` menolak file di iOS, hasilnya "Foto gagal diproses".
+- **Tidak ada lagi macet di "Memeriksa foto…":** batas 25 detik untuk decode, batas 20 detik menunggu lokasi (dialog izin lokasi iOS bisa lama dijawab; tanpa lokasi foto tetap diproses), dan `toBlob` yang mengembalikan kosong ditangani.
+- **Kompas dihapus.** Arah kompas tidak pernah dipakai di watermark, tetapi memanggil `DeviceOrientationEvent.requestPermission()` yang memunculkan dialog "izin gerak & orientasi" khusus iOS.
+- **Foto draft yang rusak/kosong** (Blob di IndexedDB iOS kadang hilang) tidak dipulihkan; operator diminta mengambil ulang.
+- Belum diuji di perangkat iOS sungguhan (hanya simulasi). Kalau masih ada masalah, catat: versi iOS, Safari atau PWA layar utama, tombol mana (kamera/galeri), dan pesan yang muncul.
+
+### Perbaikan v13: HP yang macet di versi lama
+
+- **Penyebab (bug di v10–v12):** pengecekan versi memakai unduhan pertama dari server sebagai patokan, bukan halaman yang sedang tampil. Kalau halaman yang tampil sudah basi, patokannya ikut basi dan update tidak pernah terdeteksi. Sekarang yang dibandingkan adalah isi halaman yang *sedang jalan* (`<style id="paStyle">` + `<script id="paMain">` + teks versi footer) dengan `index.html` di server.
+- **Pemicu pengecekan ditambah:** dibuka, kembali ke layar, fokus, kembali online, dipulihkan dari bfcache, dibangunkan dari kondisi beku (`resume`), dan tiap 4 menit. Ada pengaman supaya tidak reload berulang (maks. sekali per 5 menit).
+- **Service Worker baru tidak lagi gagal terpasang** hanya karena satu file shell gagal diunduh (sinyal jelek). Dulu ini bisa membuat HP tertahan di SW lama.
+- **Halaman versi lama dipaksa pindah:** begitu SW baru aktif, SW menanyakan ke tiap halaman terbuka. Halaman yang tidak menjawab (kode lama yang tidak tahu cara memperbarui diri, atau beku di latar belakang) dimuat ulang oleh SW. Halaman v13+ menjawab dan memperbarui dirinya sendiri dengan aman (menunggu form kosong atau menyimpan draft).
+- **Catatan:** teks `Versi …` di footer ikut dibandingkan, jadi perubahan yang hanya di markup HTML (tanpa mengubah CSS/JS) tetap terdeteksi **asal teks versi di footer dinaikkan**.
+- **Kalau masih ada HP yang tidak mau pindah:** buka halamannya, lihat teks `Versi …` di footer, lalu tutup aplikasi sepenuhnya (geser keluar dari daftar aplikasi) dan buka lagi sekali. Kalau tetap macet: Pengaturan browser → Data situs → hapus data situs ini (sekali saja; draft di HP itu ikut hilang).
+
+### Perubahan v12 (UX operator)
+
+- **Urutan deploy (penting):** (1) tempel `PengajuanAsah_Backend.gs` v5 ke Apps Script → `Deploy` → `Manage deployments` → `New version`; (2) baru upload `index.html` / `sw.js`. Backend v5 menambah kolom **Kode Unik** di ujung kanan sheet (dibuat otomatis). Kalau urutannya terbalik, kode unik tetap aman karena klien juga menyertakannya di kolom Catatan (`Kode: … · keterangan`).
+- **Kode unik dipisah dari keterangan.** Kolom `Kode Unik` (wajib, min. 3 karakter, otomatis huruf besar) + `Catatan` (hanya keterangan kerusakan, opsional).
+- **Draft otomatis.** Isian + foto disimpan di IndexedDB `pa_draft` (kedaluwarsa 12 jam), dipulihkan setelah reload / kamera menutup tab / update versi. Tombol "Mulai dari awal" menghapusnya. Alat disimpan berdasarkan kode, bukan nomor urut.
+- **Error per kolom:** pesan muncul di kolom yang salah dan layar scroll ke sana.
+- **Mode admin:** tombol ⚙ (URL backend) dan "+ Tambah mesin baru" disembunyikan dari operator. Aktifkan dengan membuka `…/index.html?admin=1` (matikan `?admin=0`) atau ketuk teks "Versi …" di footer 7x. Mesin baru ditambahkan lewat sheet *Mapping Alat Mesin*. Tombol "Unduh foto lampiran" juga hanya untuk admin.
+- **Panduan foto** dilipat setelah pengajuan pertama berhasil (terbuka lagi otomatis kalau foto ditolak).
+- **Layar sukses:** ada kalimat langkah berikutnya (`LANGKAH_BERIKUT` di `index.html`, sesuaikan dengan prosedur gudang) dan riwayat 5 pengajuan terakhir di HP itu.
+- Area ketuk diperbesar (tombol ≥ 48 px, teks chip 14,5 px).
 
 ---
 

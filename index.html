@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
+<style id="paStyle">
   :root{
     --navy:#2a2a5e;
     --navy-2:#1d1e4a;
@@ -41,6 +41,26 @@
     flex:none; border:0; border-radius:8px; padding:8px 12px; font:inherit; font-weight:600;
     background:#fff; color:var(--blue); cursor:pointer;
   }
+  /* ---------- Error per kolom, draft, panduan lipat, riwayat ---------- */
+  .field.has-err input, .field.has-err select, .field.has-err textarea{ border-bottom-color:var(--warn); }
+  .field.has-err .chips, .field.has-err .photo-zone-row{ outline:2px solid var(--warn); outline-offset:4px; border-radius:18px; }
+  .field-err{ margin-top:8px; color:var(--warn); font-size:13px; font-weight:600; line-height:1.4; }
+  .field-err::before{ content:'⚠ '; }
+  .draft-note{ display:none; align-items:center; gap:10px; background:var(--tint); color:var(--ink); font-size:13px; line-height:1.4; padding:8px 8px 8px 14px; border-radius:14px; margin-bottom:16px; }
+  .draft-note span{ flex:1; }
+  .draft-note .link-btn{ margin:0; padding:10px 6px; min-height:44px; flex:none; }
+  details.shot-guide > summary{ cursor:pointer; font-weight:600; font-size:14px; color:var(--blue); min-height:44px; display:flex; align-items:center; list-style:none; }
+  details.shot-guide > summary::-webkit-details-marker{ display:none; }
+  details.shot-guide > summary::after{ content:'▾'; margin-left:8px; transition:transform .15s; }
+  details.shot-guide[open] > summary::after{ transform:rotate(180deg); }
+  details.shot-guide[open] > summary{ margin-bottom:8px; }
+  .next-step{ margin:16px auto 0; max-width:300px; padding:12px 14px; border-radius:14px; background:rgba(255,255,255,.18); font-size:13px; line-height:1.55; font-weight:500; }
+  .hist-box{ margin:6px 4px 0; }
+  .hist-box summary{ cursor:pointer; font-size:13.5px; font-weight:600; color:var(--blue); min-height:44px; display:flex; align-items:center; }
+  .hist-box ul{ list-style:none; margin:0 0 10px; padding:0; font-size:12.5px; color:var(--ink); }
+  .hist-box li{ padding:8px 0; border-bottom:1px solid var(--line); line-height:1.45; }
+  .hist-box li b{ color:var(--blue); }
+  .hist-box li span{ display:block; color:var(--ink-soft); font-size:11.5px; }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   html{background:#1d1e4a;}
@@ -90,7 +110,7 @@
   input[type=text], input[type=number], select, textarea{
     width:100%; font-family:'Poppins',sans-serif; font-size:15px; color:var(--ink);
     background:transparent; border:none; border-bottom:1.5px solid var(--line);
-    padding:9px 2px 9px; outline:none; border-radius:0;
+    padding:13px 2px 11px; min-height:48px; outline:none; border-radius:0;
     appearance:none; -webkit-appearance:none; transition:border-color .15s;
   }
   select{
@@ -105,8 +125,8 @@
   .tool-preview{ margin-top:7px; font-size:12px; color:var(--ink-soft); min-height:16px; }
   .tool-preview b{ color:var(--ink); }
   .link-btn{
-    display:inline-block; margin-top:9px; background:none; border:none; padding:0;
-    font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:600; color:var(--blue); cursor:pointer;
+    display:inline-block; margin-top:4px; background:none; border:none; padding:12px 0; min-height:44px; text-align:left;
+    font-family:'Poppins',sans-serif; font-size:14px; font-weight:600; color:var(--blue); cursor:pointer;
   }
   .alt-box{ margin-top:12px; padding:12px 14px 14px; background:var(--tint); border-radius:16px; }
   .alt-box select, .alt-box input{ border-bottom-color:#b9c9e4; }
@@ -117,14 +137,14 @@
 
   .qty-row{ display:flex; }
   .stepper{ display:flex; align-items:center; border:1.5px solid var(--line); border-radius:999px; overflow:hidden; }
-  .stepper button{ width:46px; height:42px; border:none; background:transparent; font-size:20px; color:var(--blue); cursor:pointer; font-weight:600; }
+  .stepper button{ width:56px; height:50px; border:none; background:transparent; font-size:24px; color:var(--blue); cursor:pointer; font-weight:600; }
   .stepper button:active{ background:var(--tint); }
-  .stepper input{ width:56px; text-align:center; border:none; padding:9px 0; font-weight:600; }
+  .stepper input{ width:64px; text-align:center; border:none; padding:9px 0; font-weight:600; font-size:17px; }
 
-  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
   .chip{
-    padding:8px 15px; border-radius:999px; border:1.5px solid var(--blue); background:transparent;
-    font-family:'Poppins',sans-serif; font-size:13px; font-weight:500; color:var(--blue); cursor:pointer;
+    padding:12px 18px; min-height:48px; border-radius:999px; border:1.5px solid var(--blue); background:transparent;
+    font-family:'Poppins',sans-serif; font-size:14.5px; font-weight:500; color:var(--blue); cursor:pointer;
     transition:background-color .12s,color .12s;
   }
   .chip.on{ background:var(--grad); border-color:transparent; color:#fff; font-weight:600; box-shadow:0 6px 14px -6px rgba(10,102,240,.7); }
@@ -141,10 +161,13 @@
   .shot-tips{ margin:0; padding:0 0 0 18px; font-size:12.5px; line-height:1.55; color:var(--ink); }
   .shot-tips li{ margin-bottom:3px; }
   .photo-zone-row{ display:flex; gap:10px; }
+  /* input file disembunyikan TANPA display:none (iOS Safari lebih andal membuka picker lewat <label for>) */
+  .file-hidden{ position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; clip:rect(0 0 0 0); pointer-events:none; }
+  label.photo-zone{ -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; text-align:center; }
   .photo-zone{
     flex:1; display:flex; align-items:center; justify-content:center; gap:7px;
-    padding:12px 8px; border-radius:999px; font-family:'Poppins',sans-serif;
-    font-size:13px; font-weight:600; cursor:pointer;
+    padding:15px 8px; min-height:52px; border-radius:999px; font-family:'Poppins',sans-serif;
+    font-size:14.5px; font-weight:600; cursor:pointer;
   }
   .photo-zone.main{ border:none; background:var(--grad); color:#fff; box-shadow:0 8px 16px -8px rgba(10,102,240,.8); }
   .photo-zone.alt{ border:1.5px solid var(--blue); background:transparent; color:var(--blue); }
@@ -155,16 +178,16 @@
     font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:999px;
   }
   .photo-preview button{
-    position:absolute; top:-8px; right:-6px; width:28px; height:28px; border-radius:50%;
-    background:var(--warn); color:#fff; border:2px solid #fff; font-size:15px; line-height:1;
+    position:absolute; top:-12px; right:-10px; width:40px; height:40px; border-radius:50%;
+    background:var(--warn); color:#fff; border:2px solid #fff; font-size:20px; line-height:1;
     cursor:pointer; font-weight:700;
   }
   .photo-check{ margin-top:10px; font-size:12.5px; font-weight:500; line-height:1.5; padding:10px 14px; border-radius:14px; }
   .photo-check.ok{ background:var(--ok-bg); color:var(--ok); font-weight:600; }
   .photo-check.bad{ background:var(--warn-bg); color:var(--warn); }
   .photo-check.checking{ background:var(--tint); color:var(--ink-soft); }
-  .confirm{ display:flex; gap:10px; align-items:flex-start; margin-top:10px; font-size:12.5px; line-height:1.5; color:var(--ink); cursor:pointer; }
-  .confirm input{ width:20px; height:20px; margin:1px 0 0; accent-color:var(--blue); flex:none; }
+  .confirm{ display:flex; gap:12px; align-items:flex-start; margin-top:10px; padding:6px 0; font-size:13.5px; line-height:1.5; color:var(--ink); cursor:pointer; }
+  .confirm input{ width:26px; height:26px; margin:0; accent-color:var(--blue); flex:none; }
 
   button.submit{
     width:100%; padding:15px; font-family:'Poppins',sans-serif; font-size:16px; font-weight:600; color:#fff;
@@ -207,7 +230,7 @@
   .success .actions{ position:relative; z-index:1; }
 
   .gear{
-    position:fixed; bottom:calc(14px + env(safe-area-inset-bottom,0px)); right:14px; width:40px; height:40px; border-radius:50%;
+    position:fixed; bottom:calc(14px + env(safe-area-inset-bottom,0px)); right:14px; width:48px; height:48px; border-radius:50%;
     background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.35); color:#fff;
     display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; z-index:10;
   }
@@ -303,7 +326,7 @@
 
           <div class="offline-flag" id="offlineFlag"><span class="dot"></span> Tidak ada koneksi — pengajuan akan disimpan &amp; dikirim otomatis nanti</div>
           <div class="sync-tag" id="syncTag" role="status"><i></i><span id="syncText"></span></div>
-          <div class="errbox" id="errBox" role="alert"></div>
+          <div class="draft-note" id="draftNote"><span>Isian terakhir Anda dipulihkan.</span><button type="button" class="link-btn" id="draftBuang">Mulai dari awal</button></div>
 
           <div class="field">
             <label for="fOperator">Nama pengaju / operator <span class="req">*</span></label>
@@ -318,7 +341,8 @@
                 <option value="">— Pilih mesin —</option>
               </select>
             </div>
-            <button type="button" class="link-btn" id="btnAddMesin">+ Tambah mesin baru</button>
+            <div class="tool-preview" id="mesinHint">Mesin tidak ada di daftar? Hubungi gudang.</div>
+            <button type="button" class="link-btn" id="btnAddMesin" style="display:none">+ Tambah mesin baru (admin)</button>
           </div>
 
           <div class="field">
@@ -371,7 +395,8 @@
 
           <div class="field">
             <label>Foto seluruh alat <span class="req">*</span></label>
-            <div class="shot-guide">
+            <details class="shot-guide" id="shotGuide" open>
+              <summary>Cara foto yang benar</summary>
               <div class="shot-demo">
                 <figure>
                   <svg viewBox="0 0 160 120" role="img" aria-label="Contoh benar: seluruh alat terlihat">
@@ -401,15 +426,15 @@
                 <li>Bagian gigi atau mata potong yang tumpul atau rusak harus terlihat jelas.</li>
                 <li>Cahaya cukup, tahan HP diam sampai fokus, jangan pakai zoom.</li>
               </ul>
-            </div>
-            <input type="file" id="fFotoKamera" accept="image/*" capture="environment" style="display:none">
-            <input type="file" id="fFotoGaleri" accept="image/*" style="display:none">
+            </details>
+            <input type="file" id="fFotoKamera" class="file-hidden" accept="image/*" capture="environment" tabindex="-1">
+            <input type="file" id="fFotoGaleri" class="file-hidden" accept="image/*" tabindex="-1">
             <div class="photo-zone-row" id="photoZoneRow">
-              <button type="button" class="photo-zone main" id="photoZoneBtnKamera">
+              <label class="photo-zone main" id="photoZoneBtnKamera" for="fFotoKamera" role="button">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.6"/></svg>
                 Ambil foto
-              </button>
-              <button type="button" class="photo-zone alt" id="photoZoneBtnGaleri">Pilih dari galeri</button>
+              </label>
+              <label class="photo-zone alt" id="photoZoneBtnGaleri" for="fFotoGaleri" role="button">Pilih dari galeri</label>
             </div>
             <div class="photo-preview" id="photoPreview" style="display:none">
               <img id="photoImg" alt="Foto seluruh alat">
@@ -423,20 +448,27 @@
             </label>
           </div>
 
-          <div class="field" style="margin-bottom:22px">
-            <label for="fCatatan">Catatan: kode unik alat <span class="req">*</span></label>
-            <div class="tool-preview" style="margin:0 0 2px">Tulis kode unik yang tertera di alat, biasanya di bawah ukuran. Keterangan kerusakan boleh ditambahkan.</div>
-            <textarea id="fCatatan" placeholder="Contoh: 4521-0387. Gigi pecah 2 buah di sisi kiri" required aria-required="true"></textarea>
+          <div class="field">
+            <label for="fKodeUnik">Kode unik alat <span class="req">*</span><span class="hint">tertera di alat, biasanya di bawah ukuran</span></label>
+            <input type="text" id="fKodeUnik" placeholder="Contoh: 4521-0387" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40">
           </div>
 
+          <div class="field" style="margin-bottom:22px">
+            <label for="fCatatan">Keterangan kerusakan <span class="hint">opsional</span></label>
+            <textarea id="fCatatan" placeholder="Contoh: Gigi pecah 2 buah di sisi kiri" maxlength="400"></textarea>
+          </div>
+
+          <div class="errbox" id="errBox" role="alert"></div>
           <button class="submit" id="btnSubmit">Ajukan Asah</button>
         </div>
+
+        <details class="hist-box" id="histBox" style="display:none"><summary>Pengajuan saya (5 terakhir di HP ini)</summary><ul id="histList"></ul></details>
 
         <div class="foot">
           <svg class="waves" viewBox="0 0 440 60" preserveAspectRatio="none" aria-hidden="true">
             <path d="M0 0 H440 V26 C360 6 300 4 230 26 S80 52 0 26 Z" fill="#fff"/>
           </svg>
-          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span style="opacity:.7;font-size:11px">Versi 11 · 5 Nov 2026</span>
+          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span id="verTag" style="opacity:.7;font-size:11px">Versi 17 · 5 Nov 2026</span>
         </div>
       </div>
 
@@ -447,6 +479,7 @@
         <h2>Diterima</h2>
         <div class="tnum">No. Tiket<b id="doneTicket">—</b></div>
         <p id="doneDetail">Pengajuan asah telah tercatat. Gudang akan mengonfirmasi &amp; menjadwalkan pengiriman ke vendor.</p>
+        <div class="next-step" id="nextStep"></div>
         <div class="actions">
           <a id="btnDownloadFoto" class="btn-pill btn-white" download style="display:none">⬇ Unduh foto lampiran</a><br>
           <button id="btnAgain" class="btn-pill btn-line">+ Ajukan alat lain</button>
@@ -460,7 +493,7 @@
     </div>
   </div>
 
-  <div class="gear" id="gearBtn" title="Pengaturan" role="button" aria-label="Pengaturan">⚙</div>
+  <div class="gear" id="gearBtn" title="Pengaturan" role="button" aria-label="Pengaturan" style="display:none">⚙</div>
 
   <div class="cfg-modal" id="cfgModal">
     <div class="cfg-box">
@@ -487,7 +520,7 @@
     </div>
   </div>
 
-<script>
+<script id="paMain">
 (function(){
   "use strict";
 
@@ -754,9 +787,10 @@
 
   function fingerprint(){ return JSON.stringify(DATA.machines); }
 
+  var operatorAwal = '';   // nama operator terakhir yang terisi otomatis; tidak dihitung sebagai "sedang mengisi"
   function formSedangDiisi(){
-    var op = document.getElementById('fOperator'), cat = document.getElementById('fCatatan');
-    return !!mesinSel.value || (op && !!op.value.trim()) || (cat && !!cat.value.trim()) ||
+    var op = document.getElementById('fOperator'), cat = document.getElementById('fCatatan'), ku = document.getElementById('fKodeUnik');
+    return !!mesinSel.value || (op && !!op.value.trim() && op.value.trim() !== operatorAwal) || (cat && !!cat.value.trim()) || (ku && !!ku.value.trim()) ||
            altSel.value !== '' || (typeof fotoBlob !== 'undefined' && !!fotoBlob);
   }
 
@@ -968,15 +1002,12 @@
 
   var fFotoKamera = document.getElementById('fFotoKamera');
   var fFotoGaleri = document.getElementById('fFotoGaleri');
-  var photoZoneBtnKamera = document.getElementById('photoZoneBtnKamera');
-  var photoZoneBtnGaleri = document.getElementById('photoZoneBtnGaleri');
   var photoZoneRow = document.getElementById('photoZoneRow');
   var photoPreview = document.getElementById('photoPreview');
   var photoImg = document.getElementById('photoImg');
   var photoCheck = document.getElementById('photoCheck');
   var fotoBlob = null, fotoUrl = '';
   var lastLocation = null;   // {lat, lon, lines:[...]}
-  var lastHeading = null;    // derajat kompas, kalau sensor tersedia & diizinkan
 
   /* ==== Pengecekan otomatis foto: buram / terlalu gelap / terlalu terang ====
      Dijalankan pada foto ASLI (sebelum watermark digambar, supaya teks watermark tidak
@@ -1011,6 +1042,7 @@
   var fullWrap = document.getElementById('fullWrap'), fFull = document.getElementById('fFull');
   function resetKonfirmasi(){ fullWrap.style.display = 'none'; fFull.checked = false; }
   function tolakFoto(msg){
+    var g = document.getElementById('shotGuide'); if(g) g.open = true;
     fotoBlob = null;
     fFotoKamera.value = ''; fFotoGaleri.value = '';
     photoPreview.style.display = 'none';
@@ -1022,79 +1054,89 @@
   }
 
   /* ==== Lokasi GPS + alamat (reverse geocode) + arah kompas, gaya "GPS Map Camera" ==== */
-  function mintaIzinKompas(){
-    return new Promise(function(resolve){
-      if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
-        DeviceOrientationEvent.requestPermission().then(function(state){ resolve(state === 'granted'); }).catch(function(){ resolve(false); });
-      }else{ resolve(true); }
-    });
-  }
-  function bacaKompasSekali(){
-    return new Promise(function(resolve){
-      var selesai = false;
-      function handler(e){
-        if(selesai) return;
-        var h = (e.webkitCompassHeading != null) ? e.webkitCompassHeading : e.alpha;
-        if(h != null){
-          selesai = true;
-          lastHeading = Math.round(h);
-          window.removeEventListener('deviceorientation', handler);
-          resolve();
-        }
-      }
-      window.addEventListener('deviceorientation', handler);
-      setTimeout(function(){ if(!selesai){ window.removeEventListener('deviceorientation', handler); resolve(); } }, 300);
-    });
-  }
+  /* Lokasi diambil DI LATAR BELAKANG (mulai saat operator pertama menyentuh form / menekan Ambil foto),
+     bukan menunggu setelah foto. Foto hanya menunggu lokasi maks. 4 detik; kalau belum ada, foto tetap
+     diproses tanpa lokasi. Akurasi tinggi dimatikan: di dalam gedung GPS presisi sering tidak pernah
+     selesai, sedangkan untuk watermark cukup lokasi perkiraan (WiFi/menara). Di iOS callback geolocation
+     kadang tidak pernah dipanggil, jadi ada batas waktu sendiri. */
   function ambilLokasi(){
     return new Promise(function(resolve){
+      var selesai = false, batas = null;
+      function akhir(v){ if(selesai) return; selesai = true; clearTimeout(batas); resolve(v); }
       if(!navigator.geolocation){ resolve(null); return; }
-      photoCheck.style.display = 'inline-flex';
-      photoCheck.className = 'photo-check checking';
-      photoCheck.textContent = '📍 Mengambil lokasi…';
-      navigator.geolocation.getCurrentPosition(function(pos){
-        var lat = pos.coords.latitude, lon = pos.coords.longitude;
-        var sudahSelesai = false;
-        // Jaga-jaga: fetch ke Nominatim tidak punya timeout bawaan. Kalau sinyal
-        // lambat/nyangkut, batasi maks 6 detik lalu fallback ke koordinat saja,
-        // supaya operator tidak macet di layar "Mengambil lokasi…".
-        var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-        var timer = setTimeout(function(){
-          if(sudahSelesai) return;
-          sudahSelesai = true;
-          if(ctrl) ctrl.abort();
-          resolve({ lat:lat, lon:lon, lines:[] });
-        }, 6000);
-        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lon+'&zoom=16&addressdetails=1', {
-          headers:{ 'Accept-Language':'id' },
-          signal: ctrl ? ctrl.signal : undefined
-        })
-          .then(function(r){ return r.json(); })
-          .then(function(data){
-            if(sudahSelesai) return;
-            sudahSelesai = true;
-            clearTimeout(timer);
+      batas = setTimeout(function(){ akhir(null); }, 12000);
+      try{
+        navigator.geolocation.getCurrentPosition(function(pos){
+          if(selesai) return;
+          clearTimeout(batas);
+          var loc = { lat: pos.coords.latitude, lon: pos.coords.longitude, lines: [], ts: Date.now() };
+          // Alamat (reverse geocode): tunggu maks. 3 detik; kalau lambat, alamat dilengkapi belakangan pada objek yang sama
+          var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+          var tAbort = setTimeout(function(){ if(ctrl) ctrl.abort(); }, 6000);
+          var g = fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+loc.lat+'&lon='+loc.lon+'&zoom=16&addressdetails=1', {
+            headers:{ 'Accept-Language':'id' }, signal: ctrl ? ctrl.signal : undefined
+          }).then(function(r){ return r.json(); }).then(function(data){
+            clearTimeout(tAbort);
             var a = data.address || {};
-            var desa = a.village || a.suburb || a.neighbourhood || a.hamlet || '';
-            var kec = a.suburb || a.city_district || a.subdistrict || '';
-            var kab = a.county || a.city || a.regency || '';
+            var desa = a.village || a.neighbourhood || a.hamlet || '';
+            var kec = a.city_district || a.subdistrict || '';
+            if(a.suburb){ if(!desa) desa = a.suburb; else if(!kec) kec = a.suburb; }
+            kec = kec.replace(/^(Kecamatan|Kec\.)\s+/i, '');
+            var kab = (a.county || a.city || a.regency || '').replace(/^(Kabupaten|Kab\.)\s+/i, '');
             var prov = a.state || '';
-            if(prov && a.postcode) prov += ' ' + a.postcode;
             var lines = [];
             if(desa) lines.push(desa);
-            if(kec) lines.push('Kec. ' + kec);
+            if(kec) lines.push('Kecamatan ' + kec);
             if(kab) lines.push(kab);
             if(prov) lines.push(prov);
-            resolve({ lat:lat, lon:lon, lines:lines });
-          })
-          .catch(function(){
-            if(sudahSelesai) return;
-            sudahSelesai = true;
-            clearTimeout(timer);
-            resolve({ lat:lat, lon:lon, lines:[] });
-          });
-      }, function(){ resolve(null); }, { enableHighAccuracy:true, timeout:8000, maximumAge:60000 });
+            lines = lines.filter(function(l, i){ return i === 0 || l !== lines[i-1]; });
+            loc.lines = lines;
+          }).catch(function(){ clearTimeout(tAbort); });
+          Promise.race([ g, new Promise(function(r){ setTimeout(r, 3000); }) ]).then(function(){ akhir(loc); });
+        }, function(){ akhir(null); }, { enableHighAccuracy:false, timeout:10000, maximumAge:300000 });
+      }catch(e){ akhir(null); }
     });
+  }
+  /* Lokasi tidak wajib. Aplikasi ini dipakai di PT. Rayard Deli Indonesia, jadi kalau GPS/alamat tidak tersedia
+     (ditolak / lambat / di dalam gedung), watermark memakai LOKASI_CADANGAN (alamat dari foto contoh di pabrik).
+     PAKAI_GPS = false -> GPS tidak diminta sama sekali (tanpa dialog izin lokasi, tanpa menunggu). */
+  var LOKASI_CADANGAN = ['Kutanegara', 'Kecamatan Ciampel', 'Karawang', 'Jawa Barat'];   // dari foto contoh di lokasi perusahaan
+  var PAKAI_GPS = true;
+  var PAKAI_KOMPAS = true;   // arah kompas + lingkaran kompas di foto; false = tidak diminta sama sekali
+  var lastHeading = null, kompasJalan = false;
+  function mulaiKompas(){
+    if(!PAKAI_KOMPAS || kompasJalan) return;
+    function pasang(){
+      if(kompasJalan) return;
+      kompasJalan = true;
+      var ev = ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation';
+      window.addEventListener(ev, function(e){
+        var d = null;
+        if(typeof e.webkitCompassHeading === 'number') d = e.webkitCompassHeading;                              // iOS
+        else if(e.alpha != null && (e.absolute || ev === 'deviceorientationabsolute')) d = (360 - e.alpha) % 360; // Android
+        if(d !== null && isFinite(d)) lastHeading = { deg: (d + 360) % 360, ts: Date.now() };
+      }, true);
+    }
+    try{
+      // iOS 13+: harus dipanggil dari sentuhan pengguna (klik); kalau ditolak, foto tetap jalan tanpa kompas
+      if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+        DeviceOrientationEvent.requestPermission().then(function(r){ if(r === 'granted') pasang(); }).catch(function(){});
+      }else pasang();
+    }catch(e){}
+  }
+  var lokasiState = { p:null, mulai:0 };
+  function siapkanLokasi(){
+    if(!PAKAI_GPS) return Promise.resolve(null);
+    var now = Date.now();
+    if(lokasiState.p && now - lokasiState.mulai < 5*60*1000) return lokasiState.p;
+    lokasiState.mulai = now;
+    var p = ambilLokasi().then(function(loc){
+      if(loc) lastLocation = loc;
+      else if(lokasiState.p === p) lokasiState.p = null;   // gagal: boleh dicoba lagi saat operator menekan Ambil foto
+      return loc;
+    });
+    lokasiState.p = p;
+    return p;
   }
 
   function roundRectPath(ctx, x, y, w, h, r){
@@ -1127,104 +1169,98 @@
     return lines;
   }
 
-  /* Watermark satu blok pojok kiri-bawah, gaya "GPS Map Camera":
-     badge perusahaan, jam besar, tanggal, alamat, koordinat. */
-  function gambarWatermarkGps(ctx, w, h){
-    var now = new Date();
-    var jam = ('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2);
-    var tanggal = fmtDate(now);
-    var alamatFull = (lastLocation && lastLocation.lines && lastLocation.lines.length)
-      ? lastLocation.lines.join(', ') : '';
-    var koordLine = lastLocation ? fmtKoordinat(lastLocation.lat, lastLocation.lon) : '';
+  /* Watermark mengikuti format foto contoh dari perusahaan (aplikasi "TimePhoto"):
+       pojok KANAN-ATAS, rata kanan, teks putih berbayang:
+         5 Nov 2026 10.44.25 AM
+         8° N                    <- arah kompas (hanya bila sensor tersedia)
+         Kutanegara
+         Kecamatan Ciampel
+         Karawang
+         Jawa Barat
+       dan lingkaran kompas di pojok KIRI-BAWAH (hanya bila arah tersedia). Tanpa koordinat, tanpa badge. */
+  var BLN_WM = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fmtWaktuWatermark(d){
+    var h = d.getHours(), ap = h >= 12 ? 'PM' : 'AM', h12 = h % 12 || 12;
+    return d.getDate()+' '+BLN_WM[d.getMonth()]+' '+d.getFullYear()+' '+h12+'.'+('0'+d.getMinutes()).slice(-2)+'.'+('0'+d.getSeconds()).slice(-2)+' '+ap;
+  }
+  function arahMata(deg){ return ['N','NE','E','SE','S','SW','W','NW'][Math.round(deg/45) % 8]; }
 
-    var pad = Math.round(w*0.045);
-    var fsBrand = Math.max(10, Math.round(w*0.028));
-    var fsTime  = Math.max(20, Math.round(w*0.09));
-    var fsDate  = Math.max(11, Math.round(w*0.036));
-    var fsAddr  = Math.max(10, Math.round(w*0.031));
-    var fsCoord = Math.max(10, Math.round(w*0.029));
-
-    // Bungkus alamat jadi maksimal 2 baris (butuh font alamat sudah di-set dulu untuk ukur lebar)
-    ctx.font = '500 '+fsAddr+'px Poppins, sans-serif';
-    var alamatLines = alamatFull ? bungkusTeks(ctx, alamatFull, w - pad*2, 2) : [];
-
-    var brandH = fsBrand*2.1, timeH = fsTime*1.2, dateH = fsDate*1.55, addrLineH = fsAddr*1.32, coordH = fsCoord*1.6;
-    var totalH = brandH + timeH + dateH + (alamatLines.length*addrLineH) + (koordLine ? coordH : 0) + pad*0.6;
-
-    // Gradasi gelap tipis di bawah foto biar teks tetap kebaca di foto terang
-    var gradTop = Math.max(0, h - totalH - pad*1.8);
-    var grad = ctx.createLinearGradient(0, gradTop, 0, h);
-    grad.addColorStop(0, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, 'rgba(0,0,0,.5)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, gradTop, w, h-gradTop);
-
-    ctx.textBaseline = 'top';
-    ctx.shadowColor = 'rgba(0,0,0,.65)';
-    var y = h - totalH - pad*0.6;
-
-    // Badge "RDI" + nama perusahaan
-    var badgeH = fsBrand*1.7, badgeW = fsBrand*2.5;
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(255,255,255,.88)';
-    roundRectPath(ctx, pad, y, badgeW, badgeH, badgeH/2); ctx.fill();
-    ctx.fillStyle = '#c0392b';
-    ctx.font = '800 '+Math.round(fsBrand*0.95)+'px Poppins, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('RDI', pad+badgeW/2, y+badgeH*0.18);
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#fff';
-    ctx.font = '700 '+fsBrand+'px Poppins, sans-serif';
-    ctx.shadowBlur = 4;
-    ctx.fillText('PT. RAYARD DELI INDONESIA', pad+badgeW+pad*0.4, y+(badgeH-fsBrand)/2);
-    y += brandH;
-
-    // Jam besar
-    ctx.font = '800 '+fsTime+'px Poppins, sans-serif';
-    ctx.fillStyle = '#ff8a3d';
-    ctx.shadowBlur = 6;
-    ctx.fillText(jam, pad, y);
-    y += timeH;
-
-    // Tanggal
-    ctx.font = '600 '+fsDate+'px Poppins, sans-serif';
-    ctx.fillStyle = '#fff';
-    ctx.shadowBlur = 4;
-    ctx.fillText(tanggal, pad, y);
-    y += dateH;
-
-    // Alamat (hasil reverse-geocode, maks 3 baris)
-    ctx.font = '500 '+fsAddr+'px Poppins, sans-serif';
-    alamatLines.forEach(function(l){
-      ctx.fillText(l, pad, y);
-      y += addrLineH;
+  function gambarKompas(ctx, w, h, deg){
+    var R = w*0.095, m = w*0.012, cx = R + m, cy = h - R - m;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+    ctx.lineWidth = R*0.27; ctx.strokeStyle = 'rgba(72,72,72,.9)';
+    ctx.beginPath(); ctx.arc(0, 0, R*0.86, 0, Math.PI*2); ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '700 '+Math.max(9, Math.round(R*0.27))+'px Roboto, Arial, sans-serif';
+    [['N',0],['E',90],['S',180],['W',270]].forEach(function(l){
+      var ang = (l[1] - deg) * Math.PI/180;
+      ctx.fillText(l[0], Math.sin(ang)*R*0.86, -Math.cos(ang)*R*0.86);
     });
-
-    // Koordinat, selalu ditampilkan sebagai baris terakhir
-    if(koordLine){
-      ctx.font = '600 '+fsCoord+'px Poppins, sans-serif';
-      ctx.fillText(koordLine, pad, y);
-    }
-    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#29b6f6';
+    ctx.beginPath(); ctx.moveTo(0, -R*0.6); ctx.lineTo(R*0.13, R*0.45); ctx.lineTo(-R*0.13, R*0.45); ctx.closePath(); ctx.fill();
+    ctx.restore();
   }
 
+  function gambarWatermarkGps(ctx, w, h){
+    var baris = [ fmtWaktuWatermark(new Date()) ];
+    var hd = (PAKAI_KOMPAS && lastHeading && Date.now() - lastHeading.ts < 15000) ? lastHeading.deg : null;
+    if(hd !== null) baris.push((Math.round(hd) % 360) + '° ' + arahMata(hd));
+    var alamat = (lastLocation && lastLocation.lines && lastLocation.lines.length) ? lastLocation.lines : LOKASI_CADANGAN;
+    alamat.forEach(function(l){ baris.push(l); });
+
+    var fs = Math.max(12, Math.round(w*0.0375));
+    function setFont(){ ctx.font = '500 '+fs+'px Roboto, "Helvetica Neue", Arial, sans-serif'; }
+    setFont();
+    var terlebar = 0;
+    baris.forEach(function(l){ terlebar = Math.max(terlebar, ctx.measureText(l).width); });
+    if(terlebar > w*0.92){ fs = Math.max(10, Math.floor(fs * (w*0.92) / terlebar)); setFont(); }
+
+    var lh = fs*1.34, x = w - Math.round(w*0.008), y = Math.round(h*0.004);
+    ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = 'rgba(0,0,0,.85)';
+    ctx.shadowBlur = Math.max(2, fs*0.12);
+    ctx.shadowOffsetX = ctx.shadowOffsetY = Math.max(1, fs*0.05);
+    baris.forEach(function(l){ ctx.fillText(l, x, y); y += lh; });
+    ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0; ctx.textAlign = 'left';
+
+    if(hd !== null) gambarKompas(ctx, w, h, hd);
+  }
+
+  /* Decode foto -> canvas (maks 800 px). Urutan: <img> dulu (membaca orientasi EXIF dengan benar di Safari/iOS,
+     dan bisa membuka HEIC), baru createImageBitmap sebagai cadangan. Dulu createImageBitmap dipakai sendirian:
+     di sebagian iOS ia menolak file / mengabaikan EXIF, hasilnya "Foto gagal diproses" atau foto miring. */
   function decodeFoto(file){
     var maxW = 800;
     function gambar(src, w, h){
+      if(!w || !h) throw new Error('foto kosong');
       var sc = Math.min(1, maxW / w);
       var c = document.createElement('canvas');
-      c.width = Math.round(w*sc); c.height = Math.round(h*sc);
+      c.width = Math.max(1, Math.round(w*sc)); c.height = Math.max(1, Math.round(h*sc));
       c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
       return c;
     }
-    if(window.createImageBitmap){
-      return createImageBitmap(file).then(function(b){ var c = gambar(b, b.width, b.height); if(b.close) b.close(); return c; });
+    function lewatImg(){
+      return new Promise(function(res, rej){
+        var url = URL.createObjectURL(file), img = new Image();
+        img.onload = function(){
+          try{ res(gambar(img, img.naturalWidth || img.width, img.naturalHeight || img.height)); }
+          catch(e){ rej(e); }
+          finally{ URL.revokeObjectURL(url); }
+        };
+        img.onerror = function(){ URL.revokeObjectURL(url); rej(new Error('img')); };
+        img.src = url;
+      });
     }
-    return new Promise(function(res, rej){
-      var url = URL.createObjectURL(file), img = new Image();
-      img.onload = function(){ var c = gambar(img, img.width, img.height); URL.revokeObjectURL(url); res(c); };
-      img.onerror = rej; img.src = url;
-    });
+    function lewatBitmap(){
+      if(!window.createImageBitmap) return Promise.reject(new Error('no bitmap'));
+      return createImageBitmap(file, { imageOrientation: 'from-image' })
+        .catch(function(){ return createImageBitmap(file); })
+        .then(function(b){ var c = gambar(b, b.width, b.height); if(b.close) b.close(); return c; });
+    }
+    return lewatImg().catch(lewatBitmap);
   }
 
   /* Foto di-decode PARALEL dengan pengambilan lokasi. Pengecekan jelas/buram dilakukan
@@ -1235,32 +1271,48 @@
     photoCheck.style.display = 'block';
     photoCheck.className = 'photo-check checking';
     photoCheck.textContent = 'Memeriksa foto…';
-    var pLok = mintaIzinKompas().then(function(){ return Promise.all([ ambilLokasi(), bacaKompasSekali() ]); });
+    var selesai = false;
+    function gagal(msg){ if(selesai) return; selesai = true; clearTimeout(wd); tolakFoto(msg); }
+    // Jaga-jaga decode macet (mis. file HEIC besar di iOS): jangan biarkan "Memeriksa foto…" selamanya
+    var wd = setTimeout(function(){ gagal('Foto terlalu lama diproses. Coba ambil ulang atau pilih foto lain.'); }, 25000);
+    // Lokasi sudah diminta lebih awal di latar belakang; di sini menunggu maks. 4 detik, tanpa lokasi foto tetap diproses
+    var pLok = Promise.race([ siapkanLokasi(), new Promise(function(r){ setTimeout(function(){ r(null); }, 4000); }) ]).catch(function(){ return null; });
     decodeFoto(file).then(function(canvas){
+      if(selesai) return;
       var v = periksaFoto(canvas);
-      if(!v.ok){ tolakFoto(v.msg); return; }
-      return pLok.then(function(r){
-        lastLocation = r[0];
+      if(!v.ok){ gagal(v.msg); return; }
+      return pLok.then(function(loc){
+        if(selesai) return;
+        lastLocation = loc || lastLocation;
         gambarWatermarkGps(canvas.getContext('2d'), canvas.width, canvas.height);
         canvas.toBlob(function(blob){
+          if(selesai) return;
+          if(!blob || !blob.size){ gagal('Foto gagal diproses. Coba ambil ulang.'); return; }
+          selesai = true; clearTimeout(wd);
           fotoBlob = blob;
           if(fotoUrl) URL.revokeObjectURL(fotoUrl);
           fotoUrl = URL.createObjectURL(blob);
+          photoImg.onerror = null;
           photoImg.src = fotoUrl;
           photoPreview.style.display = 'block';
           photoZoneRow.style.display = 'none';
           photoCheck.className = 'photo-check ok';
           photoCheck.textContent = v.msg;
           fullWrap.style.display = 'flex';
+          jadwalDraft();
         }, 'image/jpeg', 0.65);
       });
     }).catch(function(){
-      tolakFoto('Foto gagal diproses. Coba ambil ulang.');
+      gagal('Foto gagal diproses. Coba ambil ulang.');
     });
   }
 
-  photoZoneBtnKamera.addEventListener('click', function(){ fFotoKamera.click(); });
-  photoZoneBtnGaleri.addEventListener('click', function(){ fFotoGaleri.click(); });
+  // Minta lokasi lebih awal (butuh sentuhan pengguna di iOS): saat pertama menyentuh form dan saat menekan tombol foto
+  document.getElementById('formView').addEventListener('pointerdown', function(){ siapkanLokasi(); }, { once:true });
+  photoZoneRow.addEventListener('click', function(){ siapkanLokasi(); mulaiKompas(); });
+  document.getElementById('formView').addEventListener('click', function(){ mulaiKompas(); }, { once:true });
+
+  // Tombol "Ambil foto" / "Pilih dari galeri" adalah <label for=...>: browser yang membuka picker, bukan JS.
   fFotoKamera.addEventListener('change', function(){ tanganiFileTerpilih(fFotoKamera.files[0]); });
   fFotoGaleri.addEventListener('change', function(){ tanganiFileTerpilih(fFotoGaleri.files[0]); });
 
@@ -1270,7 +1322,7 @@
     photoZoneRow.style.display = 'flex';
     photoCheck.style.display = 'none';
     resetKonfirmasi();
-    lastLocation = null; lastHeading = null;
+    lastLocation = null;
   });
 
 
@@ -1307,10 +1359,34 @@
     }catch(e){}
   }
   loadOperators();
+  operatorAwal = operatorInput.value.trim();
 
+  /* ==== Mode admin: tombol pengaturan & tambah mesin disembunyikan dari operator ====
+     Aktifkan: buka halaman dengan ?admin=1 (nonaktif: ?admin=0), atau ketuk teks "Versi" 7x. */
   var gearBtn = document.getElementById('gearBtn');
   var cfgModal = document.getElementById('cfgModal');
   var cfgInput = document.getElementById('cfgApiUrl');
+  function isAdmin(){ try{ return localStorage.getItem('pa_admin') === '1'; }catch(e){ return false; } }
+  function applyAdmin(){
+    var a = isAdmin();
+    gearBtn.style.display = a ? 'flex' : 'none';
+    document.getElementById('btnAddMesin').style.display = a ? 'inline-block' : 'none';
+    document.getElementById('mesinHint').style.display = a ? 'none' : 'block';
+  }
+  (function(){
+    var qa = (location.search.match(/[?&]admin=([01])/) || [])[1];
+    try{ if(qa === '1') localStorage.setItem('pa_admin','1'); else if(qa === '0') localStorage.removeItem('pa_admin'); }catch(e){}
+    applyAdmin();
+    var tap = 0, tmr = null;
+    document.getElementById('verTag').addEventListener('click', function(){
+      tap++; clearTimeout(tmr); tmr = setTimeout(function(){ tap = 0; }, 4000);
+      if(tap >= 7){
+        tap = 0;
+        try{ if(isAdmin()) localStorage.removeItem('pa_admin'); else localStorage.setItem('pa_admin','1'); }catch(e){}
+        applyAdmin();
+      }
+    });
+  })();
   gearBtn.addEventListener('click', function(){
     cfgInput.value = getApiUrl();
     cfgModal.style.display = 'flex';
@@ -1422,6 +1498,28 @@
   var errBox = document.getElementById('errBox');
   function showError(msg){ errBox.textContent = msg; errBox.style.display='block'; }
   function clearError(){ errBox.style.display='none'; }
+  function clearFieldErrors(){
+    document.querySelectorAll('.field.has-err').forEach(function(f){
+      f.classList.remove('has-err'); var e = f.querySelector('.field-err'); if(e) e.remove();
+    });
+  }
+  /* Tandai kolom yang salah, tampilkan pesan DI KOLOM itu, scroll ke sana, fokuskan. */
+  function fieldError(el, msg, focusEl){
+    var f = (el.closest && el.closest('.field')) || el;
+    f.classList.add('has-err');
+    var e = f.querySelector('.field-err');
+    if(!e){ e = document.createElement('div'); e.className = 'field-err'; e.setAttribute('role','alert'); f.appendChild(e); }
+    e.textContent = msg;
+    showError(msg);
+    f.scrollIntoView({ behavior:'smooth', block:'center' });
+    if(focusEl && focusEl.focus){ try{ focusEl.focus({ preventScroll:true }); }catch(x){ focusEl.focus(); } }
+  }
+  ['input','change','click'].forEach(function(ev){
+    document.getElementById('formView').addEventListener(ev, function(e){
+      var f = e.target.closest && e.target.closest('.field.has-err');
+      if(f){ f.classList.remove('has-err'); var er = f.querySelector('.field-err'); if(er) er.remove(); }
+    });
+  });
 
   var bahan = '';
   var bahanWrap = document.getElementById('bahanChips');
@@ -1439,24 +1537,35 @@
     var mesinCode = mesinSel.value;
     var m = machineByCode[mesinCode];
 
-    if(!operator){ showError('Isi nama pengaju terlebih dahulu.'); operatorInput.focus(); return; }
-    if(!m){ showError('Pilih mesin terlebih dahulu.'); mesinSel.focus(); return; }
+    clearFieldErrors();
+    if(!operator){ fieldError(operatorInput, 'Isi nama pengaju.', operatorInput); return; }
+    if(!m){ fieldError(mesinSel, 'Pilih mesin.', mesinSel); return; }
     var tool = resolveTool();
-    if(!tool){ showError('Pilih alat / spesifikasi, atau isi manual di "Pilih ukuran lain".'); return; }
-    if(altSel.value === 'manual' && !bahan){ showError('Pilih jenis bahan alat: TCT atau PCD.'); bahanWrap.scrollIntoView({behavior:'smooth', block:'center'}); return; }
-    if(!kondisi){ showError('Pilih kondisi alat, atau isi manual kalau pilih "Lainnya".'); return; }
-    if(!fotoBlob){ showError('Foto seluruh alat wajib diisi dan harus lolos pengecekan (jelas, tidak buram).'); photoZoneRow.scrollIntoView({behavior:'smooth', block:'center'}); return; }
-    if(!fFull.checked){ showError('Centang konfirmasi bahwa seluruh alat terlihat dari tepi ke tepi.'); fullWrap.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+    if(!tool){
+      if(altSel.value === 'manual') fieldError(alatSel, 'Isi kode alat dan spesifikasi.', document.getElementById('mKode'));
+      else fieldError(alatSel, 'Pilih alat, atau isi manual di "Pilih ukuran lain".', alatSel.disabled ? null : alatSel);
+      return;
+    }
+    if(altSel.value === 'manual' && !bahan){ fieldError(bahanWrap, 'Pilih jenis bahan: TCT atau PCD.'); return; }
+    if(!kondisi){
+      var kOn = chipsWrap.querySelector('.chip.on');
+      if(kOn && kOn.dataset.v === 'Lainnya') fieldError(kondisiManualInput, 'Tulis kondisi alat.', kondisiManualInput);
+      else fieldError(chipsWrap, 'Pilih kondisi alat.');
+      return;
+    }
+    if(!fotoBlob || !fotoBlob.size){ fieldError(photoZoneRow, 'Foto seluruh alat wajib diisi dan harus jelas (tidak buram).'); return; }
+    if(!fFull.checked){ fieldError(fullWrap, 'Centang konfirmasi bahwa seluruh alat terlihat dari tepi ke tepi.'); return; }
 
     var qty = parseInt(document.getElementById('fQty').value,10) || 1;
-    var catatan = document.getElementById('fCatatan').value.trim();
-    if(catatan.length < 3){
-      showError('Catatan wajib diisi dengan kode unik yang tertera di alat (biasanya di bawah ukuran).');
-      var fc = document.getElementById('fCatatan'); fc.scrollIntoView({behavior:'smooth', block:'center'}); fc.focus(); return;
-    }
+    var kodeUnikEl = document.getElementById('fKodeUnik');
+    var kodeUnik = kodeUnikEl.value.replace(/\s+/g,' ').trim().toUpperCase();
+    if(kodeUnik.length < 3){ fieldError(kodeUnikEl, 'Isi kode unik yang tertera di alat (min. 3 karakter).', kodeUnikEl); return; }
+    var ket = document.getElementById('fCatatan').value.trim();
     var KOND_OK = ['Tumpul','Gompal','Patah','Aus / Gundul'];
     var kondisiKirim = KOND_OK.indexOf(kondisi) >= 0 ? kondisi : 'Lainnya';
-    if(kondisiKirim === 'Lainnya' && kondisi !== 'Lainnya') catatan = ('Kondisi: ' + kondisi + (catatan ? '. ' + catatan : '')).slice(0, 500);
+    if(kondisiKirim === 'Lainnya' && kondisi !== 'Lainnya') ket = ('Kondisi: ' + kondisi + (ket ? '. ' + ket : '')).slice(0, 400);
+    // "catatan" gabungan tetap dikirim agar backend lama (tanpa kolom Kode Unik) tidak kehilangan kode unik
+    var catatanGabung = ('Kode: ' + kodeUnik + (ket ? ' · ' + ket : '')).slice(0, 500);
 
     var payload = {
       uid: Date.now().toString(36)+Math.random().toString(36).slice(2,8),
@@ -1472,7 +1581,9 @@
       bahan: tool.bahan || '',
       qty: qty,
       kondisi: kondisiKirim,
-      catatan: catatan,
+      catatan: catatanGabung,
+      keterangan: ket,
+      kodeUnik: kodeUnik,
       foto: fotoBlob,
       token: SHARED_TOKEN
     };
@@ -1507,6 +1618,37 @@
     });
   }
 
+  // Ubah kalimat ini sesuai prosedur gudang yang sebenarnya.
+  var LANGKAH_BERIKUT = 'Simpan nomor tiket ini. Serahkan alat ke gudang dan sebutkan nomor tiketnya.';
+
+  /* ==== Riwayat 5 pengajuan terakhir (disimpan di HP ini) ==== */
+  var LS_HIST = 'pa_history';
+  function catatRiwayat(pl){
+    try{
+      var a = JSON.parse(localStorage.getItem(LS_HIST) || '[]');
+      a = [{ t:pl.ticket, d:pl.tanggalPengajuan, s:pl.spesifikasi, k:pl.kodeUnik || '', q:pl.qty, m:pl.kodeMesin }]
+            .concat(a.filter(function(x){ return x.t !== pl.ticket; })).slice(0, 5);
+      localStorage.setItem(LS_HIST, JSON.stringify(a));
+    }catch(e){}
+    renderRiwayat();
+  }
+  function renderRiwayat(){
+    var box = document.getElementById('histBox'), ul = document.getElementById('histList'), a = [];
+    try{ a = JSON.parse(localStorage.getItem(LS_HIST) || '[]'); }catch(e){}
+    ul.innerHTML = '';
+    a.forEach(function(x){
+      var li = document.createElement('li'), b = document.createElement('b'), sp = document.createElement('span');
+      b.textContent = x.t;
+      li.appendChild(b);
+      li.appendChild(document.createTextNode(' · ' + x.s + ' ×' + x.q));
+      sp.textContent = x.d + (x.m ? ' · ' + x.m : '') + (x.k ? ' · Kode ' + x.k : '');
+      li.appendChild(sp);
+      ul.appendChild(li);
+    });
+    box.style.display = a.length ? 'block' : 'none';
+  }
+  renderRiwayat();
+
   var dlLink = document.getElementById('btnDownloadFoto'), dlUrl = '';
   function showSuccess(payload, queued){
     document.getElementById('formView').style.display = 'none';
@@ -1515,8 +1657,12 @@
     document.getElementById('doneDetail').textContent = queued
       ? 'Belum ada koneksi ke server — pengajuan tersimpan di perangkat ini dan akan terkirim otomatis begitu online kembali.'
       : 'Pengajuan asah untuk ' + payload.spesifikasi + ' (' + payload.qty + ' unit) telah tercatat. Gudang akan verifikasi & menjadwalkan pengiriman ke vendor.';
+    document.getElementById('nextStep').textContent = LANGKAH_BERIKUT;
+    catatRiwayat(payload);
+    hapusDraft();
+    try{ localStorage.setItem('pa_guide_seen','1'); }catch(e){}
     if(dlUrl) URL.revokeObjectURL(dlUrl);
-    if(payload.foto instanceof Blob){
+    if(payload.foto instanceof Blob && isAdmin()){
       dlUrl = URL.createObjectURL(payload.foto);
       dlLink.href = dlUrl; dlLink.download = payload.ticket + '.jpg'; dlLink.style.display = 'inline-block';
     }else{ dlLink.style.display = 'none'; }
@@ -1528,17 +1674,138 @@
     currentTicket = genTicketNo();
     document.getElementById('ticketNo').textContent = currentTicket;
     document.getElementById('ticketDate').textContent = fmtDate(new Date());
+    kosongkanForm();
+    hapusDraft();
+  });
+
+
+
+  function kosongkanForm(){
     mesinSel.value=''; mesinSel.dispatchEvent(new Event('change'));
     document.getElementById('fQty').value='1';
-    document.getElementById('fCatatan').value='';
+    document.getElementById('fCatatan').value=''; document.getElementById('fKodeUnik').value='';
     bahan=''; bahanWrap.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); x.setAttribute('aria-checked','false'); });
     chipsWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); kondisi='';
     kondisiManualInput.style.display='none'; kondisiManualInput.value='';
     fFotoKamera.value=''; fFotoGaleri.value=''; fotoBlob = null; photoPreview.style.display='none'; photoZoneRow.style.display='flex'; photoCheck.style.display='none';
-    lastLocation = null; lastHeading = null;
+    lastLocation = null;
     resetKonfirmasi();
-    clearError();
-  });
+    clearError(); clearFieldErrors();
+    document.getElementById('draftNote').style.display = 'none';
+  }
+
+  /* ==== Draft otomatis ====================================================
+     Isian (termasuk foto) disimpan ke IndexedDB 'pa_draft' (terpisah dari antrian
+     kirim 'pa_db'), supaya tidak hilang kalau browser me-reload tab saat kamera
+     dibuka, HP kehabisan memori, atau halaman diperbarui. Kedaluwarsa 12 jam.
+     Alat disimpan berdasarkan KODE (bukan nomor urut) supaya tidak salah pilih
+     kalau daftar alat berubah. ======================================== */
+  var DRAFT_TTL = 12 * 3600 * 1000, draftTimer = null, draftSiap = false, dbDraft = null;
+  function dbd(){
+    if(dbDraft) return dbDraft;
+    dbDraft = new Promise(function(res, rej){
+      if(!window.indexedDB){ rej(new Error('no idb')); return; }
+      var r = indexedDB.open('pa_draft', 1);
+      r.onupgradeneeded = function(){ r.result.createObjectStore('draft'); };
+      r.onsuccess = function(){ res(r.result); };
+      r.onerror = function(){ rej(r.error); };
+      r.onblocked = function(){ rej(new Error('blocked')); };
+    });
+    return dbDraft;
+  }
+  function draftTx(mode, fn){
+    return dbd().then(function(db){
+      return new Promise(function(res, rej){
+        var t = db.transaction('draft', mode), req = fn(t.objectStore('draft'));
+        t.oncomplete = function(){ res(req && req.result); };
+        t.onerror = t.onabort = function(){ rej(t.error); };
+      });
+    });
+  }
+  function kunciAlat(t){ return t ? (t.kode + '|' + t.spek) : ''; }
+  function ambilDraft(){
+    var m = machineByCode[mesinSel.value], onChip = chipsWrap.querySelector('.chip.on');
+    return {
+      t: Date.now(),
+      operator: operatorInput.value,
+      mesin: mesinSel.value,
+      alat: (m && alatSel.value !== '') ? kunciAlat(m.tools[alatSel.value]) : '',
+      alt: (altSel.value !== '' && altSel.value !== 'manual') ? kunciAlat(ALL_TOOLS[altSel.value]) : altSel.value,
+      mKode: document.getElementById('mKode').value, mBrand: document.getElementById('mBrand').value, mSpek: document.getElementById('mSpek').value,
+      bahan: bahan,
+      qty: document.getElementById('fQty').value,
+      kondisiChip: onChip ? onChip.dataset.v : '',
+      kondisiManual: kondisiManualInput.value,
+      kodeUnik: document.getElementById('fKodeUnik').value,
+      catatan: document.getElementById('fCatatan').value,
+      full: fFull.checked,
+      foto: fotoBlob
+    };
+  }
+  function simpanDraftSekarang(){
+    if(!draftSiap) return Promise.resolve(true);
+    var d = ambilDraft();
+    var kosong = !formSedangDiisi() && !d.kodeUnik.trim() && !d.catatan.trim();
+    return draftTx('readwrite', function(st){ return kosong ? st.delete('main') : st.put(d, 'main'); })
+      .then(function(){ return true; }, function(){ return false; });
+  }
+  function jadwalDraft(){ clearTimeout(draftTimer); draftTimer = setTimeout(simpanDraftSekarang, 500); }
+  function hapusDraft(){ clearTimeout(draftTimer); return draftTx('readwrite', function(st){ return st.delete('main'); }).catch(function(){}); }
+
+  function terapkanDraft(d){
+    function pilih(sel, cocok){ for(var i = 0; i < sel.options.length; i++){ if(cocok(sel.options[i])) return sel.options[i]; } return null; }
+    if(d.operator) operatorInput.value = d.operator;
+    if(d.mesin && machineByCode[d.mesin]){
+      var m = machineByCode[d.mesin];
+      mesinSel.value = d.mesin; mesinSel.dispatchEvent(new Event('change'));
+      if(d.alt === 'manual'){
+        altBox.style.display = 'block'; toggleAltBtn.textContent = 'Sembunyikan pilihan lain ▴';
+        altSel.value = 'manual'; altSel.dispatchEvent(new Event('change'));
+        document.getElementById('mKode').value = d.mKode || ''; document.getElementById('mBrand').value = d.mBrand || ''; document.getElementById('mSpek').value = d.mSpek || '';
+        if(d.bahan){ var cb = bahanWrap.querySelector('.chip[data-v="' + d.bahan + '"]'); if(cb) cb.click(); }
+      }else if(d.alt){
+        var ia = -1; for(var i = 0; i < ALL_TOOLS.length; i++){ if(kunciAlat(ALL_TOOLS[i]) === d.alt){ ia = i; break; } }
+        if(ia >= 0){
+          altBox.style.display = 'block'; toggleAltBtn.textContent = 'Sembunyikan pilihan lain ▴';
+          altSel.value = String(ia); altSel.dispatchEvent(new Event('change'));
+        }
+      }else if(d.alat){
+        var im = -1; for(var j = 0; j < m.tools.length; j++){ if(kunciAlat(m.tools[j]) === d.alat){ im = j; break; } }
+        if(im >= 0){ alatSel.value = String(im); alatSel.dispatchEvent(new Event('change')); }
+      }
+    }
+    if(d.qty) document.getElementById('fQty').value = d.qty;
+    if(d.kondisiChip){
+      var kc = pilih({ options: Array.prototype.slice.call(chipsWrap.querySelectorAll('.chip')) }, function(c){ return c.dataset.v === d.kondisiChip; });
+      if(kc){ kc.click(); if(d.kondisiChip === 'Lainnya'){ kondisiManualInput.value = d.kondisiManual || ''; kondisiManualInput.dispatchEvent(new Event('input')); } }
+    }
+    document.getElementById('fKodeUnik').value = d.kodeUnik || '';
+    document.getElementById('fCatatan').value = d.catatan || '';
+    if(d.foto instanceof Blob && d.foto.size > 2000){
+      fotoBlob = d.foto;
+      if(fotoUrl) URL.revokeObjectURL(fotoUrl);
+      fotoUrl = URL.createObjectURL(fotoBlob);
+      photoImg.onerror = function(){ photoImg.onerror = null; tolakFoto('Foto yang tersimpan tidak bisa dibuka. Ambil foto ulang.'); };
+      photoImg.src = fotoUrl;
+      photoPreview.style.display = 'block'; photoZoneRow.style.display = 'none';
+      photoCheck.style.display = 'block'; photoCheck.className = 'photo-check ok'; photoCheck.textContent = '✓ Foto dipulihkan';
+      fullWrap.style.display = 'flex'; fFull.checked = !!d.full;
+    }
+  }
+  function pulihkanDraft(){
+    return draftTx('readonly', function(st){ return st.get('main'); }).then(function(d){
+      if(!d || !d.t) return;
+      if(Date.now() - d.t > DRAFT_TTL || formSedangDiisi()){ if(Date.now() - d.t > DRAFT_TTL) hapusDraft(); return; }
+      terapkanDraft(d);
+      if(formSedangDiisi()) document.getElementById('draftNote').style.display = 'flex';
+    }).catch(function(){}).then(function(){ draftSiap = true; });
+  }
+  document.getElementById('draftBuang').addEventListener('click', function(){ kosongkanForm(); hapusDraft(); });
+  ['input','change','click'].forEach(function(ev){ document.getElementById('formView').addEventListener(ev, jadwalDraft); });
+  document.addEventListener('visibilitychange', function(){ if(document.hidden) simpanDraftSekarang(); });
+  window.addEventListener('pagehide', function(){ simpanDraftSekarang(); });
+  try{ if(localStorage.getItem('pa_guide_seen') === '1') document.getElementById('shotGuide').open = false; }catch(e){}
+  pulihkanDraft();
 
   /* ==== Tarik master data dari backend ====
      Halaman dibuka, kembali online, kembali ke layar, dan polling berkala.
@@ -1559,7 +1826,7 @@
           Jalur B jalan walau yang berubah cuma index.html (sw.js tidak disentuh).
      Reload ditunda bila operator sedang mengisi form / memegang foto, lalu
      dicoba lagi di cek berikutnya (dan otomatis setelah form dikirim/direset). */
-  var reloaded = false, updateMenunggu = false, hashAwal = null, cekBusy = false;
+  var reloaded = false, updateMenunggu = false, cekBusy = false;
   var updBanner = document.getElementById('updBanner'), updTxt = document.getElementById('updTxt'), updBtn = document.getElementById('updBtn');
   function bolehReload(){ return !fotoBlob && !formSedangDiisi(); }
   function tampilBanner(html, tombol){
@@ -1575,37 +1842,62 @@
       setTimeout(function(){ location.reload(); }, 1200);
     }else{
       updateMenunggu = true;
-      tampilBanner('<b>Versi baru tersedia.</b> Kirim / selesaikan form ini dulu, lalu ketuk <b>Muat ulang</b>. Form yang belum dikirim akan hilang.', true);
+      tampilBanner('<b>Versi baru tersedia.</b> Ketuk <b>Muat ulang</b> untuk memperbarui. Isian form Anda tersimpan otomatis.', true);
     }
   }
   updBtn.addEventListener('click', function(){
-    if(formSedangDiisi() && !confirm('Isian form yang belum dikirim akan hilang. Muat ulang sekarang?')) return;
-    reloaded = true; location.reload();
+    simpanDraftSekarang().then(function(ok){
+      if(!ok && formSedangDiisi() && !confirm('Isian form tidak bisa disimpan otomatis dan akan hilang. Muat ulang sekarang?')) return;
+      reloaded = true; location.reload();
+    });
   });
   // Setelah form dikirim / dikosongkan, update yang tertunda langsung dipasang
   setInterval(function(){ if(updateMenunggu && !reloaded && bolehReload()) reloadKalauAman(); }, 5000);
+  /* Sidik versi = hash isi <style id=paStyle> + <script id=paMain> + teks versi di footer.
+     Dibandingkan: halaman YANG SEDANG JALAN vs index.html di server. (Patokan BUKAN unduhan
+     pertama dari server: kalau halaman yang tampil sudah basi, patokan itu ikut basi dan update
+     tidak pernah terdeteksi.) Hanya elemen ber-id yang dihitung, jadi script/style sisipan
+     ekstensi browser tidak menimbulkan beda palsu. */
   function hashTeks(t){ var h = 5381, i = t.length; while(i) h = (h * 33) ^ t.charCodeAt(--i); return String(h >>> 0) + ':' + t.length; }
-  function ambilHashHalaman(){
+  function sidikDokumen(doc){
+    var st = doc.getElementById('paStyle'), sc = doc.getElementById('paMain'), v = doc.getElementById('verTag');
+    if(!st || !sc) return null;
+    return hashTeks(st.textContent + '\u0001' + sc.textContent + '\u0001' + (v ? v.textContent : ''));
+  }
+  var sidikJalan = sidikDokumen(document);
+  function ambilSidikServer(){
     return fetch('index.html', { cache: 'no-store' })
       .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
-      .then(hashTeks);
+      .then(function(t){ return sidikDokumen(new DOMParser().parseFromString(t, 'text/html')); });
   }
+  // Pengaman loop: kalau barusan reload karena beda versi tapi masih dianggap beda, jangan ulangi dalam 5 menit
+  function barusanReloadVersi(){ try{ return Date.now() - Number(sessionStorage.getItem('pa_ver_reload') || 0) < 5 * 60 * 1000; }catch(e){ return false; } }
   function cekVersiBaru(){
     if(cekBusy || reloaded || !navigator.onLine) return;
     if(updateMenunggu){ reloadKalauAman(); return; }
+    if(!sidikJalan || barusanReloadVersi()) return;
     cekBusy = true;
-    ambilHashHalaman().then(function(h){
-      if(hashAwal === null) hashAwal = h;
-      else if(h !== hashAwal) reloadKalauAman();
+    ambilSidikServer().then(function(h){
+      if(h && h !== sidikJalan){
+        try{ sessionStorage.setItem('pa_ver_reload', String(Date.now())); }catch(e){}
+        reloadKalauAman();
+      }
     }).catch(function(){}).then(function(){ cekBusy = false; });
   }
   window.addEventListener('load', function(){ cekVersiBaru(); });
   window.addEventListener('online', cekVersiBaru);
+  window.addEventListener('pageshow', function(e){ if(e.persisted) cekVersiBaru(); });   // dipulihkan dari bfcache
+  document.addEventListener('resume', cekVersiBaru);                                   // dibangunkan dari kondisi beku
+  window.addEventListener('focus', cekVersiBaru);
   document.addEventListener('visibilitychange', function(){ if(!document.hidden) cekVersiBaru(); });
   setInterval(function(){ if(!document.hidden) cekVersiBaru(); }, 4 * 60 * 1000);
 
   if('serviceWorker' in navigator){
     var hadCtl = !!navigator.serviceWorker.controller;
+    // Service Worker baru menanyakan "apakah halaman ini versi baru?" -- halaman lama tidak menjawab, lalu dimuat ulang oleh SW
+    navigator.serviceWorker.addEventListener('message', function(e){
+      if(e.data && e.data.type === 'pa-ping' && e.ports && e.ports[0]) e.ports[0].postMessage('pong');
+    });
     navigator.serviceWorker.addEventListener('controllerchange', function(){
       if(hadCtl) reloadKalauAman();
     });
