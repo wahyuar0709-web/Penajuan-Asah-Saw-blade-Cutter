@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#2a2a5e">
-<title>Pengajuan Asah — RDI Tools</title>
+<title>Pengajuan Asah: RDI Tools</title>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,7 +75,7 @@
   }
   .wrap{ width:100%; max-width:440px; }
   .card{
-    background:#fff; border-radius:30px; overflow:hidden;
+    background:#fff; border-radius:30px;
     box-shadow:0 30px 60px -20px rgba(0,0,0,.55);
   }
 
@@ -84,6 +84,7 @@
     position:relative; color:#fff; text-align:center;
     padding:34px 26px 78px;
     background:linear-gradient(165deg,#0a5ff0 0%,#149eff 58%,#2ad6ff 100%);
+    border-radius:30px 30px 0 0;
   }
   .logo{
     width:58px; height:58px; margin:0 auto 14px; border-radius:50%;
@@ -145,8 +146,9 @@
   .chip{
     padding:12px 18px; min-height:48px; border-radius:999px; border:1.5px solid var(--blue); background:transparent;
     font-family:'Poppins',sans-serif; font-size:14.5px; font-weight:500; color:var(--blue); cursor:pointer;
-    transition:background-color .12s,color .12s;
+    transition:background-color .12s,color .12s,transform .12s;
   }
+  .chip:active{ transform:scale(.96); }
   .chip.on{ background:var(--grad); border-color:transparent; color:#fff; font-weight:600; box-shadow:0 6px 14px -6px rgba(10,102,240,.7); }
   #fKondisiManual{ margin-top:8px; }
 
@@ -168,7 +170,9 @@
     flex:1; display:flex; align-items:center; justify-content:center; gap:7px;
     padding:15px 8px; min-height:52px; border-radius:999px; font-family:'Poppins',sans-serif;
     font-size:14.5px; font-weight:600; cursor:pointer;
+    transition:transform .1s ease;
   }
+  .photo-zone:active{ transform:scale(.97); }
   .photo-zone.main{ border:none; background:var(--grad); color:#fff; box-shadow:0 8px 16px -8px rgba(10,102,240,.8); }
   .photo-zone.alt{ border:1.5px solid var(--blue); background:transparent; color:var(--blue); }
   .photo-preview{ position:relative; margin-top:12px; }
@@ -189,6 +193,33 @@
   .confirm{ display:flex; gap:12px; align-items:flex-start; margin-top:10px; padding:6px 0; font-size:13.5px; line-height:1.5; color:var(--ink); cursor:pointer; }
   .confirm input{ width:26px; height:26px; margin:0; accent-color:var(--blue); flex:none; }
 
+  /* Progres: track di bawah sticky header, isi biru jadi hijau saat lengkap */
+  .prog{
+    position:sticky; top:0; z-index:6; margin:0 -24px 18px; padding:6px 24px 10px;
+    background:#fff; border-bottom:1px solid var(--line);
+  }
+  .prog-row{ display:flex; align-items:center; gap:12px; }
+  .prog-track{ flex:1; height:4px; border-radius:2px; background:var(--tint); overflow:hidden; }
+  .prog-bar{ height:100%; width:0; border-radius:2px; background:var(--blue); transition:width .25s ease; }
+  .prog-bar.full{ background:var(--ok); }
+  .prog-btn{ flex:none; max-width:60%; background:none; border:none; padding:4px 0;
+    font-family:'Poppins',sans-serif; font-size:11.5px; font-weight:600; line-height:1.35;
+    color:var(--ink-soft); cursor:pointer; text-align:right; }
+  .prog-btn:disabled{ color:var(--ok); cursor:default; }
+
+  /* Seksi form: penanda langkah 1-5 yang statusnya nyata (terisi / belum) */
+  .fsec{ padding-top:24px; scroll-margin-top:60px; }
+  .fsec:first-of-type{ padding-top:0; }
+  .fsec-head{ display:flex; align-items:center; gap:10px; margin-bottom:16px;
+    padding-bottom:10px; border-bottom:1px solid var(--line); }
+  .fsec-num{ width:26px; height:26px; border-radius:9px; background:var(--tint); color:var(--blue);
+    font-size:12.5px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:none;
+    transition:background-color .2s, color .2s; }
+  .fsec-title{ margin:0; font-size:14px; font-weight:700; color:var(--ink); }
+  .fsec-done{ display:none; margin-left:auto; color:var(--ok); flex:none; }
+  .fsec.done .fsec-done{ display:block; }
+  .fsec.done .fsec-num{ background:var(--ok-bg); color:var(--ok); }
+
   button.submit{
     width:100%; padding:15px; font-family:'Poppins',sans-serif; font-size:16px; font-weight:600; color:#fff;
     background:var(--grad); border:none; border-radius:999px; cursor:pointer; margin-top:4px;
@@ -206,7 +237,8 @@
 
   /* ---------- Kaki biru ---------- */
   .foot{ position:relative; margin-top:18px; padding:54px 24px 24px; text-align:center; color:#fff; font-size:12px; line-height:1.55;
-    background:linear-gradient(165deg,#0a5ff0 0%,#149eff 60%,#2ad6ff 100%); }
+    background:linear-gradient(165deg,#0a5ff0 0%,#149eff 60%,#2ad6ff 100%);
+    border-radius:0 0 30px 30px; }
   .foot .waves{ top:-1px; bottom:auto; height:60px; }
   .foot b{ font-weight:600; }
 
@@ -214,6 +246,7 @@
   .success{
     display:none; position:relative; text-align:center; color:#fff; min-height:520px;
     padding:56px 26px 110px; background:linear-gradient(165deg,#0a5ff0 0%,#149eff 58%,#2ad6ff 100%);
+    border-radius:30px; overflow:hidden;
   }
   .success .waves{ height:96px; bottom:-1px; }
   .success .waves.top{ top:auto; }
@@ -243,7 +276,7 @@
   .cfg-actions button{ flex:1; padding:11px; border-radius:999px; border:1.5px solid var(--blue); cursor:pointer; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; }
   .cfg-actions .save{ background:var(--grad); border-color:transparent; color:#fff; }
   .cfg-actions .close{ background:transparent; color:var(--blue); }
-  @media (prefers-reduced-motion:reduce){ .checkmark{ animation:none; } }
+  @media (prefers-reduced-motion:reduce){ .checkmark{ animation:none; } .prog-bar{ transition:none; } .chip:active, .photo-zone:active{ transform:none; } }
 
   /* ---------- Picker mesin & alat (pengganti dropdown bawaan) ---------- */
   .pk-native{ position:absolute!important; width:1px; height:1px; opacity:0; pointer-events:none; overflow:hidden; clip:rect(0 0 0 0); }
@@ -320,81 +353,119 @@
 
         <div class="sheet">
           <div class="ticket-meta">
-            <span>No. Tiket<b id="ticketNo">—</b></span>
-            <span>Tanggal<b id="ticketDate">—</b></span>
+            <span>No. Tiket<b id="ticketNo">…</b></span>
+            <span>Tanggal<b id="ticketDate">…</b></span>
           </div>
 
-          <div class="offline-flag" id="offlineFlag"><span class="dot"></span> Tidak ada koneksi — pengajuan akan disimpan &amp; dikirim otomatis nanti</div>
+          <div class="prog" id="progBar">
+            <div class="prog-row">
+              <div class="prog-track" aria-hidden="true"><div class="prog-bar" id="progFill"></div></div>
+              <button type="button" class="prog-btn" id="progBtn" aria-live="polite">Periksa pengisian…</button>
+            </div>
+          </div>
+
+          <div class="offline-flag" id="offlineFlag"><span class="dot"></span> Tidak ada koneksi: pengajuan akan disimpan &amp; dikirim otomatis nanti</div>
           <div class="sync-tag" id="syncTag" role="status"><i></i><span id="syncText"></span></div>
           <div class="draft-note" id="draftNote"><span>Isian terakhir Anda dipulihkan.</span><button type="button" class="link-btn" id="draftBuang">Mulai dari awal</button></div>
 
-          <div class="field">
-            <label for="fOperator">Nama pengaju / operator <span class="req">*</span></label>
-            <input type="text" id="fOperator" placeholder="Nama lengkap operator produksi" list="operatorList" autocomplete="off">
-            <datalist id="operatorList"></datalist>
-          </div>
+          <section class="fsec" id="secPengaju" aria-labelledby="hsecPengaju">
+            <header class="fsec-head">
+              <span class="fsec-num" aria-hidden="true">1</span>
+              <h2 class="fsec-title" id="hsecPengaju">Data pengaju</h2>
+              <svg class="fsec-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Sudah terisi"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            </header>
 
-          <div class="field">
-            <label for="fMesin">Mesin <span class="req">*</span></label>
-            <div class="mesin-row">
-              <select id="fMesin">
-                <option value="">— Pilih mesin —</option>
-              </select>
+            <div class="field">
+              <label for="fOperator">Nama pengaju / operator <span class="req">*</span></label>
+              <input type="text" id="fOperator" placeholder="Nama lengkap operator produksi" list="operatorList" autocomplete="off">
+              <datalist id="operatorList"></datalist>
             </div>
-            <div class="tool-preview" id="mesinHint">Mesin tidak ada di daftar? Hubungi gudang.</div>
-            <button type="button" class="link-btn" id="btnAddMesin" style="display:none">+ Tambah mesin baru (admin)</button>
-          </div>
+          </section>
 
-          <div class="field">
-            <label for="fAlat">Alat / spesifikasi <span class="req">*</span><span class="hint">brand &amp; ukuran</span></label>
-            <select id="fAlat" disabled>
-              <option value="">Pilih mesin dahulu…</option>
-            </select>
-            <div class="tool-preview" id="toolPreview"></div>
-            <button type="button" class="link-btn" id="toggleAlt">Alat tidak ada di daftar? Pilih ukuran lain ▾</button>
+          <section class="fsec" id="secAlat" aria-labelledby="hsecAlat">
+            <header class="fsec-head">
+              <span class="fsec-num" aria-hidden="true">2</span>
+              <h2 class="fsec-title" id="hsecAlat">Mesin dan alat</h2>
+              <svg class="fsec-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Sudah terisi"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            </header>
 
-            <div class="alt-box" id="altBox" style="display:none">
-              <select id="fAlatAlt">
-                <option value="">— Cari dari semua alat / semua mesin —</option>
+            <div class="field">
+              <label for="fMesin">Mesin <span class="req">*</span></label>
+              <div class="mesin-row">
+                <select id="fMesin">
+                  <option value="">Pilih mesin</option>
+                </select>
+              </div>
+              <div class="tool-preview" id="mesinHint">Mesin tidak ada di daftar? Hubungi gudang.</div>
+              <button type="button" class="link-btn" id="btnAddMesin" style="display:none">+ Tambah mesin baru (admin)</button>
+            </div>
+
+            <div class="field">
+              <label for="fAlat">Alat / spesifikasi <span class="req">*</span><span class="hint">brand &amp; ukuran</span></label>
+              <select id="fAlat" disabled>
+                <option value="">Pilih mesin dahulu…</option>
               </select>
-              <div class="manual-grid" id="manualGrid" style="display:none">
-                <input type="text" id="mKode" placeholder="Kode alat, mis. XYZ-SB-01">
-                <input type="text" id="mBrand" placeholder="Brand / merk">
-                <input type="text" id="mSpek" placeholder="Spesifikasi / ukuran">
-                <div class="tool-preview" style="margin:4px 0 0">Jenis bahan <span class="req" style="color:var(--warn)">*</span></div>
-                <div class="chips" id="bahanChips" role="radiogroup" aria-label="Jenis bahan mata pisau" style="margin-top:2px">
-                  <button type="button" class="chip" role="radio" aria-checked="false" data-v="TCT">TCT</button>
-                  <button type="button" class="chip" role="radio" aria-checked="false" data-v="PCD">PCD</button>
+              <div class="tool-preview" id="toolPreview"></div>
+              <button type="button" class="link-btn" id="toggleAlt">Alat tidak ada di daftar? Pilih ukuran lain ▾</button>
+
+              <div class="alt-box" id="altBox" style="display:none">
+                <select id="fAlatAlt">
+                  <option value="">Cari dari semua alat / semua mesin</option>
+                </select>
+                <div class="manual-grid" id="manualGrid" style="display:none">
+                  <input type="text" id="mKode" placeholder="Kode alat, mis. XYZ-SB-01">
+                  <input type="text" id="mBrand" placeholder="Brand / merk">
+                  <input type="text" id="mSpek" placeholder="Spesifikasi / ukuran">
+                  <div class="tool-preview" style="margin:4px 0 0">Jenis bahan <span class="req" style="color:var(--warn)">*</span></div>
+                  <div class="chips" id="bahanChips" role="radiogroup" aria-label="Jenis bahan mata pisau" style="margin-top:2px">
+                    <button type="button" class="chip" role="radio" aria-checked="false" data-v="TCT">TCT</button>
+                    <button type="button" class="chip" role="radio" aria-checked="false" data-v="PCD">PCD</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          <div class="field">
-            <label>Jumlah (qty) <span class="req">*</span></label>
-            <div class="qty-row">
-              <div class="stepper">
-                <button type="button" id="qtyMinus" aria-label="Kurangi">−</button>
-                <input type="text" id="fQty" value="1" inputmode="numeric" aria-label="Jumlah">
-                <button type="button" id="qtyPlus" aria-label="Tambah">+</button>
+          <section class="fsec" id="secQty" aria-labelledby="hsecQty">
+            <header class="fsec-head">
+              <span class="fsec-num" aria-hidden="true">3</span>
+              <h2 class="fsec-title" id="hsecQty">Jumlah dan kondisi</h2>
+              <svg class="fsec-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Sudah terisi"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            </header>
+
+            <div class="field">
+              <label>Jumlah (qty) <span class="req">*</span></label>
+              <div class="qty-row">
+                <div class="stepper">
+                  <button type="button" id="qtyMinus" aria-label="Kurangi">−</button>
+                  <input type="text" id="fQty" value="1" inputmode="numeric" aria-label="Jumlah">
+                  <button type="button" id="qtyPlus" aria-label="Tambah">+</button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="field">
-            <label>Kondisi alat <span class="req">*</span></label>
-            <div class="chips" id="kondisiChips">
-              <button type="button" class="chip" data-v="Tumpul">Tumpul</button>
-              <button type="button" class="chip" data-v="Gompal">Gompal</button>
-              <button type="button" class="chip" data-v="Patah">Patah</button>
-              <button type="button" class="chip" data-v="Aus / Gundul">Aus / Gundul</button>
-              <button type="button" class="chip" data-v="Lainnya">Lainnya</button>
+            <div class="field">
+              <label>Kondisi alat <span class="req">*</span></label>
+              <div class="chips" id="kondisiChips">
+                <button type="button" class="chip" data-v="Tumpul">Tumpul</button>
+                <button type="button" class="chip" data-v="Gompal">Gompal</button>
+                <button type="button" class="chip" data-v="Patah">Patah</button>
+                <button type="button" class="chip" data-v="Aus / Gundul">Aus / Gundul</button>
+                <button type="button" class="chip" data-v="Lainnya">Lainnya</button>
+              </div>
+              <input type="text" id="fKondisiManual" placeholder="Tulis kondisi alat…" style="display:none">
             </div>
-            <input type="text" id="fKondisiManual" placeholder="Tulis kondisi alat…" style="display:none">
-          </div>
+          </section>
 
-          <div class="field">
-            <label>Foto seluruh alat <span class="req">*</span></label>
+          <section class="fsec" id="secFoto" aria-labelledby="hsecFoto">
+            <header class="fsec-head">
+              <span class="fsec-num" aria-hidden="true">4</span>
+              <h2 class="fsec-title" id="hsecFoto">Foto alat</h2>
+              <svg class="fsec-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Sudah terisi"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            </header>
+
+            <div class="field">
+              <label>Foto seluruh alat <span class="req">*</span></label>
             <details class="shot-guide" id="shotGuide" open>
               <summary>Cara foto yang benar</summary>
               <div class="shot-demo">
@@ -446,20 +517,29 @@
               <input type="checkbox" id="fFull">
               <span>Saya sudah memeriksa: seluruh alat terlihat dari tepi ke tepi dan tidak ada bagian yang terpotong.</span>
             </label>
-          </div>
+            </div>
+          </section>
 
-          <div class="field">
-            <label for="fKodeUnik">Kode unik alat <span class="req">*</span><span class="hint">tertera di alat, biasanya di bawah ukuran</span></label>
-            <input type="text" id="fKodeUnik" placeholder="Contoh: 4521-0387" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40">
-          </div>
+          <section class="fsec" id="secCatatan" aria-labelledby="hsecCatatan">
+            <header class="fsec-head">
+              <span class="fsec-num" aria-hidden="true">5</span>
+              <h2 class="fsec-title" id="hsecCatatan">Kode unik dan catatan</h2>
+              <svg class="fsec-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Sudah terisi"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            </header>
 
-          <div class="field" style="margin-bottom:22px">
-            <label for="fCatatan">Keterangan kerusakan <span class="hint">opsional</span></label>
-            <textarea id="fCatatan" placeholder="Contoh: Gigi pecah 2 buah di sisi kiri" maxlength="400"></textarea>
-          </div>
+            <div class="field">
+              <label for="fKodeUnik">Kode unik alat <span class="req">*</span><span class="hint">tertera di alat, biasanya di bawah ukuran</span></label>
+              <input type="text" id="fKodeUnik" placeholder="Contoh: 4521-0387" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40">
+            </div>
 
-          <div class="errbox" id="errBox" role="alert"></div>
-          <button class="submit" id="btnSubmit">Ajukan Asah</button>
+            <div class="field" style="margin-bottom:22px">
+              <label for="fCatatan">Keterangan kerusakan <span class="hint">opsional</span></label>
+              <textarea id="fCatatan" placeholder="Contoh: Gigi pecah 2 buah di sisi kiri" maxlength="400"></textarea>
+            </div>
+
+            <div class="errbox" id="errBox" role="alert"></div>
+            <button class="submit" id="btnSubmit">Ajukan Asah</button>
+          </section>
         </div>
 
         <details class="hist-box" id="histBox" style="display:none"><summary>Pengajuan saya (5 terakhir di HP ini)</summary><ul id="histList"></ul></details>
@@ -468,7 +548,7 @@
           <svg class="waves" viewBox="0 0 440 60" preserveAspectRatio="none" aria-hidden="true">
             <path d="M0 0 H440 V26 C360 6 300 4 230 26 S80 52 0 26 Z" fill="#fff"/>
           </svg>
-          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span id="verTag" style="opacity:.7;font-size:11px">Versi 17 · 5 Nov 2026</span>
+          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span id="verTag" style="opacity:.7;font-size:11px">Versi 18 · 6 Nov 2026</span>
         </div>
       </div>
 
@@ -477,7 +557,7 @@
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0a66f0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
         </div>
         <h2>Diterima</h2>
-        <div class="tnum">No. Tiket<b id="doneTicket">—</b></div>
+        <div class="tnum">No. Tiket<b id="doneTicket">…</b></div>
         <p id="doneDetail">Pengajuan asah telah tercatat. Gudang akan mengonfirmasi &amp; menjadwalkan pengiriman ke vendor.</p>
         <div class="next-step" id="nextStep"></div>
         <div class="actions">
@@ -510,7 +590,7 @@
   <div class="cfg-modal" id="mesinModal">
     <div class="cfg-box">
       <h3>Tambah mesin baru</h3>
-      <p>Mesin ini tersimpan di perangkat ini dan langsung bisa dipilih. Alat untuk mesin baru belum terdaftar otomatis — gunakan "Pilih ukuran lain" untuk cari alat dari mesin lain, atau isi manual.</p>
+      <p>Mesin ini tersimpan di perangkat ini dan langsung bisa dipilih. Alat untuk mesin baru belum terdaftar otomatis. Gunakan "Pilih ukuran lain" untuk cari alat dari mesin lain, atau isi manual.</p>
       <input type="text" id="newMesinCode" placeholder="Kode mesin, mis. RDS050" style="width:100%">
       <input type="text" id="newMesinName" placeholder="Nama proses / mesin, mis. Rip Saw" style="width:100%">
       <div class="cfg-actions">
@@ -654,7 +734,7 @@
     DATA.machines.forEach(function(m){
       var opt = document.createElement('option');
       opt.value = m.code;
-      opt.textContent = m.code + ' — ' + m.name;
+      opt.textContent = m.code + ' · ' + m.name;
       opt.dataset.code = m.code; opt.dataset.name = m.name;
       groupBawaan.appendChild(opt);
     });
@@ -669,7 +749,7 @@
       machineByCode[m.code] = m;
       var opt = document.createElement('option');
       opt.value = m.code;
-      opt.textContent = m.code + ' — ' + m.name + ' (baru)';
+      opt.textContent = m.code + ' · ' + m.name + ' (baru)';
       opt.dataset.code = m.code; opt.dataset.name = m.name; opt.dataset.baru = '1';
       groupCustom.appendChild(opt);
     });
@@ -681,7 +761,7 @@
     ALL_TOOLS = [];
     DATA.machines.forEach(function(m){
       m.tools.forEach(function(t){
-        ALL_TOOLS.push({ kode:t.kode, brand:t.brand, spek:t.spek, bahan:t.bahan||'', mesin:m.code+' — '+m.name });
+        ALL_TOOLS.push({ kode:t.kode, brand:t.brand, spek:t.spek, bahan:t.bahan||'', mesin:m.code+' · '+m.name });
       });
     });
     ALL_TOOLS.sort(function(a,b){ return a.kode.localeCompare(b.kode); });
@@ -876,7 +956,7 @@
       return;
     }
     alatSel.disabled = false;
-    var o0 = document.createElement('option'); o0.value=''; o0.textContent='— Pilih alat —'; alatSel.appendChild(o0);
+    var o0 = document.createElement('option'); o0.value=''; o0.textContent='Pilih alat'; alatSel.appendChild(o0);
     if(!m.tools.length){
       var oEmpty = document.createElement('option'); oEmpty.value=''; oEmpty.disabled=true;
       oEmpty.textContent = 'Belum ada alat terdaftar untuk mesin ini';
@@ -895,7 +975,7 @@
     var m = machineByCode[mesinSel.value];
     if(!m || alatSel.value===''){ toolPreview.innerHTML=''; return; }
     var t = m.tools[alatSel.value];
-    toolPreview.innerHTML = '<b>'+t.kode+'</b> — '+t.nama+' &middot; '+(t.bahan ? '<b>'+t.bahan+'</b> &middot; ' : '')+t.spek;
+    toolPreview.innerHTML = '<b>'+t.kode+'</b> · '+t.nama+' &middot; '+(t.bahan ? '<b>'+t.bahan+'</b> &middot; ' : '')+t.spek;
     altSel.value = ''; toggleManualGrid(false);
   });
 
@@ -985,10 +1065,12 @@
   var chipsWrap = document.getElementById('kondisiChips');
   var kondisiManualInput = document.getElementById('fKondisiManual');
   var kondisi = '';
+  function getar(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
   chipsWrap.addEventListener('click', function(e){
     var btn = e.target.closest('.chip'); if(!btn) return;
     chipsWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
     btn.classList.add('on');
+    getar(5);
     if(btn.dataset.v === 'Lainnya'){
       kondisiManualInput.style.display = 'block';
       kondisiManualInput.focus();
@@ -997,6 +1079,7 @@
       kondisiManualInput.style.display = 'none';
       kondisi = btn.dataset.v;
     }
+    updateProgress();
   });
   kondisiManualInput.addEventListener('input', function(){ kondisi = kondisiManualInput.value.trim(); });
 
@@ -1051,6 +1134,7 @@
     photoCheck.style.display = 'block';
     photoCheck.className = 'photo-check bad';
     photoCheck.textContent = '✗ ' + msg;
+    updateProgress();
   }
 
   /* ==== Lokasi GPS + alamat (reverse geocode) + arah kompas, gaya "GPS Map Camera" ==== */
@@ -1299,7 +1383,9 @@
           photoCheck.className = 'photo-check ok';
           photoCheck.textContent = v.msg;
           fullWrap.style.display = 'flex';
+          getar(15);
           jadwalDraft();
+          updateProgress();
         }, 'image/jpeg', 0.65);
       });
     }).catch(function(){
@@ -1323,6 +1409,7 @@
     photoCheck.style.display = 'none';
     resetKonfirmasi();
     lastLocation = null;
+    updateProgress();
   });
 
 
@@ -1442,8 +1529,8 @@
       q = q.filter(function(x){ return !x.failed; });
       offlineFlag.style.display = (!navigator.onLine || q.length || nFail) ? 'flex' : 'none';
       offlineFlag.querySelector('.dot').nextSibling.textContent =
-        !navigator.onLine ? ' Tidak ada koneksi — pengajuan akan disimpan & dikirim otomatis nanti'
-        : (q.length ? ' '+q.length+' pengajuan menunggu dikirim…' : '') + (nFail ? ' '+nFail+' pengajuan DITOLAK server — hubungi gudang' : '');
+        !navigator.onLine ? ' Tidak ada koneksi: pengajuan akan disimpan & dikirim otomatis nanti'
+        : (q.length ? ' '+q.length+' pengajuan menunggu dikirim…' : '') + (nFail ? ' '+nFail+' pengajuan DITOLAK server. Hubungi gudang' : '');
     });
   }
   function blobToB64(b){
@@ -1527,6 +1614,8 @@
     c.addEventListener('click', function(){
       bahanWrap.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); x.setAttribute('aria-checked','false'); });
       c.classList.add('on'); c.setAttribute('aria-checked','true'); bahan = c.getAttribute('data-v');
+      getar(5);
+      updateProgress();
     });
   });
 
@@ -1572,7 +1661,7 @@
       ticket: currentTicket,
       tanggalPengajuan: fmtDate(new Date()),
       namaPengaju: operator,
-      mesin: mesinCode + ' — ' + m.name,
+      mesin: mesinCode + ' · ' + m.name,
       kodeMesin: mesinCode,
       kodeAlat: tool.kode,
       manual: altSel.value === 'manual',
@@ -1655,7 +1744,7 @@
     document.getElementById('successView').style.display = 'block';
     document.getElementById('doneTicket').textContent = payload.ticket;
     document.getElementById('doneDetail').textContent = queued
-      ? 'Belum ada koneksi ke server — pengajuan tersimpan di perangkat ini dan akan terkirim otomatis begitu online kembali.'
+      ? 'Belum ada koneksi ke server: pengajuan tersimpan di perangkat ini dan akan terkirim otomatis begitu online kembali.'
       : 'Pengajuan asah untuk ' + payload.spesifikasi + ' (' + payload.qty + ' unit) telah tercatat. Gudang akan verifikasi & menjadwalkan pengiriman ke vendor.';
     document.getElementById('nextStep').textContent = LANGKAH_BERIKUT;
     catatRiwayat(payload);
@@ -1692,7 +1781,56 @@
     resetKonfirmasi();
     clearError(); clearFieldErrors();
     document.getElementById('draftNote').style.display = 'none';
+    updateProgress();
   }
+
+  /* ==== Progres pengisian: 5 seksi, status nyata per seksi ====
+     Bar biru jadi hijau begitu semua bagian wajib lengkap. Label "Kurang:"
+     bisa ditap untuk lompat ke seksi yang belum terisi. Done-check tiap
+     seksi mengikuti aturan validasi submit (mis. kode unik min. 3 karakter). */
+  var SEKSI = [
+    { id:'secPengaju', label:'Data pengaju', focus:'fOperator',
+      done:function(){ return (document.getElementById('fOperator').value || '').trim().length >= 2; } },
+    { id:'secAlat', label:'Mesin dan alat', focus:'fMesin',
+      done:function(){ return resolveTool() != null; } },
+    { id:'secQty', label:'Jumlah dan kondisi', focus:null,
+      done:function(){ return !!kondisi; } },
+    { id:'secFoto', label:'Foto alat', focus:'photoZoneBtnKamera',
+      done:function(){ return !!fotoBlob && !!fotoBlob.size && fFull.checked; } },
+    { id:'secCatatan', label:'Kode unik alat', focus:'fKodeUnik',
+      done:function(){ return (document.getElementById('fKodeUnik').value || '').trim().length >= 3; } }
+  ];
+  var progFill = document.getElementById('progFill');
+  var progBtn = document.getElementById('progBtn');
+  var seksiKurang = null;
+  function updateProgress(){
+    var n = 0, pertama = null;
+    SEKSI.forEach(function(s){
+      var el = document.getElementById(s.id), ok = false;
+      try{ ok = !!s.done(); }catch(e){ ok = false; }
+      el.classList.toggle('done', ok);
+      if(ok){ n++; } else if(!pertama){ pertama = s; }
+    });
+    seksiKurang = pertama;
+    progFill.style.width = Math.round(n / SEKSI.length * 100) + '%';
+    progFill.classList.toggle('full', n === SEKSI.length);
+    if(n === SEKSI.length){
+      progBtn.disabled = true;
+      progBtn.textContent = 'Semua bagian terisi, tap Ajukan Asah';
+    }else{
+      progBtn.disabled = false;
+      progBtn.textContent = 'Kurang: ' + pertama.label + ' (tap untuk isi)';
+    }
+  }
+  progBtn.addEventListener('click', function(){
+    if(!seksiKurang) return;
+    document.getElementById(seksiKurang.id).scrollIntoView({ behavior:'smooth', block:'start' });
+    var f = seksiKurang.focus ? document.getElementById(seksiKurang.focus) : null;
+    if(f) setTimeout(function(){ f.focus(); }, 400);
+  });
+  var formViewEl = document.getElementById('formView');
+  formViewEl.addEventListener('input', updateProgress);
+  formViewEl.addEventListener('change', updateProgress);
 
   /* ==== Draft otomatis ====================================================
      Isian (termasuk foto) disimpan ke IndexedDB 'pa_draft' (terpisah dari antrian
@@ -1722,7 +1860,7 @@
       });
     });
   }
-  function kunciAlat(t){ return t ? (t.kode + '|' + t.spek) : ''; }
+  function kunciAlat(t){ return t ? (t.kode + '|' + t.spek).toUpperCase() : ''; }
   function ambilDraft(){
     var m = machineByCode[mesinSel.value], onChip = chipsWrap.querySelector('.chip.on');
     return {
@@ -1764,13 +1902,13 @@
         document.getElementById('mKode').value = d.mKode || ''; document.getElementById('mBrand').value = d.mBrand || ''; document.getElementById('mSpek').value = d.mSpek || '';
         if(d.bahan){ var cb = bahanWrap.querySelector('.chip[data-v="' + d.bahan + '"]'); if(cb) cb.click(); }
       }else if(d.alt){
-        var ia = -1; for(var i = 0; i < ALL_TOOLS.length; i++){ if(kunciAlat(ALL_TOOLS[i]) === d.alt){ ia = i; break; } }
+        var ia = -1; for(var i = 0; i < ALL_TOOLS.length; i++){ if(kunciAlat(ALL_TOOLS[i]) === d.alt.toUpperCase()){ ia = i; break; } }
         if(ia >= 0){
           altBox.style.display = 'block'; toggleAltBtn.textContent = 'Sembunyikan pilihan lain ▴';
           altSel.value = String(ia); altSel.dispatchEvent(new Event('change'));
         }
       }else if(d.alat){
-        var im = -1; for(var j = 0; j < m.tools.length; j++){ if(kunciAlat(m.tools[j]) === d.alat){ im = j; break; } }
+        var im = -1; for(var j = 0; j < m.tools.length; j++){ if(kunciAlat(m.tools[j]) === d.alat.toUpperCase()){ im = j; break; } }
         if(im >= 0){ alatSel.value = String(im); alatSel.dispatchEvent(new Event('change')); }
       }
     }
@@ -1797,6 +1935,7 @@
       if(!d || !d.t) return;
       if(Date.now() - d.t > DRAFT_TTL || formSedangDiisi()){ if(Date.now() - d.t > DRAFT_TTL) hapusDraft(); return; }
       terapkanDraft(d);
+      updateProgress();
       if(formSedangDiisi()) document.getElementById('draftNote').style.display = 'flex';
     }).catch(function(){}).then(function(){ draftSiap = true; });
   }
@@ -1806,6 +1945,7 @@
   window.addEventListener('pagehide', function(){ simpanDraftSekarang(); });
   try{ if(localStorage.getItem('pa_guide_seen') === '1') document.getElementById('shotGuide').open = false; }catch(e){}
   pulihkanDraft();
+  updateProgress();
 
   /* ==== Tarik master data dari backend ====
      Halaman dibuka, kembali online, kembali ke layar, dan polling berkala.

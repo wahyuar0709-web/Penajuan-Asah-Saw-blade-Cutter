@@ -1,7 +1,7 @@
 // Service Worker: halaman tetap bisa dibuka offline. POST (kirim data) tidak pernah di-cache.
 // Strategi: NETWORK-FIRST untuk semua file milik app (index.html, manifest, icon, dst) -> update
 // otomatis tanpa hapus cache. Cache hanya dipakai saat offline. Font: cache-first (jarang berubah).
-var V = 'pa-v17';
+var V = 'pa-v18';
 var SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', function (e) {
