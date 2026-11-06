@@ -368,23 +368,15 @@
           <div class="sync-tag" id="syncTag" role="status"><i></i><span id="syncText"></span></div>
           <div class="draft-note" id="draftNote"><span>Isian terakhir Anda dipulihkan.</span><button type="button" class="link-btn" id="draftBuang">Mulai dari awal</button></div>
 
-          <section class="fsec" id="secPengaju" aria-labelledby="hsecPengaju">
-            <header class="fsec-head">
-              <span class="fsec-num" aria-hidden="true">1</span>
-              <h2 class="fsec-title" id="hsecPengaju">Data pengaju</h2>
-              <svg class="fsec-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Sudah terisi"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
-            </header>
-
-            <div class="field">
-              <label for="fOperator">Nama pengaju / operator <span class="req">*</span></label>
-              <input type="text" id="fOperator" placeholder="Nama lengkap operator produksi" list="operatorList" autocomplete="off">
-              <datalist id="operatorList"></datalist>
-            </div>
-          </section>
+          <div class="field">
+            <label for="fOperator">Nama pengaju <span class="req">*</span><span class="hint">terisi dari pengajuan terakhir</span></label>
+            <input type="text" id="fOperator" placeholder="Nama lengkap operator produksi" list="operatorList" autocomplete="off">
+            <datalist id="operatorList"></datalist>
+          </div>
 
           <section class="fsec" id="secAlat" aria-labelledby="hsecAlat">
             <header class="fsec-head">
-              <span class="fsec-num" aria-hidden="true">2</span>
+              <span class="fsec-num" aria-hidden="true">1</span>
               <h2 class="fsec-title" id="hsecAlat">Mesin dan alat</h2>
               <svg class="fsec-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Sudah terisi"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
             </header>
@@ -428,7 +420,7 @@
 
           <section class="fsec" id="secQty" aria-labelledby="hsecQty">
             <header class="fsec-head">
-              <span class="fsec-num" aria-hidden="true">3</span>
+              <span class="fsec-num" aria-hidden="true">2</span>
               <h2 class="fsec-title" id="hsecQty">Jumlah dan kondisi</h2>
               <svg class="fsec-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Sudah terisi"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
             </header>
@@ -459,7 +451,7 @@
 
           <section class="fsec" id="secFoto" aria-labelledby="hsecFoto">
             <header class="fsec-head">
-              <span class="fsec-num" aria-hidden="true">4</span>
+              <span class="fsec-num" aria-hidden="true">3</span>
               <h2 class="fsec-title" id="hsecFoto">Foto alat</h2>
               <svg class="fsec-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Sudah terisi"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
             </header>
@@ -522,7 +514,7 @@
 
           <section class="fsec" id="secCatatan" aria-labelledby="hsecCatatan">
             <header class="fsec-head">
-              <span class="fsec-num" aria-hidden="true">5</span>
+              <span class="fsec-num" aria-hidden="true">4</span>
               <h2 class="fsec-title" id="hsecCatatan">Kode unik dan catatan</h2>
               <svg class="fsec-done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Sudah terisi"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
             </header>
@@ -548,7 +540,7 @@
           <svg class="waves" viewBox="0 0 440 60" preserveAspectRatio="none" aria-hidden="true">
             <path d="M0 0 H440 V26 C360 6 300 4 230 26 S80 52 0 26 Z" fill="#fff"/>
           </svg>
-          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span id="verTag" style="opacity:.7;font-size:11px">Versi 18 · 6 Nov 2026</span>
+          Data langsung tercatat ke sheet <b>Pengajuan Asah</b> gudang.<br>Gudang akan verifikasi &amp; teruskan ke vendor sesuai antrian.<br><span id="verTag" style="opacity:.7;font-size:11px">Versi 19 · 6 Nov 2026</span>
         </div>
       </div>
 
@@ -1784,13 +1776,12 @@
     updateProgress();
   }
 
-  /* ==== Progres pengisian: 5 seksi, status nyata per seksi ====
-     Bar biru jadi hijau begitu semua bagian wajib lengkap. Label "Kurang:"
-     bisa ditap untuk lompat ke seksi yang belum terisi. Done-check tiap
-     seksi mengikuti aturan validasi submit (mis. kode unik min. 3 karakter). */
+  /* ==== Progres pengisian: 4 seksi bernomor, status nyata per seksi ====
+     Nama pengaju berada di luar seksi karena sudah terisi otomatis dari
+     pengajuan terakhir. Bar biru jadi hijau begitu semua wajib lengkap.
+     Label "Kurang:" bisa ditap untuk lompat ke seksi yang belum terisi.
+     Done-check tiap seksi mengikuti aturan validasi submit. */
   var SEKSI = [
-    { id:'secPengaju', label:'Data pengaju', focus:'fOperator',
-      done:function(){ return (document.getElementById('fOperator').value || '').trim().length >= 2; } },
     { id:'secAlat', label:'Mesin dan alat', focus:'fMesin',
       done:function(){ return resolveTool() != null; } },
     { id:'secQty', label:'Jumlah dan kondisi', focus:null,
